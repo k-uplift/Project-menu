@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 실행 방법
+##  실행 방법
 
 ```bash
 npm install
@@ -17,10 +17,10 @@ Expo Go 앱으로 QR을 스캔하거나, `i` (iOS) / `a` (Android) 키로 실행
 
 ---
 
-## 📁 프로젝트 구조
+##  프로젝트 구조
 
 ```
-menu-app/
+menu-app/ 
 ├── App.js                       # 진입점 + 네비게이션 (Home → Keyword → Recommend → Restaurant)
 │
 ├── screens/                     # 화면 단위 컴포넌트
@@ -38,7 +38,7 @@ menu-app/
 │   ├── RestaurantCard.js        # 음식점 카드
 │   └── LoadingOverlay.js        # 분석 중 로딩 화면
 │
-├── services/                    # ⭐ API 연결 진입점 (mock → real)
+├── services/                    # API 연결 진입점 (mock → real)
 │   ├── keywordService.js        # analyzeKeywords(text)         → LLM 연결 예정
 │   ├── recommendationService.js # getFoodRecommendations(...)   → CF 엔진 연결 예정
 │   └── restaurantService.js     # getRestaurantsByFood(foodId)  → DB/Map API 연결 예정
@@ -57,7 +57,7 @@ menu-app/
 
 ---
 
-## 🎓 교수님 피드백 반영
+## 교수님 피드백 반영
 
 ### 1. 핵심 흐름이 명확하게 보이도록
 - 모든 화면 상단에 **StepIndicator** (4단계 진행 표시) 노출
@@ -65,9 +65,9 @@ menu-app/
 
 ### 2. CF의 역할이 추천 이유에 드러나도록
 - `FoodCard` 컴포넌트의 추천 이유를 **3종으로 명시 분리**:
-  1. 🎯 **감성 매칭** — 어떤 키워드가 일치했는지
-  2. 👥 **유사 사용자** — 협업 필터링 결과 (강조 표시)
-  3. 🌧️ **지금 상황** — 컨텍스트 (날씨/시간)
+  1.  **감성 매칭** — 어떤 키워드가 일치했는지
+  2.  **유사 사용자** — 협업 필터링 결과 (강조 표시)
+  3.  **지금 상황** — 컨텍스트 (날씨/시간)
 - `RecommendScreen` 에 **"기본 추천 vs 나를 위한 추천(CF)" 탭** 으로 비교 가능
 - `RestaurantScreen` 에 거리순 vs 취향 맞춤(CF) 정렬 + CF 일치도 시각화
 
@@ -132,7 +132,7 @@ export async function getRestaurantsByFood(foodId, { sort }) {
 
 ---
 
-## 🎨 디자인 시스템
+## 디자인 시스템
 
 데모의 따뜻한 다크 테마(주황 액센트)를 그대로 유지하면서, 모든 색상/간격/폰트를 `constants/theme.js` 에서 토큰으로 관리합니다.
 
@@ -145,7 +145,7 @@ export async function getRestaurantsByFood(foodId, { sort }) {
 
 ---
 
-## 🎯 발표 시연 시나리오 (추천)
+##  발표 시연 시나리오 (추천)
 
 1. **입력**: "비 오는 날 혼자 먹을 따뜻한 것" 타이핑
 2. **키워드**: AI가 추출한 `#따뜻한 #국물있는` 등을 보여주고, 한두 개 토글하거나 추가
