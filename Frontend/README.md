@@ -81,9 +81,7 @@ menu-app/
 - 키워드 객체에 `source: 'llm' | 'user'` 플래그 → 출처 추적 가능
 - 추천 키워드 풀(`SUGGESTED_KEYWORDS`)은 단순 UI 도우미일 뿐, 추천 로직과 분리
 
----
-
-## 🔌 API 연결 가이드 (mock → real)
+--API 연결 가이드 (mock → real)
 
 services 폴더의 함수는 **시그니처만 유지**하고 내부만 교체하면 됩니다.
 
