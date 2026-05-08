@@ -6,7 +6,7 @@
 
 ---
 
-## 🚀 실행 방법
+##  실행 방법
 
 ```bash
 npm install
@@ -17,10 +17,10 @@ Expo Go 앱으로 QR을 스캔하거나, `i` (iOS) / `a` (Android) 키로 실행
 
 ---
 
-## 📁 프로젝트 구조
+##  프로젝트 구조
 
 ```
-menu-app/
+menu-app/ 
 ├── App.js                       # 진입점 + 네비게이션 (Home → Keyword → Recommend → Restaurant)
 │
 ├── screens/                     # 화면 단위 컴포넌트
@@ -38,7 +38,7 @@ menu-app/
 │   ├── RestaurantCard.js        # 음식점 카드
 │   └── LoadingOverlay.js        # 분석 중 로딩 화면
 │
-├── services/                    # ⭐ API 연결 진입점 (mock → real)
+├── services/                    # API 연결 진입점 (mock → real)
 │   ├── keywordService.js        # analyzeKeywords(text)         → LLM 연결 예정
 │   ├── recommendationService.js # getFoodRecommendations(...)   → CF 엔진 연결 예정
 │   └── restaurantService.js     # getRestaurantsByFood(foodId)  → DB/Map API 연결 예정
@@ -57,7 +57,7 @@ menu-app/
 
 ---
 
-## 🎓 교수님 피드백 반영
+## 교수님 피드백 반영
 
 ### 1. 핵심 흐름이 명확하게 보이도록
 - 모든 화면 상단에 **StepIndicator** (4단계 진행 표시) 노출
@@ -65,9 +65,9 @@ menu-app/
 
 ### 2. CF의 역할이 추천 이유에 드러나도록
 - `FoodCard` 컴포넌트의 추천 이유를 **3종으로 명시 분리**:
-  1. 🎯 **감성 매칭** — 어떤 키워드가 일치했는지
-  2. 👥 **유사 사용자** — 협업 필터링 결과 (강조 표시)
-  3. 🌧️ **지금 상황** — 컨텍스트 (날씨/시간)
+  1.  **감성 매칭** — 어떤 키워드가 일치했는지
+  2.  **유사 사용자** — 협업 필터링 결과 (강조 표시)
+  3.  **지금 상황** — 컨텍스트 (날씨/시간)
 - `RecommendScreen` 에 **"기본 추천 vs 나를 위한 추천(CF)" 탭** 으로 비교 가능
 - `RestaurantScreen` 에 거리순 vs 취향 맞춤(CF) 정렬 + CF 일치도 시각화
 
@@ -91,48 +91,69 @@ services 폴더의 함수는 **시그니처만 유지**하고 내부만 교체�
 
 ```js
 export async function analyzeKeywords(text) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://백엔드주소/analyze-keywords', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4',
-      max_tokens: 200,
-      messages: [{ role: 'user', content: PROMPT_TEMPLATE + text }],
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
   });
-  const data = await res.json();
-  return parseClaudeResponse(data); // Keyword[] 반환
+
+  return await res.json(); // Keyword[] 반환
+}
 }
 ```
+
+흐름:
+
+사용자 입력
+→ analyzeKeywords(text)
+→ 백엔드 LLM API 호출
+→ Claude/OpenAI 분석
+→ Keyword[] 반환
+
 
 ### 2. CF 추천 엔진 — `services/recommendationService.js`
 
 ```js
 export async function getFoodRecommendations(keywords, context) {
-  const res = await fetch('https://api.menu-app.com/recommend', {
+  const res = await fetch('https://백엔드주소/recommend', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ keywords, context }),
   });
+
   return await res.json(); // FoodItem[] 반환
 }
 ```
+흐름:
+
+Keyword[] + context
+→ getFoodRecommendations(keywords, context)
+→ CF 추천 API 호출
+→ FoodItem[] 반환
 
 ### 3. 음식점 DB — `services/restaurantService.js`
 
 ```js
-export async function getRestaurantsByFood(foodId, { sort }) {
-  const res = await fetch(
-    `https://api.menu-app.com/restaurants?food=${foodId}&sort=${sort}`
-  );
-  return await res.json(); // Restaurant[] 반환
+export async function getFoodRecommendations(keywords, context) {
+  const res = await fetch('https://백엔드주소/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keywords, context }),
+  });
+
+  return await res.json(); // FoodItem[] 반환
 }
 ```
+흐름:
 
-화면 코드는 **하나도 바꿀 필요가 없습니다.**
+foodId + 정렬 기준
+→ getRestaurantsByFood(foodId, { sort })
+→ 음식점 DB API 호출
+→ Restaurant[] 반환
 
 ---
 
-## 🎨 디자인 시스템
+## 디자인 시스템
 
 데모의 따뜻한 다크 테마(주황 액센트)를 그대로 유지하면서, 모든 색상/간격/폰트를 `constants/theme.js` 에서 토큰으로 관리합니다.
 
@@ -145,7 +166,7 @@ export async function getRestaurantsByFood(foodId, { sort }) {
 
 ---
 
-## 🎯 발표 시연 시나리오 (추천)
+##  발표 시연 시나리오 (추천)
 
 1. **입력**: "비 오는 날 혼자 먹을 따뜻한 것" 타이핑
 2. **키워드**: AI가 추출한 `#따뜻한 #국물있는` 등을 보여주고, 한두 개 토글하거나 추가
@@ -153,3 +174,17 @@ export async function getRestaurantsByFood(foodId, { sort }) {
    - "비슷한 취향의 사용자 91%가 비 오는 저녁에 이 메뉴를 선택했어요" 강조
 4. **음식점**: 거리순 → 취份 맞춤(CF) 전환 시 **CF 매칭도 바**가 보이는 점 강조
 5. **외부 연결**: 배민/요기요/카카오맵/네이버 버튼으로 자연스럽게 마무리
+
+
+##  접속방법
+```bash
+git clone https://github.com/k-uplift/Project-menu.git
+cd Project-menu
+cd Frontend
+npm install
+npx expo start
+```
+이후 업데이트 받을때는 
+```bash
+git pull
+```
