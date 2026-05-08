@@ -10,4 +10,4 @@ __pycache__/
 # 혹시 모를 환경변수(비밀번호 등) 파일 무시
 .env
 # 대용량 데이터베이스 파일 무시
-Backend/db/raw.db
+db/raw.db
