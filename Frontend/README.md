@@ -174,3 +174,17 @@ foodId + 정렬 기준
    - "비슷한 취향의 사용자 91%가 비 오는 저녁에 이 메뉴를 선택했어요" 강조
 4. **음식점**: 거리순 → 취份 맞춤(CF) 전환 시 **CF 매칭도 바**가 보이는 점 강조
 5. **외부 연결**: 배민/요기요/카카오맵/네이버 버튼으로 자연스럽게 마무리
+
+
+##  접속방법
+```bash
+git clone https://github.com/k-uplift/Project-menu.git
+cd Project-menu
+cd Frontend
+npm install
+npx expo start
+```
+이후 업데이트 받을때는 
+```bash
+git pull
+```
