@@ -91,44 +91,65 @@ services 폴더의 함수는 **시그니처만 유지**하고 내부만 교체�
 
 ```js
 export async function analyzeKeywords(text) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://백엔드주소/analyze-keywords', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': API_KEY },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4',
-      max_tokens: 200,
-      messages: [{ role: 'user', content: PROMPT_TEMPLATE + text }],
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
   });
-  const data = await res.json();
-  return parseClaudeResponse(data); // Keyword[] 반환
+
+  return await res.json(); // Keyword[] 반환
+}
 }
 ```
+
+흐름:
+
+사용자 입력
+→ analyzeKeywords(text)
+→ 백엔드 LLM API 호출
+→ Claude/OpenAI 분석
+→ Keyword[] 반환
+
 
 ### 2. CF 추천 엔진 — `services/recommendationService.js`
 
 ```js
 export async function getFoodRecommendations(keywords, context) {
-  const res = await fetch('https://api.menu-app.com/recommend', {
+  const res = await fetch('https://백엔드주소/recommend', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ keywords, context }),
   });
+
   return await res.json(); // FoodItem[] 반환
 }
 ```
+흐름:
+
+Keyword[] + context
+→ getFoodRecommendations(keywords, context)
+→ CF 추천 API 호출
+→ FoodItem[] 반환
 
 ### 3. 음식점 DB — `services/restaurantService.js`
 
 ```js
-export async function getRestaurantsByFood(foodId, { sort }) {
-  const res = await fetch(
-    `https://api.menu-app.com/restaurants?food=${foodId}&sort=${sort}`
-  );
-  return await res.json(); // Restaurant[] 반환
+export async function getFoodRecommendations(keywords, context) {
+  const res = await fetch('https://백엔드주소/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keywords, context }),
+  });
+
+  return await res.json(); // FoodItem[] 반환
 }
 ```
+흐름:
 
-화면 코드는 **하나도 바꿀 필요가 없습니다.**
+foodId + 정렬 기준
+→ getRestaurantsByFood(foodId, { sort })
+→ 음식점 DB API 호출
+→ Restaurant[] 반환
 
 ---
 
