@@ -11,3 +11,5 @@ __pycache__/
 .env
 # 대용량 데이터베이스 파일 무시
 db/raw.db
+# 크롤러 디버그 응답 덤프
+src/crawler/_debug/
