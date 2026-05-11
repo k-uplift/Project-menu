@@ -10,10 +10,12 @@ DB_PATH = BACKEND_ROOT / "db" / "details.db"
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS stores (
     store_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    mgtno           TEXT UNIQUE,
     name            TEXT NOT NULL,
     address         TEXT,
-    naver_place_id  TEXT UNIQUE
+    naver_place_id  TEXT
 );
+CREATE INDEX IF NOT EXISTS idx_stores_place ON stores(naver_place_id);
 
 CREATE TABLE IF NOT EXISTS menus (
     store_id    INTEGER NOT NULL,
@@ -29,10 +31,21 @@ CREATE TABLE IF NOT EXISTS business_hours (
     open_time    TEXT,
     close_time   TEXT,
     is_closed    INTEGER NOT NULL DEFAULT 0,
+    break_start  TEXT,
+    break_end    TEXT,
+    last_order   TEXT,
     PRIMARY KEY (store_id, day_of_week),
     FOREIGN KEY (store_id) REFERENCES stores(store_id) ON DELETE CASCADE
 );
 """
+
+# 기존 DB 에 누락된 컬럼을 ALTER 로 추가하기 위한 마이그레이션 목록
+ADD_COLUMNS: list[tuple[str, str, str]] = [
+    ("business_hours", "break_start", "TEXT"),
+    ("business_hours", "break_end",   "TEXT"),
+    ("business_hours", "last_order",  "TEXT"),
+    ("stores",         "mgtno",       "TEXT"),
+]
 
 
 def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
@@ -42,10 +55,18 @@ def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
     return conn
 
 
+def _apply_migrations(conn: sqlite3.Connection) -> None:
+    for table, col, coltype in ADD_COLUMNS:
+        existing = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+        if col not in existing:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {coltype}")
+
+
 def init_db(db_path: Path = DB_PATH) -> None:
     conn = connect(db_path)
     try:
         conn.executescript(SCHEMA)
+        _apply_migrations(conn)
         conn.commit()
     finally:
         conn.close()

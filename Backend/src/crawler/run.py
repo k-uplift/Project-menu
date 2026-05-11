@@ -33,37 +33,56 @@ THROTTLE = 1.5      # 가게 1건 처리 후 대기 (네이버 차단 회피, Pl
 MAX_FAIL = 20       # 연속 실패 N건이면 중단
 
 
-def load_source_stores(limit: int | None = None) -> list[tuple[str, str]]:
-    """(BPLCNM, 주소) 튜플 리스트 반환. 도로명주소 우선, 없으면 지번."""
+def load_source_stores(limit: int | None = None) -> list[tuple[str, str, str]]:
+    """(MGTNO, BPLCNM, 주소) 튜플 리스트. 도로명주소 우선, 없으면 지번."""
     if not SOURCE_DB_PATH.exists():
         print(f"[X] {SOURCE_DB_PATH} 없음. 먼저 fetch.py / clean.py 실행.", file=sys.stderr)
         sys.exit(1)
     conn = sqlite3.connect(SOURCE_DB_PATH)
     try:
         sql = """
-            SELECT BPLCNM,
+            SELECT MGTNO, BPLCNM,
                    COALESCE(NULLIF(TRIM(RDNWHLADDR), ''), SITEWHLADDR) AS addr
               FROM restaurants
              WHERE BPLCNM IS NOT NULL AND TRIM(BPLCNM) != ''
         """
         if limit:
             sql += f" LIMIT {int(limit)}"
-        return [(r[0], r[1] or "") for r in conn.execute(sql).fetchall()]
+        return [(r[0], r[1], r[2] or "") for r in conn.execute(sql).fetchall()]
     finally:
         conn.close()
 
 
-def upsert_store(conn: sqlite3.Connection, name: str, address: str, place_id: str) -> int:
-    """stores 에 추가하고 store_id 반환. 이미 있으면 기존 id 반환."""
+def upsert_store(
+    conn: sqlite3.Connection,
+    mgtno: str,
+    name: str,
+    address: str,
+    place_id: str,
+) -> int:
+    """mgtno 기준 upsert.
+
+    같은 mgtno 가 있으면 store_id 재사용 + 매칭된 place_id/이름/주소가 바뀌었으면 UPDATE.
+    없으면 INSERT 후 새 store_id 반환.
+    """
     cur = conn.execute(
-        "SELECT store_id FROM stores WHERE naver_place_id = ?", (place_id,)
+        "SELECT store_id, naver_place_id FROM stores WHERE mgtno = ?", (mgtno,)
     )
     row = cur.fetchone()
     if row:
-        return row[0]
+        store_id, prev_pid = row
+        if prev_pid != place_id:
+            conn.execute(
+                "UPDATE stores SET naver_place_id = ?, name = ?, address = ? "
+                "WHERE store_id = ?",
+                (place_id, name, address, store_id),
+            )
+        return store_id
+
     cur = conn.execute(
-        "INSERT INTO stores (name, address, naver_place_id) VALUES (?, ?, ?)",
-        (name, address, place_id),
+        "INSERT INTO stores (mgtno, name, address, naver_place_id) "
+        "VALUES (?, ?, ?, ?)",
+        (mgtno, name, address, place_id),
     )
     return cur.lastrowid
 
@@ -82,10 +101,12 @@ def replace_hours(conn: sqlite3.Connection, store_id: int, detail: PlaceDetail) 
     if detail.hours:
         conn.executemany(
             """INSERT INTO business_hours
-               (store_id, day_of_week, open_time, close_time, is_closed)
-               VALUES (?, ?, ?, ?, ?)""",
+               (store_id, day_of_week, open_time, close_time, is_closed,
+                break_start, break_end, last_order)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
             [
-                (store_id, h.day_of_week, h.open_time, h.close_time, int(h.is_closed))
+                (store_id, h.day_of_week, h.open_time, h.close_time, int(h.is_closed),
+                 h.break_start, h.break_end, h.last_order)
                 for h in detail.hours
             ],
         )
@@ -103,7 +124,7 @@ def main(limit: int | None = None) -> None:
     conn = connect(DETAILS_DB_PATH)
     try:
         with browser_session() as page:
-            for i, (name, address) in enumerate(sources, 1):
+            for i, (mgtno, name, address) in enumerate(sources, 1):
                 print(f"[{i:>4}/{len(sources)}] {name}")
 
                 # 첫 번째 가게는 항상 디버그 출력 — 응답/DOM 구조 확인용
@@ -124,7 +145,7 @@ def main(limit: int | None = None) -> None:
                 place_id = cand["id"]
                 detail = fetch_detail(place_id, page=page, verbose=verbose)
 
-                store_id = upsert_store(conn, name, address, place_id)
+                store_id = upsert_store(conn, mgtno, name, address, place_id)
                 replace_menus(conn, store_id, detail)
                 replace_hours(conn, store_id, detail)
                 conn.commit()

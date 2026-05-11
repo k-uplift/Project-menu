@@ -44,6 +44,9 @@ class BusinessHour:
     open_time: str = ""
     close_time: str = ""
     is_closed: bool = False
+    break_start: Optional[str] = None
+    break_end: Optional[str] = None
+    last_order: Optional[str] = None
 
 
 @dataclass
@@ -255,82 +258,122 @@ _RE_DAY_CLOSED = __import__("re").compile(
 
 
 def _is_hours_expanded(page: Page) -> bool:
-    """DOM 의 텍스트에 '월요일'~'일요일' 중 3개 이상이 들어있으면 펼쳐진 상태."""
+    """펼쳐진 상태인지 검증.
+
+    펼치면 i8cJw 라벨(월/화/.../일 또는 매일/평일/주말)이 최소 1개 나타난다.
+    접힌 상태에서는 영업 중/종료 안내만 보이고 i8cJw 가 없다.
+    """
     try:
         return page.evaluate(
-            "() => { const t = document.body.innerText || ''; "
-            "const days = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일']; "
-            "return days.filter(d => t.includes(d)).length >= 3; }"
+            """() => {
+                const labels = document.querySelectorAll("[class*='i8cJw']");
+                return Array.from(labels).some(el => {
+                    const t = (el.innerText || '').trim();
+                    return /^(매일|평일|주말|월|화|수|목|금|토|일)/.test(t);
+                });
+            }"""
         )
     except Exception:
         return False
 
 
-def _expand_hours_block(page: Page, debug: bool) -> None:
-    """영업시간 블록을 펼치도록 여러 전략을 순차 시도.
+def _find_hours_section(page: Page):
+    """'영업시간' 라벨을 포함하는 가장 가까운 place_section 컨테이너.
 
-    네이버는 chevron 아이콘 (텍스트 없는 토글) 을 쓰는 경우가 많아서
-    텍스트 기반 셀렉터만으론 부족하다.
+    찾으면 Locator, 못 찾으면 None.
+    전역 셀렉터로 펼치기 버튼을 누르면 주소 등 다른 섹션이 먼저 매칭되므로
+    영업시간 섹션 내부로 한정하기 위한 anchor.
+    """
+    candidates = [
+        "xpath=//*[normalize-space(text())='영업시간']/ancestor::div[contains(@class,'place_section')][1]",
+        "xpath=//*[normalize-space(text())='영업시간']/ancestor::div[2]",
+        "xpath=//*[normalize-space(text())='영업시간']/ancestor::div[1]",
+    ]
+    for sel in candidates:
+        try:
+            loc = page.locator(sel).first
+            if loc.count():
+                return loc
+        except Exception:
+            continue
+    return None
+
+
+def _expand_hours_block(page: Page, debug: bool) -> None:
+    """'영업시간' 섹션으로 범위를 좁혀 펼치기 버튼을 클릭.
+
+    네이버는 펼치기 버튼에 텍스트가 없고 outer <a aria-expanded='false' role='button'>
+    로 전체 row 를 감싸는 경우가 많음. 텍스트/aria/role 순으로 시도하며, 각 strategy
+    안에서 매칭된 모든 후보를 순회 (.first 만 보면 잘못된 element 를 클릭하기 쉬움).
+    클릭 후 i8cJw 라벨 출현을 명시적으로 기다림 (고정 sleep 대신).
     """
     if _is_hours_expanded(page):
         if debug:
             print(f"  [DEBUG] hours 이미 펼쳐짐")
         return
 
-    strategies: list[tuple[str, str]] = [
-        ("text=펼치기 버튼", "css=button:has-text('펼치기'), css=a:has-text('펼치기')"),
-        ("aria-expanded=false", "css=[aria-expanded='false']"),
-        # '영업 중' / '영업 종료' / '영업시간' 텍스트가 있는 클릭 가능 요소
-        ("영업 텍스트 근처 role=button", "css=a[role='button']:has-text('영업'), button:has-text('영업')"),
-        # H3ua4 같은 영업시간 컨테이너 내의 첫 클릭 가능 요소
-        ("영업시간 컨테이너 내부", "css=div.H3ua4 a[role='button'], div.H3ua4 button, [class*='H3ua4'] a[role='button']"),
+    section = _find_hours_section(page)
+    if section is None:
+        if debug:
+            print(f"  [DEBUG] hours 섹션 못 찾음 — 펼치기 스킵")
+        return
+
+    scoped_strategies: list[tuple[str, str]] = [
+        ("펼쳐보기/펼치기/더보기 텍스트",
+         "a:has-text('펼쳐보기'), button:has-text('펼쳐보기'), "
+         "a:has-text('펼치기'), button:has-text('펼치기'), "
+         "a:has-text('더보기'), button:has-text('더보기')"),
+        ("aria-expanded=false", "[aria-expanded='false']"),
+        ("role=button (chevron 아이콘 등)", "a[role='button'], button"),
     ]
 
-    for label, sel in strategies:
+    for label, sel in scoped_strategies:
         try:
-            loc = page.locator(sel).first
-            if not loc.count():
-                continue
-            try:
-                if not loc.is_visible():
-                    continue
-            except Exception:
-                continue
-            loc.click(timeout=1500)
-            page.wait_for_timeout(500)
-            if debug:
-                print(f"  [DEBUG] hours expand 시도: {label}")
-            if _is_hours_expanded(page):
-                if debug:
-                    print(f"  [DEBUG] hours 펼쳐짐 ✓")
-                return
+            cands = section.locator(sel)
+            n = cands.count()
         except Exception as e:
             if debug:
-                print(f"  [DEBUG] hours expand 실패 ({label}): {e}")
+                print(f"  [DEBUG] hours expand 셀렉터 실패 ({label}): {e}")
+            continue
+        if n == 0:
             continue
 
-    # 마지막 전략: '영업시간' 라벨의 같은 영역에서 클릭 가능한 모든 후보를 차례로 시도
-    try:
-        anchor = page.get_by_text("영업시간", exact=False).first
-        if anchor.count():
-            container = anchor.locator("xpath=ancestor::div[1]")
-            clickables = container.locator("css=a[role='button'], button, [aria-expanded]")
-            n = min(clickables.count(), 5)
-            for i in range(n):
+        for i in range(min(n, 5)):
+            try:
+                loc = cands.nth(i)
                 try:
-                    clickables.nth(i).click(timeout=1000)
-                    page.wait_for_timeout(400)
-                    if _is_hours_expanded(page):
-                        if debug:
-                            print(f"  [DEBUG] hours 펼쳐짐 (anchor 형제 #{i})")
-                        return
+                    if not loc.is_visible():
+                        continue
                 except Exception:
                     continue
-    except Exception:
-        pass
+                loc.click(timeout=1500)
+                if debug:
+                    print(f"  [DEBUG] hours expand 시도: {label} #{i}")
+                # i8cJw 라벨이 보이는지 명시적 대기 (최대 0.5s)
+                try:
+                    page.wait_for_function(
+                        """() => {
+                            const labels = document.querySelectorAll("[class*='i8cJw']");
+                            return Array.from(labels).some(el => {
+                                const t = (el.innerText || '').trim();
+                                return /^(매일|평일|주말|월|화|수|목|금|토|일)/.test(t);
+                            });
+                        }""",
+                        timeout=500,
+                    )
+                except PWTimeout:
+                    pass
+                if _is_hours_expanded(page):
+                    if debug:
+                        print(f"  [DEBUG] hours 펼쳐짐 ✓ ({label} #{i})")
+                    return
+            except Exception as e:
+                if debug:
+                    print(f"  [DEBUG] hours expand 클릭 실패 ({label} #{i}): {e}")
+                continue
 
-    if debug and not _is_hours_expanded(page):
-        print(f"  [DEBUG] hours: 모든 펼치기 시도 실패")
+    if debug:
+        print(f"  [DEBUG] hours: 섹션 내 모든 펼치기 시도 실패")
 
 
 def _read_hours_text(page: Page, debug: bool) -> str:
@@ -419,18 +462,171 @@ def _parse_hours_text(text: str) -> list[BusinessHour]:
     return out
 
 
+# 그룹 라벨 → 실제 요일 펼침
+DAY_GROUP_EXPANSION: dict[str, list[str]] = {
+    "매일": ["월", "화", "수", "목", "금", "토", "일"],
+    "평일": ["월", "화", "수", "목", "금"],
+    "주말": ["토", "일"],
+}
+
+_RE_TIME_RANGE = __import__("re").compile(
+    r"(?P<open>\d{1,2}:\d{2})\s*[-~∼]\s*(?:다음\s*날\s*)?(?P<close>\d{1,2}:\d{2})"
+)
+_RE_SINGLE_TIME = __import__("re").compile(r"\d{1,2}:\d{2}")
+
+
+def _parse_time_block(text: str) -> dict:
+    """한 요일의 시간 텍스트 블록을 파싱.
+
+    예) "11:00 - 24:00\n14:00 - 16:00 브레이크타임\n23:30 라스트오더"
+         → {"open":"11:00","close":"24:00","break_start":"14:00",
+            "break_end":"16:00","last_order":"23:30","is_closed":False}
+
+    라스트오더/브레이크타임이 없으면 해당 키는 None.
+    """
+    out = {
+        "is_closed": False,
+        "open": "",
+        "close": "",
+        "break_start": None,
+        "break_end": None,
+        "last_order": None,
+    }
+    if not text:
+        return out
+    if ("휴무" in text) or ("휴일" in text):
+        out["is_closed"] = True
+        return out
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        is_break = ("브레이크" in line) or ("휴게" in line)
+        is_lo = ("라스트오더" in line) or ("라스트 오더" in line) or ("L.O" in line.upper())
+
+        if is_break:
+            m = _RE_TIME_RANGE.search(line)
+            if m:
+                out["break_start"] = m.group("open")
+                out["break_end"] = m.group("close")
+        elif is_lo:
+            m = _RE_SINGLE_TIME.search(line)
+            if m:
+                out["last_order"] = m.group(0)
+        else:
+            m = _RE_TIME_RANGE.search(line)
+            if m and not out["open"]:
+                out["open"] = m.group("open")
+                out["close"] = m.group("close")
+    return out
+
+
+def _extract_hours_pairs_from_dom(page: Page, debug: bool) -> list[dict]:
+    """네이버 영업시간 DOM 의 (요일, 시간) 페어 추출.
+
+    구조: <span class='i8cJw'>월|매일|...</span> ... <div class='H3ua4'>10:00 -23:00</div>
+    클래스명이 obfuscated 라 substring 셀렉터 사용. document 순서대로 i8cJw 와
+    H3ua4 를 수집하여 인접한 페어로 묶는다.
+    """
+    try:
+        pairs = page.evaluate(
+            """
+            () => {
+                const nodes = document.querySelectorAll("[class*='i8cJw'], [class*='H3ua4']");
+                const out = [];
+                let pendingDay = null;
+                nodes.forEach(el => {
+                    const cls = typeof el.className === 'string' ? el.className : '';
+                    const txt = (el.innerText || '').trim();
+                    if (!txt) return;
+                    if (cls.includes('i8cJw')) {
+                        pendingDay = txt;
+                    } else if (cls.includes('H3ua4')) {
+                        if (pendingDay !== null) {
+                            out.push({ day: pendingDay, time: txt });
+                            pendingDay = null;
+                        }
+                    }
+                });
+                return out;
+            }
+            """
+        ) or []
+    except Exception as e:
+        if debug:
+            print(f"  [DEBUG] hours 페어 추출 실패: {e}")
+        return []
+    return pairs
+
+
+def _parse_hour_pairs(pairs: list[dict]) -> list[BusinessHour]:
+    """(day, time) 페어 리스트 → BusinessHour. '매일'/'평일'/'주말' 그룹 라벨 펼침.
+
+    time 텍스트는 다중 라인일 수 있음 (영업시간 + 브레이크타임 + 라스트오더).
+    _parse_time_block 으로 분해하여 BusinessHour 의 각 필드 채움.
+    """
+    by_day: dict[str, BusinessHour] = {}
+
+    for p in pairs:
+        raw_day = (p.get("day") or "").strip()
+        time_text = (p.get("time") or "").strip()
+        if not raw_day:
+            continue
+
+        parsed = _parse_time_block(time_text)
+        # 영업시간도 없고 휴무도 아니면 의미 없는 row
+        if not parsed["is_closed"] and not parsed["open"]:
+            continue
+
+        target_days = DAY_GROUP_EXPANSION.get(raw_day)
+        if target_days is None:
+            kor = _normalize_day(raw_day)
+            target_days = [kor] if kor else []
+
+        for d in target_days:
+            if d in by_day:
+                continue
+            by_day[d] = BusinessHour(
+                day_of_week=d,
+                open_time=parsed["open"],
+                close_time=parsed["close"],
+                is_closed=parsed["is_closed"],
+                break_start=parsed["break_start"],
+                break_end=parsed["break_end"],
+                last_order=parsed["last_order"],
+            )
+
+    return sorted(by_day.values(), key=lambda h: KOR_DAY_ORDER.index(h.day_of_week))
+
+
 def _parse_hours_from_dom(page: Page, place_id: str, debug: bool) -> list[BusinessHour]:
     """페이지 DOM 에서 영업시간 추출 — Apollo state 가 비어있을 때 폴백.
 
+    1순위: i8cJw / H3ua4 페어 (정확)
+    2순위: 컨테이너 inner_text 정규식 (기존 폴백)
     파싱 실패 시 추출한 raw 텍스트를 _debug 폴더에 저장 (정규식 보강용).
     """
     _expand_hours_block(page, debug)
+
+    # 1순위: DOM 페어 추출
+    pairs = _extract_hours_pairs_from_dom(page, debug)
+    if debug:
+        preview = pairs[:3]
+        print(f"  [DEBUG] hours DOM 페어: {len(pairs)}건, 샘플={preview}")
+    parsed = _parse_hour_pairs(pairs)
+    if parsed:
+        if debug:
+            print(f"  [DEBUG] hours 페어 파싱: {len(parsed)}건 ✓")
+        return parsed
+
+    # 2순위: 컨테이너 텍스트 + 정규식
     text = _read_hours_text(page, debug)
     if not text:
         return []
     parsed = _parse_hours_text(text)
     if debug:
-        print(f"  [DEBUG] hours DOM: 파싱 결과 {len(parsed)}건")
+        print(f"  [DEBUG] hours 텍스트 파싱: {len(parsed)}건")
     if not parsed:
         DEBUG_DIR.mkdir(exist_ok=True)
         path = DEBUG_DIR / f"hours_text_{place_id}.txt"
