@@ -57,12 +57,24 @@ def _extract_candidates(parsed: dict, debug: bool) -> list[PlaceCandidate]:
             return None
         if isinstance(name, str):
             name = name.replace("<b>", "").replace("</b>", "")
+        # 네이버 좌표 (WGS84): x=경도, y=위도
+        try:
+            lng = float(it.get("x")) if it.get("x") not in (None, "") else None
+        except (TypeError, ValueError):
+            lng = None
+        try:
+            lat = float(it.get("y")) if it.get("y") not in (None, "") else None
+        except (TypeError, ValueError):
+            lat = None
         return PlaceCandidate(
             id=str(pid),
             name=str(name),
             address=str(it.get("address") or it.get("addr") or ""),
             road_address=str(it.get("roadAddress") or it.get("roadAddr") or ""),
             category=str(it.get("category") or ""),
+            lng=lng,
+            lat=lat,
+            tel=str(it.get("tel") or it.get("telDisplay") or ""),
         )
 
     candidate_lists: list[tuple[str, list]] = []
@@ -149,55 +161,138 @@ def search_place(
     return _extract_candidates(parsed, debug)
 
 
-_DONG_RE = __import__("re").compile(r"^[가-힣]+동(?:\d+가)?$")
+import re as _re
+
+_DONG_RE = _re.compile(r"^[가-힣]+동(?:\d+가)?$")
+_DONG_BASE_RE = _re.compile(r"^([가-힣]+동)\d+가$")
+_ROAD_RE = _re.compile(r"^[가-힣A-Za-z0-9]+로(?:\d+(?:번)?길)?$")
+_ROAD_BASE_RE = _re.compile(r"^(.+로)\d+(?:번)?길$")
+
+# 가게명에서 무시할 흔한 접미사 (분점·본점은 매칭 시 핵심 토큰이 아님)
+_NAME_SUFFIXES = {
+    "본점", "분점", "지점", "직영", "직영점", "본관",
+    "1호점", "2호점", "3호점", "4호점", "5호점", "6호점",
+}
+
+
+def _strip_brackets(addr: str) -> str:
+    """주소의 괄호·쉼표를 공백으로 치환. '(삼선동4가)' 같은 토큰을 정상 분리."""
+    return _re.sub(r"[(),]", " ", addr)
 
 
 def _extract_location(addr: str) -> tuple[str, str]:
     """주소 문자열에서 (구, 동) 토큰 추출. 없으면 ('', '').
 
     예:
-      '서울특별시 성북구 삼선동5가 296' → ('성북구', '삼선동5가')
-      '서울 강북구 수유동 168-5'        → ('강북구', '수유동')
+      '서울특별시 성북구 삼선동5가 296'              → ('성북구', '삼선동5가')
+      '서울특별시 성북구 보문로 181, 1층 (삼선동4가)' → ('성북구', '삼선동4가')
     """
     if not addr:
         return ("", "")
-    tokens = addr.split()
+    tokens = _strip_brackets(addr).split()
     gu = next((t for t in tokens if t.endswith("구")), "")
     dong = next((t for t in tokens if _DONG_RE.match(t)), "")
     return (gu, dong)
 
 
-def _matches_location(cand_addr: str, src_gu: str, src_dong: str) -> bool:
-    """후보 주소가 소스의 (구, 동) 과 같은 위치에 있는지 검증."""
+def _has_dong_token(addr: str) -> bool:
+    """주소에 동 형태 토큰이 들어있는지. 네이버 도로명 주소는 동 없는 경우가 많음."""
+    return any(_DONG_RE.match(t) for t in _strip_brackets(addr).split())
+
+
+def _extract_road(addr: str) -> str:
+    """주소의 도로명 베이스 토큰. 예: '삼선교로14길' → '삼선교로'.
+
+    못 찾으면 빈 문자열.
+    """
+    if not addr:
+        return ""
+    tokens = _strip_brackets(addr).split()
+    full = next((t for t in tokens if _ROAD_RE.match(t)), "")
+    if not full:
+        return ""
+    m = _ROAD_BASE_RE.match(full)
+    return m.group(1) if m else full
+
+
+def _matches_location(
+    cand_addr: str,
+    src_gu: str,
+    src_dong: str,
+    src_road_base: str = "",
+) -> bool:
+    """후보 주소가 소스 위치와 일치하는지 검증.
+
+    검증 순서:
+      1) 구 일치 필수
+      2) cand 에 동 토큰이 있으면 동까지 일치 필요
+      3) cand 가 도로명 주소(동 토큰 없음)면 도로명 베이스 일치 필요
+         예: source '삼선교로14길' → cand '...삼선교로 ...' 통과,
+                                    cand '...동소문로 ...' 거부
+    """
     if not src_gu:
-        return True  # 비교 기준 없음 → 통과
+        return True
     if src_gu not in cand_addr:
         return False
-    if not src_dong:
-        return True  # 구만으로도 충분
-    if src_dong in cand_addr:
+
+    if _has_dong_token(cand_addr):
+        # cand 가 동 토큰을 가지고 있으면 동 일치 검사
+        if not src_dong:
+            return True
+        if src_dong in cand_addr:
+            return True
+        m = _DONG_BASE_RE.match(src_dong)
+        return bool(m and m.group(1) in cand_addr)
+
+    # cand 가 도로명 주소 (동 토큰 없음) — 도로명 베이스로 검증
+    if src_road_base:
+        return src_road_base in cand_addr
+    # 도로명 베이스도 없으면 구 매칭으로 통과 (현행 유지)
+    return True
+
+
+def _norm_name(s: str) -> str:
+    """공백 제거 + 소문자. 비교용 정규화."""
+    return _re.sub(r"\s+", "", s or "").lower()
+
+
+def _name_matches(source: str, cand: str) -> bool:
+    """source 의 핵심 토큰이 모두 cand 에 들어있어야 매칭 인정.
+
+    - 흔한 접미사(본점/분점/...)는 핵심에서 제외
+    - '푸른농장 정육식당' vs '푸른농장 성신여대1호점' → '정육식당' 누락 → False
+    - '양슐랭 본점' vs '양슐랭 성신여대점' → 핵심 ['양슐랭'] 만 비교 → True
+    - '동궁찜닭' vs '동궁찜닭 성북석관점' → True
+    """
+    src_n = _norm_name(source)
+    cand_n = _norm_name(cand)
+    if not src_n or not cand_n:
+        return False
+    if src_n == cand_n:
         return True
-    # '삼선동5가' 가 후보엔 '삼선동' 으로만 있는 케이스 허용
-    import re
-    m = re.match(r"^([가-힣]+동)\d+가$", src_dong)
-    return bool(m and m.group(1) in cand_addr)
+    core_tokens = [t for t in source.split() if t and t not in _NAME_SUFFIXES]
+    if not core_tokens:
+        return src_n in cand_n or cand_n in src_n
+    return all(_norm_name(t) in cand_n for t in core_tokens)
+
+
+COORD_DISTANCE_THRESHOLD_M = 300  # 좌표 일치 임계 — 300m
 
 
 def find_place_id(
     name: str,
     page: Page,
     source_address: str = "",
+    source_lnglat: Optional[tuple[float, float]] = None,
     verbose: Optional[bool] = None,
 ) -> Optional[PlaceCandidate]:
     """가장 일치도 높은 후보 1건 반환. 없으면 None.
 
-    위치 검증: source_address 가 주어지면 같은 (구, 동) 인 후보만 사용.
-    위치 일치 후보가 0이면 None (잘못된 가게 저장 방지).
+    위치 검증 우선순위:
+      A) source_lnglat 가 있고 cand 도 좌표 있으면 → 거리 300m 이내 필터 (정확)
+      B) 그 외엔 source_address 의 (구, 동) 토큰 일치 필터 (텍스트)
 
-    매칭 우선순위 (위치 일치 후보 안에서):
-      1) 정확 일치
-      2) 결과 name 에 BPLCNM 이 포함됨
-      3) 첫 결과
+    이름 매칭: 핵심 토큰이 모두 cand 에 포함되어야 매칭. 미일치 시 None.
     """
     try:
         candidates = search_place(name, page=page, verbose=verbose)
@@ -208,30 +303,57 @@ def find_place_id(
     if not candidates:
         return None
 
-    if source_address:
-        src_gu, src_dong = _extract_location(source_address)
-        validated: list[PlaceCandidate] = []
+    # === 위치 필터 ===
+    if source_lnglat is not None:
+        from coord import haversine_m
+        src_lng, src_lat = source_lnglat
+        scored: list[tuple[float, PlaceCandidate]] = []
         for c in candidates:
-            cand_addr = c.get("road_address") or c.get("address") or ""
-            if _matches_location(cand_addr, src_gu, src_dong):
-                validated.append(c)
-
+            if c.get("lng") is None or c.get("lat") is None:
+                continue
+            d = haversine_m(src_lng, src_lat, c["lng"], c["lat"])
+            if d <= COORD_DISTANCE_THRESHOLD_M:
+                scored.append((d, c))
+        scored.sort(key=lambda x: x[0])
+        validated = [c for _, c in scored]
         if verbose:
-            print(f"  [DEBUG] 위치필터 src=({src_gu}, {src_dong}) — "
-                  f"{len(validated)}/{len(candidates)} 통과")
-
+            print(f"  [DEBUG] 좌표필터 — {len(validated)}/{len(candidates)} 통과 "
+                  f"(임계 {COORD_DISTANCE_THRESHOLD_M}m)")
+            for d, c in scored[:3]:
+                print(f"    {d:6.0f}m  {c['name']}  ({c.get('road_address') or c.get('address')})")
         if not validated:
-            print(f"  [위치 불일치] {len(candidates)}개 후보 모두 다른 지역")
+            print(f"  [위치 불일치] {len(candidates)}개 후보 모두 좌표 {COORD_DISTANCE_THRESHOLD_M}m 밖")
             return None
         candidates = validated
 
+    elif source_address:
+        src_gu, src_dong = _extract_location(source_address)
+        src_road = _extract_road(source_address)
+        validated2: list[PlaceCandidate] = []
+        for c in candidates:
+            cand_addr = c.get("road_address") or c.get("address") or ""
+            if _matches_location(cand_addr, src_gu, src_dong, src_road):
+                validated2.append(c)
+
+        if verbose:
+            print(f"  [DEBUG] 주소필터 src=({src_gu}, {src_dong}, road={src_road}) — "
+                  f"{len(validated2)}/{len(candidates)} 통과")
+
+        if not validated2:
+            print(f"  [위치 불일치] {len(candidates)}개 후보 모두 다른 지역")
+            return None
+        candidates = validated2
+
+    # === 이름 매칭 — 핵심 토큰 모두 일치하는 첫 후보. 0건이면 None ===
     for c in candidates:
-        if c["name"] == name:
+        if _norm_name(c["name"]) == _norm_name(name):
             return c
     for c in candidates:
-        if name in c["name"]:
+        if _name_matches(name, c["name"]):
             return c
-    return candidates[0]
+    if verbose:
+        print(f"  [DEBUG] 이름 일치 후보 0건 (위치 통과 {len(candidates)}개) → 매칭 폐기")
+    return None
 
 
 if __name__ == "__main__":
