@@ -164,6 +164,34 @@ CATEGORY_DEFAULTS: dict[str, tuple[str, ...]] = {
 
 MAX_TAGS = 3
 
+# Claude enrichment 프롬프트 — 메뉴명+업종 → 시드 태그 1~3개.
+ENRICH_SYSTEM_PROMPT = """\
+당신은 한국 음식점 메뉴에 '먹는 경험' 태그를 붙이는 분류기입니다.
+메뉴 이름(과 업종)을 보고 아래 시드 어휘에서만 1~3개를 고르세요.
+
+시드 어휘: {seed}
+
+규칙:
+- 메뉴의 맛/온도/포만감/상황을 가장 잘 나타내는 태그를 고릅니다.
+- 음료·주류·디저트 등 '맛 태그가 무의미한 비식사류'는 빈 배열을 반환합니다.
+- 애매하면 더 적게 고릅니다(억지로 3개를 채우지 않음).
+
+출력은 JSON 한 줄만: {{"tags": ["...", "..."]}}\
+""".format(seed=list(SEED_TAGS))
+
+# 구조화 출력 스키마 — 시드 어휘로만 제한(enum) → LLM이 임의 태그를 못 만든다.
+ENRICH_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "tags": {
+            "type": "array",
+            "items": {"type": "string", "enum": list(SEED_TAGS)},
+        },
+    },
+    "required": ["tags"],
+    "additionalProperties": False,
+}
+
 
 @dataclass
 class MenuTagResult:
@@ -210,11 +238,45 @@ def _enrich_heuristic(menu_name: str, category: str | None) -> MenuTagResult:
     return MenuTagResult(0, menu_name, category, [], "fallback")
 
 
+def _user_prompt(menu_name: str, category: str | None) -> str:
+    """배치/단건 공용 — 메뉴 한 건의 사용자 프롬프트."""
+    cat = category or "미상"
+    return f"메뉴명: {menu_name}\n업종: {cat}"
+
+
 def _enrich_claude(menu_name: str, category: str | None, api_key: str) -> MenuTagResult:
-    raise NotImplementedError(
-        "anthropic 클라이언트 미연결. API 키 수령 후 구현 — 메뉴명+업종을 주고 "
-        "시드 태그 1~3개를 JSON으로 받게 한다 (extract._extract_claude와 동일 패턴)."
-    )
+    """Claude(Sonnet 4.6) 단건 호출로 메뉴 태그 부여. 실패 시 휴리스틱 폴백.
+
+    대량(5,813건)은 scripts/enrich_menus.py의 Batches API(50% 할인)를 쓰고,
+    이 단건 경로는 enrich_menu() 호출·소량 보정·디버그용이다.
+    """
+    try:
+        import anthropic
+    except ImportError:
+        print("[enrich] anthropic 미설치 → 휴리스틱 폴백 (pip install anthropic)")
+        return _enrich_heuristic(menu_name, category)
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model=CLAUDE_MODEL,
+            max_tokens=128,
+            system=[
+                {
+                    "type": "text",
+                    "text": ENRICH_SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+            messages=[{"role": "user", "content": _user_prompt(menu_name, category)}],
+            output_config={"format": {"type": "json_schema", "schema": ENRICH_SCHEMA}},
+        )
+        raw = next((b.text for b in resp.content if b.type == "text"), "")
+        tags = json.loads(raw).get("tags", [])[:MAX_TAGS]
+        return MenuTagResult(0, menu_name, category, list(tags), "claude")
+    except Exception as e:
+        print(f"[enrich] Claude 호출 실패({type(e).__name__}) → 휴리스틱 폴백")
+        return _enrich_heuristic(menu_name, category)
 
 
 def enrich_menu(menu_name: str, category: str | None = None) -> MenuTagResult:

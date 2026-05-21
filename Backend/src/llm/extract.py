@@ -29,6 +29,18 @@ SYSTEM_PROMPT = """\
 """.format(seed=list(SEED_TAGS))
 
 
+# 구조화 출력 스키마 — Claude가 항상 이 JSON 형태로만 응답하게 강제.
+# (output_config.format / Sonnet 4.6 지원). tags는 문자열 배열.
+TAGS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "tags": {"type": "array", "items": {"type": "string"}},
+    },
+    "required": ["tags"],
+    "additionalProperties": False,
+}
+
+
 @dataclass
 class ExtractResult:
     original_text: str
@@ -48,9 +60,40 @@ def extract_tags(text: str) -> ExtractResult:
 
 
 def _extract_claude(text: str, api_key: str) -> ExtractResult:
-    raise NotImplementedError(
-        "anthropic 클라이언트 미연결. API 키 수령 후 구현 (requirements.txt에 anthropic 추가)."
-    )
+    """Claude(Sonnet 4.6) 호출로 태그 추출. 실패 시 mock으로 폴백.
+
+    - 구조화 출력(output_config.format)으로 JSON 형태를 강제 → 파싱 안정.
+    - 단순 추출 작업이라 thinking은 끔(기본). max_tokens는 짧게.
+    - system 프롬프트는 고정이라 cache_control을 달아둠(프리픽스가 모델 최소
+      캐시 길이 이상일 때만 실제 캐시됨 — 짧으면 무시되며 비용 영향 없음).
+    """
+    try:
+        import anthropic
+    except ImportError:
+        print("[extract] anthropic 미설치 → mock 폴백 (pip install anthropic)")
+        return _extract_mock(text)
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model=CLAUDE_MODEL,
+            max_tokens=256,
+            system=[
+                {
+                    "type": "text",
+                    "text": SYSTEM_PROMPT,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            ],
+            messages=[{"role": "user", "content": text}],
+            output_config={"format": {"type": "json_schema", "schema": TAGS_SCHEMA}},
+        )
+        raw = next((b.text for b in resp.content if b.type == "text"), "")
+        tags = _parse_claude_json(raw)
+        return ExtractResult(original_text=text, tags=tags, source="claude")
+    except Exception as e:  # 네트워크/레이트리밋/스키마 등 → mock 폴백
+        print(f"[extract] Claude 호출 실패({type(e).__name__}) → mock 폴백")
+        return _extract_mock(text)
 
 
 def _extract_mock(text: str) -> ExtractResult:
