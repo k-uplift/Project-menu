@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -23,6 +24,16 @@ from .tags import normalize
 
 _HERE = Path(__file__).resolve().parent
 DEFAULT_MENU_TAGS = _HERE / "data" / "menu_tags.jsonl"
+
+
+def stable_food_id(store_id: int, menu_name: str) -> str:
+    """(store_id, menu_name) → 결정적 메뉴 id. 프론트 'food-xxx' 식별자 계약과 호환.
+
+    크롤링 메뉴엔 frontend foods.mock.js 같은 id가 없다. (store_id, menu_name)으로부터
+    해시를 만들어 재실행/누가 계산하든 같은 id가 나오게 한다 (카운터 불필요).
+    """
+    h = hashlib.sha1(f"{store_id}|{menu_name}".encode("utf-8")).hexdigest()[:10]
+    return f"food-{h}"
 
 
 @dataclass
@@ -42,6 +53,7 @@ class MatchResult:
     matched: list[str]  # 쿼리와 겹친 태그
     overlap: int
     jaccard: float
+    coverage: float  # 쿼리 태그 중 충족 비율 (0~1)
     score: float
 
 
@@ -99,12 +111,50 @@ def match(
                 matched=sorted(inter),
                 overlap=overlap,
                 jaccard=round(jaccard, 3),
+                coverage=round(coverage, 3),
                 score=round(score, 4),
             )
         )
 
     results.sort(key=lambda r: (r.overlap, r.jaccard), reverse=True)
     return results[:top_k]
+
+
+def to_food(r: MatchResult) -> dict:
+    """MatchResult → 프론트 food 객체 계약 (foods.mock.js 형태).
+
+    reason의 cfScore/cfDescription은 CF가, contextNote는 컨텍스트 트랙이 채울 빈 칸.
+    여기선 matchedKeywords와 매칭 기반 score만 채운다.
+      - storeId: 프론트 mock엔 없지만 식당 집계·연결에 필수라 확장 필드로 포함
+      - score: 0~100. CF 합류 전이라 현재는 매칭 커버리지 기반
+    """
+    return {
+        "id": stable_food_id(r.store_id, r.menu_name),
+        "storeId": r.store_id,
+        "name": r.menu_name,
+        "tags": r.tags,
+        "score": round(min(r.coverage, 1.0) * 100),
+        "reason": {
+            "matchedKeywords": r.matched,
+            "cfScore": None,        # CF가 채움 (CF_hw)
+            "cfDescription": None,  # CF가 채움
+            "contextNote": None,    # 컨텍스트 트랙이 채움 (혼밥·날씨 등)
+        },
+    }
+
+
+def recommend_foods(query_text: str, top_k: int = 10) -> dict:
+    """자연어 → 프론트 계약 그대로의 추천 응답. extract→match→food 객체.
+
+    반환: {"query", "keywords", "foods": [food 객체...]}
+    cfScore/contextNote는 빈 칸 — 이후 CF·컨텍스트 단계가 같은 객체를 채운다.
+    """
+    tags, results = recommend(query_text, top_k=top_k)
+    return {
+        "query": query_text,
+        "keywords": tags,
+        "foods": [to_food(r) for r in results],
+    }
 
 
 def recommend(query_text: str, top_k: int = 10) -> tuple[list[str], list[MatchResult]]:
@@ -139,3 +189,9 @@ if __name__ == "__main__":
                 f" 매칭{r.matched} 메뉴태그{r.tags}"
             )
         print()
+
+    # 프론트 계약(food 객체) 출력 샘플 — 첫 쿼리
+    print("=" * 60)
+    print(f"프론트 계약 형태 (recommend_foods) — {queries[0]!r}")
+    sample = recommend_foods(queries[0], top_k=2)
+    print(json.dumps(sample, ensure_ascii=False, indent=2))
