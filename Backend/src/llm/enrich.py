@@ -37,8 +37,8 @@ DRINK_MARKERS: tuple[str, ...] = (
     "커피", "라떼", "아메리카노", "에스프레소", "카푸치노", "프라페", "스무디",
     "쉐이크", "쥬스", "주스", "음료", "탄산", "맥주", "생맥", "소주", "하이볼",
     "와인", "막걸리", "사케", "위스키", "보드카", "칵테일", "차(", "녹차", "홍차",
-    "드링크", "라테",
-    # 영어 음료명 (소문자 비교)
+    "드링크", "라테", "아이스티", "밀크티", "버블티", "식혜", "수정과",
+    # 영어 음료명 (소문자 비교) — "티"는 스파게티니 등과 충돌하므로 단독 사용 금지
     "latte", "americano", "cappuccino", "espresso", "ade", "cola",
     "juice", "beer", "coffee", "smoothie",
 )
@@ -144,6 +144,12 @@ KEYWORD_RULES: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("면", ("담백한",)),
 )
 
+# 오매칭 차단: 메뉴명에 blocker가 있으면 해당 태그를 후보에서 제외한다.
+# substring 매칭의 함정 교정 (예: '탕수육'의 '탕'이 국물 규칙에 잘못 걸림).
+EXCLUSIONS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("탕수", ("국물있는", "따뜻한")),  # 탕수육은 국물 요리가 아님
+)
+
 # 키워드 미적중 시 업종(UPTAENM) 기반 fallback.
 CATEGORY_DEFAULTS: dict[str, tuple[str, ...]] = {
     "호프/통닭": ("야식", "바삭한"),
@@ -178,11 +184,17 @@ def _enrich_heuristic(menu_name: str, category: str | None) -> MenuTagResult:
     if _is_drink(menu_name):
         return MenuTagResult(0, menu_name, category, [], "drink")
 
+    # 오매칭 차단 태그 — 후보에 아예 안 넣어 MAX 캡에 좋은 태그가 밀리지 않게 한다.
+    blocked: set[str] = set()
+    for blocker, btags in EXCLUSIONS:
+        if blocker in menu_name:
+            blocked.update(btags)
+
     tags: list[str] = []
     for kw, kw_tags in KEYWORD_RULES:
         if kw in menu_name:
             for t in kw_tags:
-                if t not in tags:
+                if t not in tags and t not in blocked:
                     tags.append(t)
             if len(tags) >= MAX_TAGS:
                 break

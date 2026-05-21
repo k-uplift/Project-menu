@@ -7,7 +7,7 @@
 {"store_id": 1, "menu_name": "동궁 닭도리탕", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 1, "menu_name": "동궁 도시락김", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 1, "menu_name": "동궁 묵은지김치찜닭", "category": "한식", "tags": ["든든한", "진한"], "source": "heuristic"}
-{"store_id": 1, "menu_name": "동궁 식혜 500ml", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 1, "menu_name": "동궁 식혜 500ml", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 1, "menu_name": "동궁 안동찜닭", "category": "한식", "tags": ["든든한", "진한"], "source": "heuristic"}
 {"store_id": 1, "menu_name": "동궁 황금찜닭", "category": "한식", "tags": ["든든한", "진한"], "source": "heuristic"}
 {"store_id": 1, "menu_name": "동궁김+동궁참기름", "category": "한식", "tags": [], "source": "fallback"}
@@ -122,10 +122,10 @@
 {"store_id": 11, "menu_name": "(햄스테드 유기농) 허니유자블랙티(XL)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 11, "menu_name": "(햄스테드 유기농) 허니자몽블랙티(XL)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 11, "menu_name": "(햄스테드) 유기농 얼그레이 티(XL)", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 11, "menu_name": "(헴스테드 유기농) 돌체 로얄 밀크티(XL)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 11, "menu_name": "(헴스테드 유기농) 돌체 로얄 밀크티(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "5개 스타 행사(1만원 이상 주문시 사용)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 11, "menu_name": "[1인세트] 쉬즈베이글&크림치즈베이글&음료(15900)", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 11, "menu_name": "[3잔] 립톤 아이스티(3잔)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 11, "menu_name": "[3잔] 립톤 아이스티(3잔)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "[she's way] 내가 만들어먹는 베이글토스트(1인분)", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
 {"store_id": 11, "menu_name": "[가볍고프레쉬한]리코타치즈 샐러드 브런치 SET", "category": "기타", "tags": ["가벼운", "시원한"], "source": "heuristic"}
 {"store_id": 11, "menu_name": "[가심비 세트] 콰트로 햄 플러스 SET", "category": "기타", "tags": [], "source": "fallback"}
@@ -200,7 +200,7 @@
 {"store_id": 11, "menu_name": "[상큼한 건강] 레몬차(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "[쉬즈모닝] 포테이토치즈머핀", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 11, "menu_name": "[아이들홀릭] 어린이 키즈토스트", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
-{"store_id": 11, "menu_name": "[아이스티의원조]립톤 복숭아 아이스티(XL)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 11, "menu_name": "[아이스티의원조]립톤 복숭아 아이스티(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "[애플망고가낭낭해] 애플망고 주스(500ml)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "[야식 휴게소 느낌 낭낭]추억의 소세지(1개)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 11, "menu_name": "[엄마손맛불고기로든든하게]불고기 랩", "category": "기타", "tags": ["얼큰한", "든든한", "진한"], "source": "heuristic"}
@@ -263,7 +263,7 @@
 {"store_id": 11, "menu_name": "민트 초코 프라페(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "밀크 쉐이크(550ml)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "버블 녹차 라떼(XL)", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 11, "menu_name": "버블 돌체 로얄 밀크티(XL)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 11, "menu_name": "버블 돌체 로얄 밀크티(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "버블 초코 라떼(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "버블 타로라떼(XL)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 11, "menu_name": "버블 홍차라떼(XL)", "category": "기타", "tags": [], "source": "drink"}
@@ -465,7 +465,7 @@
 {"store_id": 28, "menu_name": "[만해께드리는 고기맛두부전] 두포육전", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 28, "menu_name": "[자가제면]성북동맑은칼국수 청산", "category": "한식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 29, "menu_name": "말차라떼", "category": "경양식", "tags": [], "source": "drink"}
-{"store_id": 29, "menu_name": "밀크티", "category": "경양식", "tags": [], "source": "fallback"}
+{"store_id": 29, "menu_name": "밀크티", "category": "경양식", "tags": [], "source": "drink"}
 {"store_id": 29, "menu_name": "바닐라라떼", "category": "경양식", "tags": [], "source": "drink"}
 {"store_id": 29, "menu_name": "바질 청포도 에이드", "category": "경양식", "tags": [], "source": "drink"}
 {"store_id": 29, "menu_name": "성북천 벚꽃 아인슈페너", "category": "경양식", "tags": [], "source": "fallback"}
@@ -483,7 +483,7 @@
 {"store_id": 31, "menu_name": "말차 라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 31, "menu_name": "말차 크림 라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 31, "menu_name": "바닐라라떼", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 31, "menu_name": "복숭아 아이스티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 31, "menu_name": "복숭아 아이스티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 31, "menu_name": "블루라임 에이드", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 31, "menu_name": "수제 딸기청 라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 31, "menu_name": "수제 오리지널 티라미수", "category": "기타", "tags": [], "source": "fallback"}
@@ -617,8 +617,8 @@
 {"store_id": 43, "menu_name": "차돌박이짬뽕밥", "category": "분식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 43, "menu_name": "차돌비빔면", "category": "분식", "tags": ["얼큰한", "담백한"], "source": "heuristic"}
 {"store_id": 43, "menu_name": "차돌짬뽕밥계란빼고", "category": "분식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
-{"store_id": 43, "menu_name": "탕수육 미니(1-2인)", "category": "분식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 43, "menu_name": "탕수육 소(3-4인)", "category": "분식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 43, "menu_name": "탕수육 미니(1-2인)", "category": "분식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 43, "menu_name": "탕수육 소(3-4인)", "category": "분식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 44, "menu_name": "가래떡 2개", "category": "횟집", "tags": ["시원한", "담백한"], "source": "fallback"}
 {"store_id": 44, "menu_name": "가리비구이.찜", "category": "횟집", "tags": ["든든한", "진한"], "source": "heuristic"}
 {"store_id": 44, "menu_name": "계란 3개", "category": "횟집", "tags": ["시원한", "담백한"], "source": "fallback"}
@@ -669,7 +669,7 @@
 {"store_id": 48, "menu_name": "파스타", "category": "기타", "tags": ["가벼운", "진한"], "source": "heuristic"}
 {"store_id": 48, "menu_name": "한우 일본식카레", "category": "기타", "tags": ["진한", "든든한"], "source": "heuristic"}
 {"store_id": 48, "menu_name": "한우A++채끝등심 스테이크", "category": "기타", "tags": ["든든한", "진한"], "source": "heuristic"}
-{"store_id": 49, "menu_name": "밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 49, "menu_name": "밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 49, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 49, "menu_name": "카페라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 50, "menu_name": "고구마튀김", "category": "기타", "tags": ["바삭한"], "source": "heuristic"}
@@ -1064,7 +1064,7 @@
 {"store_id": 71, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 71, "menu_name": "자몽에이드", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 71, "menu_name": "헤이즐넛라떼", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 72, "menu_name": "1kg탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 72, "menu_name": "1kg탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 72, "menu_name": "1인분 운영중", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 72, "menu_name": "1키로 반반메뉴", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 72, "menu_name": "깐풍기", "category": "중국식", "tags": ["진한"], "source": "fallback"}
@@ -1072,9 +1072,9 @@
 {"store_id": 72, "menu_name": "꿔바로우", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 72, "menu_name": "멘보샤(10pcs)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 72, "menu_name": "반반메뉴", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 72, "menu_name": "사천식탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 72, "menu_name": "사천식탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 72, "menu_name": "유린기", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 72, "menu_name": "탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 72, "menu_name": "탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 73, "menu_name": "디아블로 또띠아피자", "category": "호프/통닭", "tags": ["야식", "바삭한"], "source": "fallback"}
 {"store_id": 73, "menu_name": "마늘간장치킨", "category": "호프/통닭", "tags": ["야식", "바삭한"], "source": "fallback"}
 {"store_id": 73, "menu_name": "바질 페스토 또띠아피자", "category": "호프/통닭", "tags": ["야식", "바삭한"], "source": "fallback"}
@@ -1287,25 +1287,25 @@
 {"store_id": 84, "menu_name": "(NEW) 연유꽃방튀김", "category": "중국식", "tags": ["바삭한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "(NEW).연유꽃방튀김", "category": "중국식", "tags": ["바삭한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "(NEW).연유꽃방튀김(6개)", "category": "중국식", "tags": ["바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(육해공곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(육해공곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "(무료배달) [가성비 끝판왕] 팔보해물쟁반짜장(2인분)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 84, "menu_name": "1 셋트 탕수육소+양장피소+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1. 탕수육+볶음밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1. 탕수육+볶음밥1+만두(볶음밥곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1. 탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "10. 탕수육+삼선짬뽕2+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "11.탕수육+고추짬뽕2+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운 비냉 보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운비냉곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "12. 사천탕수육+짜장2+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1 셋트 탕수육소+양장피소+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1. 탕수육+볶음밥1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1. 탕수육+볶음밥1+만두(볶음밥곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1. 탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "10. 탕수육+삼선짬뽕2+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "11.탕수육+고추짬뽕2+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운 비냉 보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운비냉곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "12. 사천탕수육+짜장2+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "13. 깐쇼육+짜장2+만두(보통)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "13.돈까스+짜장+만두(보통)", "category": "중국식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "13.돈까스+짜장+만두(볶음밥변경)", "category": "중국식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
@@ -1323,71 +1323,71 @@
 {"store_id": 84, "menu_name": "17. 양장피+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "18. 팔보채+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "19. 유산슬+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2 셋트 탕수육소+고추잡채소+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(제육덮밥곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2. 탕수육+짬뽕1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "20. 사천탕수육+쟁반짜장2인+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2 셋트 탕수육소+고추잡채소+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(제육덮밥곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2. 탕수육+짬뽕1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "20. 사천탕수육+쟁반짜장2인+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "21. 양장피+쟁반짜장2인+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "22. 고추잡채+쟁반짜장2인+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "23. 팔보채+쟁반짜장2인+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(짬짜곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(간짜장곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(쟁반곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(차돌짬뽕곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(삼선짬뽕곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3 셋트 탕수육소+깐쇼새우소+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(삼선볶음밥곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "4 셋트 탕수육소+양장피소+깐풍기소+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(짬뽕밥곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 탕수육+간짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(삼선짬뽕밥곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "6. 탕수육+짬뽕2+만두", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(차돌짬뽕밥곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(짬짜곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(간짜장곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(쟁반곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(차돌짬뽕곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(삼선짬뽕곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3 셋트 탕수육소+깐쇼새우소+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(삼선볶음밥곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "4 셋트 탕수육소+양장피소+깐풍기소+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(짬뽕밥곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(보통)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 탕수육+간짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(삼선짬뽕밥곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "6. 탕수육+짬뽕2+만두", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(차돌짬뽕밥곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(보통)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(볶음밥 변경)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(짬뽕 변경)", "category": "중국식", "tags": ["국물있는", "얼큰한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(짬짜면 변경)", "category": "중국식", "tags": ["든든한", "담백한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(육해공짬뽕밥곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "7. 탕수육+쟁반짜장2인+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "8. 탕수육+볶음밥2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉곱배기)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉보통)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "9. 탕수육+차돌짬뽕2+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(육해공짬뽕밥곱배기)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "7. 탕수육+쟁반짜장2인+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "8. 탕수육+볶음밥2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "시원한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉보통)", "category": "중국식", "tags": ["바삭한", "진한", "시원한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉곱배기)", "category": "중국식", "tags": ["바삭한", "진한", "시원한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉보통)", "category": "중국식", "tags": ["바삭한", "진한", "시원한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "9. 탕수육+차돌짬뽕2+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[HIT&HOT] 육해공 얼큰짬뽕(곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[HIT&HOT] 육해공 얼큰짬뽕(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[국물일품] 차돌박이짬뽕(곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[국물일품] 차돌박이짬뽕(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[선호도1위] 탕짜면", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "[우리집 별미] 김피탕(김치치즈탕수육)(대)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "[우리집 별미] 김피탕(김치치즈탕수육)(중)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "[우리집 별미] 김피탕(김치치즈탕수육)(대)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "[우리집 별미] 김피탕(김치치즈탕수육)(중)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[주문수1위] 짜장면", "category": "중국식", "tags": ["담백한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "[중독성갑] 간짜장", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 84, "menu_name": "[찰떡궁합] 3. 탕수육+짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "[커플추천]4. 탕수육+짜장+짬뽕+만두", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "[찰떡궁합] 3. 탕수육+짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "[커플추천]4. 탕수육+짜장+짬뽕+만두", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "간짜장", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "갈비탕", "category": "중국식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "고기왕만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
@@ -1433,9 +1433,9 @@
 {"store_id": 84, "menu_name": "라조육(中)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "라조육(大)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "라조육(小)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 84, "menu_name": "마늘탕수육(대)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "마늘탕수육(소)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "마늘탕수육(중)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "마늘탕수육(대)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "마늘탕수육(소)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "마늘탕수육(중)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "마파두부(中)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "마파두부(大)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "마파두부(小)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
@@ -1453,9 +1453,9 @@
 {"store_id": 84, "menu_name": "비빔냉면", "category": "중국식", "tags": ["시원한", "담백한", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "사천볶음밥", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "사천짜장", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 84, "menu_name": "사천탕수육(中)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "사천탕수육(大)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "사천탕수육(小)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "사천탕수육(中)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "사천탕수육(大)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "사천탕수육(小)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "삼선간짜장", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "삼선고추짬뽕", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "삼선고추짬뽕밥", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
@@ -1476,9 +1476,9 @@
 {"store_id": 84, "menu_name": "삼선차돌짬뽕밥(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "삼선해물탕", "category": "중국식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "새우볶음밥", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "소고기탕수육(中)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "소고기탕수육(大)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "소고기탕수육(小)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "소고기탕수육(中)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "소고기탕수육(大)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "소고기탕수육(小)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "송이덮밥", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "양장피(中)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "양장피(大)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
@@ -1547,24 +1547,24 @@
 {"store_id": 84, "menu_name": "차돌짬뽕밥(곱배기)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "차돌짬뽕밥(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "춘권", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 84, "menu_name": "치킨탕수육(中)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "치킨탕수육(大)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "치킨탕수육(小)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "치킨탕수육(中)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "치킨탕수육(大)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "치킨탕수육(小)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "칠성사이다(1.25L)", "category": "중국식", "tags": [], "source": "drink"}
 {"store_id": 84, "menu_name": "칠성사이다500ml", "category": "중국식", "tags": [], "source": "drink"}
 {"store_id": 84, "menu_name": "카레볶음밥", "category": "중국식", "tags": ["든든한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "콜라 500ml(펩시)", "category": "중국식", "tags": [], "source": "drink"}
 {"store_id": 84, "menu_name": "콜라(펩시)(1.25L)", "category": "중국식", "tags": [], "source": "drink"}
-{"store_id": 84, "menu_name": "탕간(탕수육+간짜장)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕간(탕수육+간짜장)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "탕볶밥", "category": "중국식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육(中)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육(大)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육(小)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+깐풍기+고추잡채+양장피(6~7인기준)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+고추잡채+양장피+깐쇼새우(8~9인기준)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+양장피(4~5인기준)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육+해물볶음짬뽕2인+만두(보통)", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 84, "menu_name": "탕수육돈가스 정식", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육(中)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육(大)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육(小)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+깐풍기+고추잡채+양장피(6~7인기준)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+고추잡채+양장피+깐쇼새우(8~9인기준)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+양장피(4~5인기준)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육+해물볶음짬뽕2인+만두(보통)", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 84, "menu_name": "탕수육돈가스 정식", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "탕짬면", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 84, "menu_name": "팔보채(中)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 84, "menu_name": "팔보채(大)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
@@ -1745,7 +1745,7 @@
 {"store_id": 100, "menu_name": "과일차", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "그릴드 파니니 세트", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "누룽지 튀김(100g)", "category": "기타", "tags": ["바삭한"], "source": "heuristic"}
-{"store_id": 100, "menu_name": "단호박 식혜(500ml)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 100, "menu_name": "단호박 식혜(500ml)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "디카페인 아메리카노", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "딸기 에이드", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "딸기 요거트 스무디", "category": "기타", "tags": [], "source": "drink"}
@@ -1761,7 +1761,7 @@
 {"store_id": 100, "menu_name": "바닐라라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "바질 치킨 파니니", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "바질 햄치즈 파니니", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 100, "menu_name": "복숭아 아이스티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 100, "menu_name": "복숭아 아이스티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "블루베리 요거트 스무디", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "소불고기 파니니", "category": "기타", "tags": ["얼큰한", "든든한", "진한"], "source": "heuristic"}
 {"store_id": 100, "menu_name": "수제 마카롱", "category": "기타", "tags": [], "source": "fallback"}
@@ -1769,7 +1769,7 @@
 {"store_id": 100, "menu_name": "수제 마카롱 6 SET", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "시나몬 카페모카", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 100, "menu_name": "아이스티샷추가(아샷추)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 100, "menu_name": "아이스티샷추가(아샷추)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 100, "menu_name": "에그 치즈 그릴 토스트", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
 {"store_id": 100, "menu_name": "에그타르트", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 100, "menu_name": "에그타르트 4 SET", "category": "기타", "tags": [], "source": "fallback"}
@@ -1985,7 +1985,7 @@
 {"store_id": 121, "menu_name": "바닐라라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 121, "menu_name": "발로나 초코라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 121, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 121, "menu_name": "잉글리쉬블랙퍼스트 밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 121, "menu_name": "잉글리쉬블랙퍼스트 밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 121, "menu_name": "카페라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 121, "menu_name": "코우이크림라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 121, "menu_name": "플랫화이트", "category": "기타", "tags": [], "source": "fallback"}
@@ -2187,7 +2187,7 @@
 {"store_id": 148, "menu_name": "바닐라라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 148, "menu_name": "수제 레몬차,자몽차", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 148, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 148, "menu_name": "아이스티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 148, "menu_name": "아이스티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 148, "menu_name": "아포가토", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 148, "menu_name": "제주말차라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 148, "menu_name": "청포도&케일", "category": "기타", "tags": [], "source": "fallback"}
@@ -2266,7 +2266,7 @@
 {"store_id": 150, "menu_name": "깻잎완자[3개]", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 150, "menu_name": "내장국밥", "category": "한식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 150, "menu_name": "돼지국밥", "category": "한식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
-{"store_id": 150, "menu_name": "립톤 제로아이스티(캔)", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 150, "menu_name": "립톤 제로아이스티(캔)", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 150, "menu_name": "맛보기 편육[125g]", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 150, "menu_name": "맛보기순대(12알)", "category": "한식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 150, "menu_name": "맛보기편육(125g)", "category": "한식", "tags": [], "source": "fallback"}
@@ -2417,7 +2417,7 @@
 {"store_id": 156, "menu_name": "쌈야채(쌈장X)", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 156, "menu_name": "쌈장", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 156, "menu_name": "양념목살돼지갈비(400g)", "category": "한식", "tags": ["든든한", "진한"], "source": "heuristic"}
-{"store_id": 156, "menu_name": "육칠이 명품식혜(320ml)", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 156, "menu_name": "육칠이 명품식혜(320ml)", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 156, "menu_name": "육회200g+참깨소스", "category": "한식", "tags": ["쫄깃한", "담백한", "시원한"], "source": "heuristic"}
 {"store_id": 156, "menu_name": "짜글이 김치찌개", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 156, "menu_name": "쪽파김치", "category": "한식", "tags": [], "source": "fallback"}
@@ -2448,15 +2448,15 @@
 {"store_id": 157, "menu_name": "순두부찌개", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 157, "menu_name": "조기매운탕(1인)", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
 {"store_id": 157, "menu_name": "황태구이 정식", "category": "한식", "tags": ["든든한", "진한", "담백한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[1000원할인세트]짜장+짜장+미니탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]볶음밥+미니탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]불고기잡채밥+미니탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]짜장+미니탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]짜장+짬뽕+미니탕수육", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]짬뽕+미니탕수육", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]짬뽕+짬뽕+미니탕수육", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]해물쟁반짜장+미니탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "[세트]해물쟁반짬뽕+미니탕수육", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[1000원할인세트]짜장+짜장+미니탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]볶음밥+미니탕수육", "category": "한식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]불고기잡채밥+미니탕수육", "category": "한식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]짜장+미니탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]짜장+짬뽕+미니탕수육", "category": "한식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]짬뽕+미니탕수육", "category": "한식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]짬뽕+짬뽕+미니탕수육", "category": "한식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]해물쟁반짜장+미니탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "[세트]해물쟁반짬뽕+미니탕수육", "category": "한식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "간짜장", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 158, "menu_name": "겉바속촉 辛군만두(4ps)", "category": "한식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "겉바속촉 辛군만두(8ps)", "category": "한식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
@@ -2508,10 +2508,10 @@
 {"store_id": 158, "menu_name": "짬뽕+군만두(4p)", "category": "한식", "tags": ["국물있는", "얼큰한", "바삭한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "짬뽕+짬뽕+군만두(8p)", "category": "한식", "tags": ["국물있는", "얼큰한", "바삭한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "짬뽕국물", "category": "한식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "찹쌀탕수육(대(4인추천))", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "찹쌀탕수육(미니(1인추천))", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "찹쌀탕수육(소(2인추천))", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 158, "menu_name": "찹쌀탕수육(중(3인추천))", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "찹쌀탕수육(대(4인추천))", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "찹쌀탕수육(미니(1인추천))", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "찹쌀탕수육(소(2인추천))", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "찹쌀탕수육(중(3인추천))", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "청양고추짜장(곱빼기)", "category": "한식", "tags": ["얼큰한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "청양고추짜장(보통)", "category": "한식", "tags": ["얼큰한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "청양고추짬뽕(곱빼기)", "category": "한식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
@@ -2525,7 +2525,7 @@
 {"store_id": 158, "menu_name": "크림짬뽕(보통)", "category": "한식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "탐스제로 오렌지 뚱캔(355ml)", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 158, "menu_name": "탐스제로 파인애플뚱캔(355ml)", "category": "한식", "tags": [], "source": "fallback"}
-{"store_id": 158, "menu_name": "탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 158, "menu_name": "탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "펩시 캔(355ml)", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 158, "menu_name": "해물누룽지탕", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 158, "menu_name": "해물백짬뽕", "category": "한식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
@@ -2551,7 +2551,7 @@
 {"store_id": 159, "menu_name": "더블치즈김밥", "category": "한식", "tags": ["가벼운"], "source": "heuristic"}
 {"store_id": 159, "menu_name": "두툼계란in김밥", "category": "한식", "tags": ["가벼운"], "source": "heuristic"}
 {"store_id": 159, "menu_name": "등심돈까스김밥", "category": "한식", "tags": ["바삭한", "든든한", "가벼운"], "source": "heuristic"}
-{"store_id": 159, "menu_name": "레몬아이스티", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 159, "menu_name": "레몬아이스티", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 159, "menu_name": "레몬에이드", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 159, "menu_name": "매콤미나리참치김밥", "category": "한식", "tags": ["얼큰한", "가벼운"], "source": "heuristic"}
 {"store_id": 159, "menu_name": "매콤어묵.미나리 묵은지 말이 김밥", "category": "한식", "tags": ["얼큰한", "가벼운"], "source": "heuristic"}
@@ -2562,7 +2562,7 @@
 {"store_id": 159, "menu_name": "미나리삼겹살김밥", "category": "한식", "tags": ["든든한", "진한", "가벼운"], "source": "heuristic"}
 {"store_id": 159, "menu_name": "미나리삼겹살김밥 속에 묵은지", "category": "한식", "tags": ["든든한", "진한", "가벼운"], "source": "heuristic"}
 {"store_id": 159, "menu_name": "바닐라라떼", "category": "한식", "tags": [], "source": "drink"}
-{"store_id": 159, "menu_name": "복숭아이스티", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 159, "menu_name": "복숭아이스티", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 159, "menu_name": "생수500ml", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 159, "menu_name": "스프라이트355ml", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 159, "menu_name": "아메리카노", "category": "한식", "tags": [], "source": "drink"}
@@ -2728,7 +2728,7 @@
 {"store_id": 172, "menu_name": "마파두부밥", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 172, "menu_name": "멘보샤", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 172, "menu_name": "사천군만두", "category": "중국식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
-{"store_id": 172, "menu_name": "사천탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 172, "menu_name": "사천탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "수제비짬뽕", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "순두부짬뽕면", "category": "중국식", "tags": ["국물있는", "얼큰한", "담백한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "순두부짬뽕밥", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
@@ -2741,7 +2741,7 @@
 {"store_id": 172, "menu_name": "지존짬뽕", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "지존짬뽕밥", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "짜장밥", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 172, "menu_name": "찹쌀탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 172, "menu_name": "찹쌀탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 172, "menu_name": "콩국수", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 173, "menu_name": "갈비천왕", "category": "호프/통닭", "tags": ["든든한", "진한"], "source": "heuristic"}
 {"store_id": 173, "menu_name": "고추바사삭", "category": "호프/통닭", "tags": ["야식", "바삭한"], "source": "fallback"}
@@ -2936,9 +2936,9 @@
 {"store_id": 175, "menu_name": "베이컨에그샐러드", "category": "기타", "tags": ["가벼운", "시원한"], "source": "heuristic"}
 {"store_id": 175, "menu_name": "베이컨에그포케", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "베이컨크림파스타샐러드", "category": "기타", "tags": ["가벼운", "시원한", "진한"], "source": "heuristic"}
-{"store_id": 175, "menu_name": "복숭아아이스티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "복숭아아이스티(ICE 1L)", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "복숭아아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 175, "menu_name": "복숭아아이스티", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 175, "menu_name": "복숭아아이스티(ICE 1L)", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 175, "menu_name": "복숭아아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 175, "menu_name": "부드러운 호박죽(300g)", "category": "기타", "tags": ["담백한", "따뜻한"], "source": "heuristic"}
 {"store_id": 175, "menu_name": "부채살 단백질 도시락", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "부채살 샐러드(100g)", "category": "기타", "tags": ["가벼운", "시원한"], "source": "heuristic"}
@@ -3058,9 +3058,9 @@
 {"store_id": 175, "menu_name": "자몽에이드", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 175, "menu_name": "자몽에이드(ICE 1L)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 175, "menu_name": "자몽에이드(ICE 500m)", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 175, "menu_name": "제로 칼로리 레몬 아이스티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "제로 칼로리 레몬아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "제로 칼로리 복숭아 아이스티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 175, "menu_name": "제로 칼로리 레몬 아이스티", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 175, "menu_name": "제로 칼로리 레몬아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 175, "menu_name": "제로 칼로리 복숭아 아이스티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 175, "menu_name": "제로 칼로리 콤부차 [선택구매]", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "제로 칼로리 콤부차 레몬", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "제로 칼로리 콤부차 복숭아", "category": "기타", "tags": [], "source": "fallback"}
@@ -3068,8 +3068,8 @@
 {"store_id": 175, "menu_name": "제로 칼로리 콤부차 히비스커스", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "제로 칼로리 타우린비타S", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "제로 칼로리 힐링티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "제로칼로리 복숭아 아이스티(ICE 1L)", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 175, "menu_name": "제로칼로리 복숭아 아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 175, "menu_name": "제로칼로리 복숭아 아이스티(ICE 1L)", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 175, "menu_name": "제로칼로리 복숭아 아이스티(ICE 500ml)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 175, "menu_name": "제로칼로리 타우린비타S(ICE 500ml)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "제로칼로리 힐링티(ICE 500ml)", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 175, "menu_name": "체다치즈 듬뿍 계란볶이", "category": "기타", "tags": [], "source": "fallback"}
@@ -3285,8 +3285,8 @@
 {"store_id": 179, "menu_name": "아이스아메리카노(L)", "category": "패스트푸드", "tags": [], "source": "drink"}
 {"store_id": 179, "menu_name": "아이스아메리카노(R)", "category": "패스트푸드", "tags": [], "source": "drink"}
 {"store_id": 179, "menu_name": "아이스카페라떼(살균우유)", "category": "패스트푸드", "tags": [], "source": "drink"}
-{"store_id": 179, "menu_name": "아이스티(L)", "category": "패스트푸드", "tags": [], "source": "fallback"}
-{"store_id": 179, "menu_name": "아이스티(R)", "category": "패스트푸드", "tags": [], "source": "fallback"}
+{"store_id": 179, "menu_name": "아이스티(L)", "category": "패스트푸드", "tags": [], "source": "drink"}
+{"store_id": 179, "menu_name": "아이스티(R)", "category": "패스트푸드", "tags": [], "source": "drink"}
 {"store_id": 179, "menu_name": "양념감자", "category": "패스트푸드", "tags": [], "source": "fallback"}
 {"store_id": 179, "menu_name": "양념너겟", "category": "패스트푸드", "tags": [], "source": "fallback"}
 {"store_id": 179, "menu_name": "오렌지주스 PET(400ml)", "category": "패스트푸드", "tags": [], "source": "drink"}
@@ -3835,37 +3835,37 @@
 {"store_id": 216, "menu_name": "코다리조림", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 218, "menu_name": "깐풍기+짜장2", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 218, "menu_name": "양장피+짜장2", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 218, "menu_name": "양장피+탕수육+짜장2", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 218, "menu_name": "양장피+탕수육+짜장2", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 218, "menu_name": "유산슬+짜장2", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 218, "menu_name": "탕수육+짜장2", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 218, "menu_name": "탕수육+짜장2", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 218, "menu_name": "팔보채+짜장2", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 219, "menu_name": "0. 등심탕수육+짜장1+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "00.등심탕수육+짬뽕1+만두", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "1. 등심사천탕수육+짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "1. 등심탕수육+양장피+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "1. 등심탕수육+짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "0. 등심탕수육+짜장1+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "00.등심탕수육+짬뽕1+만두", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "1. 등심사천탕수육+짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "1. 등심탕수육+양장피+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "1. 등심탕수육+짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "2. 깐쇼육+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "2. 등심탕수육+고추잡채+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "2. 등심탕수육+짜장+짬뽕+만두", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "2. 등심탕수육+고추잡채+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "2. 등심탕수육+짜장+짬뽕+만두", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "3. 깐풍기+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "3. 등심탕수육+짬뽕2+만두", "category": "중국식", "tags": ["국물있는", "얼큰한", "따뜻한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "3. 등심탕수육+팔보채+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "3. 등심탕수육+짬뽕2+만두", "category": "중국식", "tags": ["얼큰한", "바삭한", "진한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "3. 등심탕수육+팔보채+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "4. 고추잡채+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "4. 깐풍기+양장피+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "4. 등심탕수육+간짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "4. 등심탕수육+간짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "5. 깐풍기+팔보채+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "5. 등심탕수육+삼선쟁반짜장2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "5. 등심탕수육+삼선쟁반짜장2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "5. 양장피+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "6. 등심  탕수육+볶음밥2+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "6. 등심  탕수육+볶음밥2+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "6. 양장피+고추잡채+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "7. 양장피+팔보채+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "7. 팔보채+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "7.등심탕수육 + 쟁반짜장 1+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "7.등심탕수육 + 쟁반짜장 1+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "8. 깐쇼새우+짜장2+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "8. 등심탕수육+양장피+고추잡채+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "8.등심탕수육 + 간짜장 1+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "8. 등심탕수육+양장피+고추잡채+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "8.등심탕수육 + 간짜장 1+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "9. 양장피+고추잡채+팔보채+만두", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "9.등심탕수육 + 볶음밥 1+만두", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "9.등심탕수육 + 볶음밥 1+만두", "category": "중국식", "tags": ["바삭한", "진한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "간짜장", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 219, "menu_name": "갈비탕", "category": "중국식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "고추덮밥", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
@@ -3881,10 +3881,10 @@
 {"store_id": 219, "menu_name": "등심깐쇼육", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 219, "menu_name": "등심깐풍육", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 219, "menu_name": "등심라조육", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 219, "menu_name": "등심사천탕수육中", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "등심탕수육(中)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "등심탕수육(大)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "등심탕수육(小)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "등심사천탕수육中", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "등심탕수육(中)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "등심탕수육(大)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "등심탕수육(小)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "떡만두국", "category": "중국식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "라조기", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 219, "menu_name": "마파밥", "category": "중국식", "tags": ["진한"], "source": "fallback"}
@@ -3940,7 +3940,7 @@
 {"store_id": 219, "menu_name": "차돌박이 짬뽕(1인분)", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "차돌짬뽕밥", "category": "중국식", "tags": ["국물있는", "얼큰한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "탕볶밥", "category": "중국식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
-{"store_id": 219, "menu_name": "탕수육(소/중/대)", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 219, "menu_name": "탕수육(소/중/대)", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "탕짜(짬)면", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "탕짜면", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 219, "menu_name": "탕짬면", "category": "중국식", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
@@ -4029,7 +4029,7 @@
 {"store_id": 232, "menu_name": "복불고기", "category": "한식", "tags": ["얼큰한", "든든한", "진한"], "source": "heuristic"}
 {"store_id": 232, "menu_name": "복지리/매운탕", "category": "한식", "tags": ["국물있는", "담백한", "얼큰한"], "source": "heuristic"}
 {"store_id": 232, "menu_name": "복코스", "category": "한식", "tags": [], "source": "fallback"}
-{"store_id": 232, "menu_name": "복탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 232, "menu_name": "복탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 232, "menu_name": "복튀김", "category": "한식", "tags": ["바삭한"], "source": "heuristic"}
 {"store_id": 232, "menu_name": "활참복 코스", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 232, "menu_name": "활참복 회(1마리)", "category": "한식", "tags": ["담백한", "시원한"], "source": "heuristic"}
@@ -4095,7 +4095,7 @@
 {"store_id": 240, "menu_name": "열무비빔국수 소", "category": "정종/대포집/소주방", "tags": ["국물있는", "따뜻한", "얼큰한"], "source": "heuristic"}
 {"store_id": 240, "menu_name": "옥수수국수", "category": "정종/대포집/소주방", "tags": ["국물있는", "따뜻한", "담백한"], "source": "heuristic"}
 {"store_id": 240, "menu_name": "왕양갈비", "category": "정종/대포집/소주방", "tags": ["든든한", "진한"], "source": "heuristic"}
-{"store_id": 240, "menu_name": "탕수육", "category": "정종/대포집/소주방", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 240, "menu_name": "탕수육", "category": "정종/대포집/소주방", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 241, "menu_name": "누룽지삼계탕", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 241, "menu_name": "반계탕", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
 {"store_id": 241, "menu_name": "전복삼계탕", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
@@ -4504,7 +4504,7 @@
 {"store_id": 271, "menu_name": "더 홈 카푸치노", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 271, "menu_name": "라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 271, "menu_name": "말차 바스크 치즈케이크", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 271, "menu_name": "밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 271, "menu_name": "밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 271, "menu_name": "수제 바스크 치즈케이크", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 271, "menu_name": "아인슈페너", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 271, "menu_name": "진저밀크", "category": "기타", "tags": [], "source": "fallback"}
@@ -4540,7 +4540,7 @@
 {"store_id": 274, "menu_name": "쫄면", "category": "기타", "tags": ["담백한"], "source": "heuristic"}
 {"store_id": 275, "menu_name": "드립커피", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 275, "menu_name": "레몬딜에이드", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 275, "menu_name": "복숭아잎아이스티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 275, "menu_name": "복숭아잎아이스티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 275, "menu_name": "비엔나커피", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 275, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 275, "menu_name": "카페라떼", "category": "기타", "tags": [], "source": "drink"}
@@ -4592,13 +4592,13 @@
 {"store_id": 278, "menu_name": "장터국밥", "category": "일식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 278, "menu_name": "장터국밥 특", "category": "일식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 278, "menu_name": "전복곰탕", "category": "일식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
-{"store_id": 279, "menu_name": "냄비에 끓이는 밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 279, "menu_name": "냄비에 끓이는 밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 279, "menu_name": "레몬 팥빙수", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 279, "menu_name": "민트밀크티 빙수", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 279, "menu_name": "민트밀크티 빙수", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 279, "menu_name": "바나나푸딩", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 279, "menu_name": "아이스 민트 밀크티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 279, "menu_name": "아이스 짜이 밀크티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 279, "menu_name": "아이스 카모마일 밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 279, "menu_name": "아이스 민트 밀크티", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 279, "menu_name": "아이스 짜이 밀크티", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 279, "menu_name": "아이스 카모마일 밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 279, "menu_name": "아이스 홍차 밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 279, "menu_name": "홍차밀크티 빙수", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 280, "menu_name": "김치부대찌개", "category": "한식", "tags": ["국물있는", "따뜻한"], "source": "heuristic"}
@@ -4793,13 +4793,13 @@
 {"store_id": 290, "menu_name": "어향가지덮밥(면)", "category": "중국식", "tags": ["든든한", "담백한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "오향장육과 해파리냉채", "category": "중국식", "tags": ["시원한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "유린기", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 290, "menu_name": "유린탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 290, "menu_name": "유린탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "잡채밥", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 290, "menu_name": "중국식냉면", "category": "중국식", "tags": ["국물있는", "따뜻한", "시원한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "짜장면", "category": "중국식", "tags": ["담백한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "차돌짬뽕 (면,밥)", "category": "중국식", "tags": ["국물있는", "얼큰한", "담백한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "칠리큰새우(12마리)", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 290, "menu_name": "탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 290, "menu_name": "탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "해물백짬뽕(면,밥)", "category": "중국식", "tags": ["국물있는", "얼큰한", "담백한"], "source": "heuristic"}
 {"store_id": 290, "menu_name": "해물양장피", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 292, "menu_name": "(고단백질) 살코기수육국밥정식", "category": "한식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
@@ -4849,7 +4849,7 @@
 {"store_id": 292, "menu_name": "뼈다귀전골+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
 {"store_id": 292, "menu_name": "생부추 추가", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 292, "menu_name": "생수(500ml)", "category": "한식", "tags": [], "source": "fallback"}
-{"store_id": 292, "menu_name": "식혜(340ml)", "category": "한식", "tags": [], "source": "fallback"}
+{"store_id": 292, "menu_name": "식혜(340ml)", "category": "한식", "tags": [], "source": "drink"}
 {"store_id": 292, "menu_name": "얇은피왕만두(고기)(4개)", "category": "한식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 292, "menu_name": "얇은피왕만두(고기2+김치2)(4개)", "category": "한식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 292, "menu_name": "얇은피왕만두(김치)(4개)", "category": "한식", "tags": ["든든한"], "source": "heuristic"}
@@ -5201,7 +5201,7 @@
 {"store_id": 308, "menu_name": "C 코스", "category": "중국식", "tags": ["진한"], "source": "fallback"}
 {"store_id": 308, "menu_name": "삼선 자장면", "category": "중국식", "tags": ["담백한"], "source": "heuristic"}
 {"store_id": 308, "menu_name": "칠리소스 대하", "category": "중국식", "tags": ["진한"], "source": "fallback"}
-{"store_id": 308, "menu_name": "탕수육", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 308, "menu_name": "탕수육", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 309, "menu_name": "(new)흑임자라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "(시즌한정) 생수박주스", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "누네띠네 스콘", "category": "기타", "tags": [], "source": "fallback"}
@@ -5227,7 +5227,7 @@
 {"store_id": 309, "menu_name": "바닐라빈라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "바닐라빈라떼(제로슈가)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "바질치킨 샌드위치", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
-{"store_id": 309, "menu_name": "복숭아 아이스티(only ice)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 309, "menu_name": "복숭아 아이스티(only ice)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "블루베리 리코타 크로플", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 309, "menu_name": "사브레쿠키", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 309, "menu_name": "샌드위치 세트", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
@@ -5238,7 +5238,7 @@
 {"store_id": 309, "menu_name": "쑥 오곡라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "쑥 오곡라떼(only ice)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "아메리카노", "category": "기타", "tags": [], "source": "drink"}
-{"store_id": 309, "menu_name": "얼그레이밀크티", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 309, "menu_name": "얼그레이밀크티", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "에그베이컨 샌드위치", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
 {"store_id": 309, "menu_name": "에그베이컨 크로와상", "category": "기타", "tags": [], "source": "fallback"}
 {"store_id": 309, "menu_name": "에그베이컨 크로와상 샌드위치", "category": "기타", "tags": ["가벼운"], "source": "heuristic"}
@@ -5272,8 +5272,8 @@
 {"store_id": 309, "menu_name": "헤이즐넛라떼", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "헤이즐넛라떼(제로슈가)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 309, "menu_name": "헤이즐넛초코 휘낭시에", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 309, "menu_name": "히비스커스 아이스티", "category": "기타", "tags": [], "source": "fallback"}
-{"store_id": 309, "menu_name": "히비스커스아이스티(only ice)", "category": "기타", "tags": [], "source": "fallback"}
+{"store_id": 309, "menu_name": "히비스커스 아이스티", "category": "기타", "tags": [], "source": "drink"}
+{"store_id": 309, "menu_name": "히비스커스아이스티(only ice)", "category": "기타", "tags": [], "source": "drink"}
 {"store_id": 310, "menu_name": "뼈다귀 해물찜 대", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 310, "menu_name": "뼈다귀 해물찜- 중", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 310, "menu_name": "뼈다귀간장찜 중", "category": "한식", "tags": [], "source": "fallback"}
@@ -5497,7 +5497,7 @@
 {"store_id": 321, "menu_name": "직화불향쭈꾸미", "category": "한식", "tags": ["얼큰한"], "source": "heuristic"}
 {"store_id": 321, "menu_name": "쭈꾸미만두", "category": "한식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 321, "menu_name": "쭈대전골", "category": "한식", "tags": ["국물있는", "따뜻한", "든든한"], "source": "heuristic"}
-{"store_id": 321, "menu_name": "찹쌀탕수육", "category": "한식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 321, "menu_name": "찹쌀탕수육", "category": "한식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 321, "menu_name": "철판불향쭈꾸미", "category": "한식", "tags": ["얼큰한"], "source": "heuristic"}
 {"store_id": 321, "menu_name": "철판양념쭈꾸미", "category": "한식", "tags": [], "source": "fallback"}
 {"store_id": 321, "menu_name": "치즈돈까스", "category": "한식", "tags": ["바삭한", "든든한"], "source": "heuristic"}
@@ -5640,9 +5640,9 @@
 {"store_id": 328, "menu_name": "계란 볶음밥(곱빼기)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 328, "menu_name": "계란 볶음밥(기본)", "category": "중국식", "tags": ["든든한"], "source": "heuristic"}
 {"store_id": 328, "menu_name": "꿔바로우", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
-{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(대(16조각))", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(미니(6조각))", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
-{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(소(10조각))", "category": "중국식", "tags": ["국물있는", "따뜻한", "바삭한"], "source": "heuristic"}
+{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(대(16조각))", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(미니(6조각))", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
+{"store_id": 328, "menu_name": "꿔바로우(찹쌀탕수육)(소(10조각))", "category": "중국식", "tags": ["바삭한", "진한"], "source": "heuristic"}
 {"store_id": 328, "menu_name": "딘딘향 마라샹궈(1인분)", "category": "중국식", "tags": ["얼큰한", "진한"], "source": "heuristic"}
 {"store_id": 328, "menu_name": "딘딘향 마라샹궈(2~3인분)", "category": "중국식", "tags": ["얼큰한", "진한"], "source": "heuristic"}
 {"store_id": 328, "menu_name": "딘딘향 마라샹궈+계란 볶음밥", "category": "중국식", "tags": ["얼큰한", "진한", "든든한"], "source": "heuristic"}
