@@ -123,22 +123,27 @@ def match(
 def to_food(r: MatchResult) -> dict:
     """MatchResult → 프론트 food 객체 계약 (foods.mock.js 형태).
 
-    reason의 cfScore/cfDescription은 CF가, contextNote는 컨텍스트 트랙이 채울 빈 칸.
+    reason의 cfScore/cfDescription/contextNote는 이후 단계(CF 등)가 채울 빈 칸.
     여기선 matchedKeywords와 매칭 기반 score만 채운다.
       - storeId: 프론트 mock엔 없지만 식당 집계·연결에 필수라 확장 필드로 포함
-      - score: 0~100. CF 합류 전이라 현재는 매칭 커버리지 기반
+      - score: 0~100. CF 합류 전 임시값. match()의 정렬 키 (overlap, jaccard)를
+        그대로 반영하도록 커버리지(0.85)+Jaccard(0.15) 가중 합으로 산출한다.
+        커버리지만 쓰면 태그를 다 충족한 후보가 전부 100점으로 몰려 순위 정보가
+        사라지므로, Jaccard를 섞어 프론트가 score로 재정렬해도 같은 순서가 나오게 한다.
+        (extract가 쿼리 태그를 최대 4개로 캡 → 커버리지 한 칸 차이 ≥ 21점 > Jaccard
+        기여 최대 15점이라 '커버리지 우선, Jaccard 동점처리' 순서가 보존됨.)
     """
     return {
         "id": stable_food_id(r.store_id, r.menu_name),
         "storeId": r.store_id,
         "name": r.menu_name,
         "tags": r.tags,
-        "score": round(min(r.coverage, 1.0) * 100),
+        "score": round((min(r.coverage, 1.0) * 0.85 + r.jaccard * 0.15) * 100),
         "reason": {
             "matchedKeywords": r.matched,
             "cfScore": None,        # CF가 채움 (CF_hw)
             "cfDescription": None,  # CF가 채움
-            "contextNote": None,    # 컨텍스트 트랙이 채움 (혼밥·날씨 등)
+            "contextNote": None,    # 이후 단계가 채울 빈 칸
         },
     }
 
@@ -147,7 +152,7 @@ def recommend_foods(query_text: str, top_k: int = 10) -> dict:
     """자연어 → 프론트 계약 그대로의 추천 응답. extract→match→food 객체.
 
     반환: {"query", "keywords", "foods": [food 객체...]}
-    cfScore/contextNote는 빈 칸 — 이후 CF·컨텍스트 단계가 같은 객체를 채운다.
+    cfScore/contextNote는 빈 칸 — 이후 CF 단계가 같은 객체를 채운다.
     """
     tags, results = recommend(query_text, top_k=top_k)
     return {
@@ -160,8 +165,8 @@ def recommend_foods(query_text: str, top_k: int = 10) -> dict:
 def recommend(query_text: str, top_k: int = 10) -> tuple[list[str], list[MatchResult]]:
     """자연어 한 줄 → (추출된 태그, 매칭된 메뉴 후보). 파이프라인 end-to-end.
 
-    extract → match를 묶는다. extract가 API 키 유무로 mock/Claude 분기되는 것 외엔
-    이 함수도 키와 무관.
+    extract → match를 묶는다. 쿼리·메뉴 둘 다 시드 13개 어휘라 교집합 매칭이 잘 정의된다.
+    extract가 API 키 유무로 mock/Claude 분기되는 것 외엔 이 함수도 키와 무관.
     """
     from .extract import extract_tags
 
@@ -174,7 +179,7 @@ def recommend(query_text: str, top_k: int = 10) -> tuple[list[str], list[MatchRe
 if __name__ == "__main__":
     import sys
 
-    queries = sys.argv[1:] or ["얼큰한 국물", "혼자 가볍게", "해장되는 거", "바삭한 야식"]
+    queries = sys.argv[1:] or ["얼큰한 국물", "고소한 거", "해장되는 거", "바삭한 야식"]
     rows = load_menu_tags()
     print(f"(매칭 대상 메뉴: {len(rows)}개)\n")
     for qtext in queries:
