@@ -27,11 +27,11 @@ const KEYWORD_HINTS = [
   { match: ['진한', '깊은', '구수'], label: '진한' },
   { match: ['가벼', '간단', '간편'], label: '가벼운' },
   { match: ['든든', '배부르', '푸짐'], label: '든든한' },
-  { match: ['혼자', '혼밥'], label: '혼밥' },
   { match: ['해장'], label: '해장' },
   { match: ['야식'], label: '야식' },
   { match: ['바삭'], label: '바삭한' },
   { match: ['쫄깃'], label: '쫄깃한' },
+  { match: ['고소', '치즈', '크림', '버터'], label: '고소한' },
 ];
 
 /**
