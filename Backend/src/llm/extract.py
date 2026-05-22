@@ -1,7 +1,7 @@
 """자연어 → 추천 태그 추출.
 
-5/17 회의 확정: 태그 추출이 메인. 1~4개 추출, open vocab + 시드 정규화.
-API 키 수령 전엔 mock(규칙 기반)으로 동작 — 키 받으면 _extract_claude만 채우면 됨.
+5/17 회의 확정: 태그 추출이 메인. 시드 13개에서만 1~4개 추출(쿼리·메뉴 동일 어휘).
+API 키 수령 전엔 mock(규칙 기반)으로 동작 — 키 받으면 _extract_claude가 enum으로 강제.
 """
 
 from __future__ import annotations
@@ -19,8 +19,9 @@ SYSTEM_PROMPT = """\
 사용자 자연어 입력에서 '추천에 쓸 핵심 표현' 1~4개를 한국어 형용사/명사구로 추출하세요.
 
 규칙:
-- 가능하면 다음 시드 어휘를 우선 사용: {seed}
-- 시드에 없는 자연스러운 표현은 새로 만들어도 됩니다 (예: "비 오는 날", "집밥 같은").
+- 다음 시드 어휘에서만 고릅니다: {seed}
+- 사용자 표현은 의미가 가장 가까운 시드로 매핑합니다 (예: "칼칼한"→"얼큰한",
+  "비 오는 날"→"따뜻한"+"국물있는", "느끼한"→"고소한").
 - 부정은 "X 말고" 형태로 표기 (예: "매운 거 말고").
 - 비음식·노이즈는 무시합니다. 의미가 전혀 없으면 빈 배열을 반환합니다.
 
@@ -30,11 +31,15 @@ SYSTEM_PROMPT = """\
 
 
 # 구조화 출력 스키마 — Claude가 항상 이 JSON 형태로만 응답하게 강제.
-# (output_config.format / Sonnet 4.6 지원). tags는 문자열 배열.
+# (output_config.format / Sonnet 4.6 지원). items enum으로 시드 13개 밖 태그를 차단
+# → 쿼리·메뉴 양쪽이 같은 어휘를 써서 매칭(교집합)이 항상 잘 정의된다.
 TAGS_SCHEMA = {
     "type": "object",
     "properties": {
-        "tags": {"type": "array", "items": {"type": "string"}},
+        "tags": {
+            "type": "array",
+            "items": {"type": "string", "enum": list(SEED_TAGS)},
+        },
     },
     "required": ["tags"],
     "additionalProperties": False,
@@ -97,7 +102,7 @@ def _extract_claude(text: str, api_key: str) -> ExtractResult:
 
 
 def _extract_mock(text: str) -> ExtractResult:
-    """규칙 기반 mock — Frontend keywordService.js의 13개 매칭과 동일 동작 + 정규화."""
+    """규칙 기반 mock — SURFACE_TO_CANONICAL 부분문자열 매칭. 시드 정규형만 출력."""
     hits: list[str] = []
     lowered = text.lower()
     for surface, canonical in SURFACE_TO_CANONICAL:
@@ -106,11 +111,7 @@ def _extract_mock(text: str) -> ExtractResult:
             if len(hits) >= 4:
                 break
     if not hits:
-        return ExtractResult(
-            original_text=text,
-            tags=[text.strip()[:12]],
-            source="fallback",
-        )
+        return ExtractResult(original_text=text, tags=[text.strip()[:12]], source="fallback")
     return ExtractResult(original_text=text, tags=hits, source="mock")
 
 
