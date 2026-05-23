@@ -32,6 +32,7 @@ const KEYWORD_HINTS = [
   { match: ['바삭'], label: '바삭한' },
   { match: ['쫄깃'], label: '쫄깃한' },
   { match: ['고소', '치즈', '크림', '버터'], label: '고소한' },
+  { match: ['달달', '달콤', '단짠', '꿀', '시럽', '디저트'], label: '달달한' },
 ];
 
 /**
