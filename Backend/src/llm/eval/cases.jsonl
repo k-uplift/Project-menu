@@ -1,0 +1,36 @@
+{"id":"clear-01","category":"명확","query":"얼큰한 국물","expected_tags":["얼큰한","국물있는"],"accept_tags":["얼큰한","국물있는"],"top5_should_match":"라면·짬뽕·찌개·매운탕 계열","top5_should_avoid":null,"notes":"전형 매핑"}
+{"id":"clear-02","category":"명확","query":"해장되는 거","expected_tags":["해장"],"accept_tags":["해장","국물있는","따뜻한"],"top5_should_match":"국밥·해장국·콩나물국밥·내장탕","top5_should_avoid":null,"notes":"단일 시드 직접 매핑"}
+{"id":"clear-03","category":"명확","query":"달달한 디저트 먹고 싶어","expected_tags":["달달한"],"accept_tags":["달달한"],"top5_should_match":"케이크·쿠키·마카롱·아이스크림·푸딩","top5_should_avoid":null,"notes":"5/24 추가된 달달한 시드 활용"}
+{"id":"clear-04","category":"명확","query":"바삭한 튀김","expected_tags":["바삭한"],"accept_tags":["바삭한"],"top5_should_match":"돈까스·치킨·튀김·강정·전","top5_should_avoid":null,"notes":"단일 시드"}
+{"id":"clear-05","category":"명확","query":"따뜻한 국물요리","expected_tags":["따뜻한","국물있는"],"accept_tags":["따뜻한","국물있는"],"top5_should_match":"국밥·찌개·전골·탕","top5_should_avoid":null,"notes":"전형 2태그"}
+{"id":"clear-06","category":"명확","query":"시원한 거 먹고 싶다","expected_tags":["시원한"],"accept_tags":["시원한"],"top5_should_match":"냉면·물회·빙수·아이스류","top5_should_avoid":null,"notes":"단일 시드"}
+{"id":"clear-07","category":"명확","query":"든든한 한 끼","expected_tags":["든든한"],"accept_tags":["든든한"],"top5_should_match":"백반·국밥·정식·도시락·찜닭","top5_should_avoid":"음료·간식","notes":"단일 시드 — 약점 카테고리와도 연관(공기밥 추가가 1위 될 위험)"}
+{"id":"clear-08","category":"명확","query":"야식 추천","expected_tags":["야식"],"accept_tags":["야식"],"top5_should_match":"치킨·곱창·족발·라면·강정","top5_should_avoid":null,"notes":"단일 시드 — 시간대 컨텍스트"}
+{"id":"vague-01","category":"모호","query":"매콤한 거","expected_tags":["얼큰한"],"accept_tags":["얼큰한"],"top5_should_match":"떡볶이·짬뽕·매운탕 등 매운 메뉴","top5_should_avoid":null,"notes":"매콤→얼큰한 (SURFACE_TO_CANONICAL)"}
+{"id":"vague-02","category":"모호","query":"느끼한 거","expected_tags":["고소한"],"accept_tags":["고소한","진한"],"top5_should_match":"크림파스타·치즈·버터·리조또","top5_should_avoid":null,"notes":"extract.py SYSTEM_PROMPT 예시. 부정적 표현이지만 시드 매핑은 긍정으로"}
+{"id":"vague-03","category":"모호","query":"칼칼한 국물","expected_tags":["얼큰한","국물있는"],"accept_tags":["얼큰한","국물있는"],"top5_should_match":"짬뽕·해장국·매운탕","top5_should_avoid":null,"notes":"칼칼→얼큰한 매핑 확인"}
+{"id":"vague-04","category":"모호","query":"가벼운 점심","expected_tags":["가벼운"],"accept_tags":["가벼운","담백한"],"top5_should_match":"김밥·샐러드·샌드위치·포케","top5_should_avoid":"기름지거나 양 많은 정식","notes":"가벼운 단독 또는 가벼운+담백한"}
+{"id":"vague-05","category":"모호","query":"진한 맛","expected_tags":["진한"],"accept_tags":["진한","고소한"],"top5_should_match":"카레·크림류·곱창·갈비","top5_should_avoid":null,"notes":"진한 단독. 고소한이 함께 와도 OK"}
+{"id":"vague-06","category":"모호","query":"쫄깃한 식감","expected_tags":["쫄깃한"],"accept_tags":["쫄깃한"],"top5_should_match":"떡·면·오징어·족발·낙지","top5_should_avoid":null,"notes":"식감 축 단독"}
+{"id":"vague-07","category":"모호","query":"구수한 거","expected_tags":["진한"],"accept_tags":["진한","담백한"],"top5_should_match":"된장찌개·청국장·누룽지·콩비지","top5_should_avoid":null,"notes":"구수→진한 (SURFACE_TO_CANONICAL). 담백한 동반도 허용"}
+{"id":"vague-08","category":"모호","query":"고소한 게 좋아","expected_tags":["고소한"],"accept_tags":["고소한"],"top5_should_match":"크림류·치즈·들깨·견과·콩","top5_should_avoid":null,"notes":"단일 시드 직접"}
+{"id":"context-01","category":"컨텍스트","query":"비 오는 날 따뜻한 거","expected_tags":["따뜻한","국물있는"],"accept_tags":["따뜻한","국물있는"],"top5_should_match":"부침개·국·찌개·전","top5_should_avoid":null,"notes":"extract.py SYSTEM_PROMPT 명시 예시"}
+{"id":"context-02","category":"컨텍스트","query":"추울 때 먹기 좋은 거","expected_tags":["따뜻한"],"accept_tags":["따뜻한","국물있는","든든한"],"top5_should_match":"국밥·찌개·전골·죽","top5_should_avoid":"빙수·냉면","notes":"날씨 컨텍스트 → 시드 투영"}
+{"id":"context-03","category":"컨텍스트","query":"더울 때 시원하게","expected_tags":["시원한"],"accept_tags":["시원한","담백한","가벼운"],"top5_should_match":"냉면·물회·콩국수·샐러드","top5_should_avoid":"국·찌개·전골","notes":"반대 방향 날씨 컨텍스트"}
+{"id":"context-04","category":"컨텍스트","query":"출근 전 빠르게","expected_tags":["가벼운"],"accept_tags":["가벼운","담백한"],"top5_should_match":"김밥·샌드위치·토스트·베이글","top5_should_avoid":"전골·찜닭","notes":"상황 컨텍스트 → 가벼운"}
+{"id":"context-05","category":"컨텍스트","query":"회식 끝나고 해장","expected_tags":["해장"],"accept_tags":["해장","국물있는"],"top5_should_match":"해장국·콩나물국밥·내장탕","top5_should_avoid":"양념치킨·디저트","notes":"상황 → 해장 단일 매핑"}
+{"id":"context-06","category":"컨텍스트","query":"야근하고 든든하게","expected_tags":["든든한","야식"],"accept_tags":["든든한","야식"],"top5_should_match":"치킨·국밥·돈까스·정식","top5_should_avoid":null,"notes":"두 컨텍스트 합성 (시간대 + 양)"}
+{"id":"neg-01","category":"부정","query":"매운 거 말고 담백한 거","expected_tags":["담백한"],"accept_tags":["담백한"],"top5_should_match":"백반·죽·맑은탕·생선구이","top5_should_avoid":"매운 메뉴(짬뽕·매운탕)","notes":"enum 잠금이라 부정은 자동으로 잘림. 긍정 부분만 남음"}
+{"id":"neg-02","category":"부정","query":"단 거 말고 담백한 야식","expected_tags":["담백한","야식"],"accept_tags":["담백한","야식"],"top5_should_match":"맑은 국·해장·새벽국밥","top5_should_avoid":"치킨양념·디저트","notes":"긍정 2태그 — 5/22 실호출 검증된 케이스"}
+{"id":"neg-03","category":"부정","query":"기름진 거 말고 가벼운","expected_tags":["가벼운"],"accept_tags":["가벼운","담백한"],"top5_should_match":"샐러드·김밥·샌드위치","top5_should_avoid":"치킨·전·튀김","notes":"긍정 부분 단일"}
+{"id":"neg-04","category":"부정","query":"찬 거 말고 따뜻한 국물","expected_tags":["따뜻한","국물있는"],"accept_tags":["따뜻한","국물있는"],"top5_should_match":"국·찌개·전골","top5_should_avoid":"빙수·냉면","notes":"긍정 2태그"}
+{"id":"neg-05","category":"부정","query":"느끼한 거 빼고","expected_tags":[],"accept_tags":["담백한","가벼운"],"top5_should_match":"담백/가벼운 메뉴 (느슨)","top5_should_avoid":"크림·치즈·튀김","notes":"긍정 표현 부재 — 빈 배열 또는 함의 추론(담백/가벼움)"}
+{"id":"neg-06","category":"부정","query":"튀긴 거 말고 든든한 한식","expected_tags":["든든한"],"accept_tags":["든든한","담백한"],"top5_should_match":"백반·국밥·정식·찜","top5_should_avoid":"돈까스·튀김·치킨","notes":"긍정 부분 단일"}
+{"id":"noise-01","category":"노이즈","query":"ㅋㅋㅋㅋㅋ","expected_tags":[],"accept_tags":[],"top5_should_match":"(빈 배열이면 매칭 안 됨)","top5_should_avoid":null,"notes":"음식과 무관 — 빈 배열 기대"}
+{"id":"noise-02","category":"노이즈","query":"도와줘","expected_tags":[],"accept_tags":[],"top5_should_match":"(빈 배열)","top5_should_avoid":null,"notes":"의도 불명"}
+{"id":"noise-03","category":"노이즈","query":"오늘 날씨 어때","expected_tags":[],"accept_tags":[],"top5_should_match":"(빈 배열)","top5_should_avoid":null,"notes":"음식 무관"}
+{"id":"noise-04","category":"노이즈","query":"1234567","expected_tags":[],"accept_tags":[],"top5_should_match":"(빈 배열)","top5_should_avoid":null,"notes":"숫자만 — 빈 배열"}
+{"id":"cat-01","category":"카테고리축 부재","query":"고기 든든하게","expected_tags":["든든한"],"accept_tags":["든든한","진한"],"top5_should_match":"갈비·삼겹살·찜닭·고기 들어간 메뉴","top5_should_avoid":"공기밥 추가·즉석밥·사리추가 같은 사이드","notes":"end-to-end 4번 약점 케이스 — '고기' 시드 없어 match 결과가 의도와 멂"}
+{"id":"cat-02","category":"카테고리축 부재","query":"면 먹고 싶어","expected_tags":[],"accept_tags":["담백한","국물있는"],"top5_should_match":"국수·면류·파스타","top5_should_avoid":"치킨·디저트","notes":"'면' 시드 없음. extract가 빈 배열 또는 무관한 태그"}
+{"id":"cat-03","category":"카테고리축 부재","query":"회 먹고 싶다","expected_tags":[],"accept_tags":["담백한","시원한"],"top5_should_match":"회·사시미·초밥·물회","top5_should_avoid":"찌개·튀김","notes":"'회' 시드 없음. SURFACE에도 없음. 빈 배열 또는 정황 추론"}
+{"id":"cat-04","category":"카테고리축 부재","query":"치킨 먹고 싶다","expected_tags":[],"accept_tags":["바삭한","야식"],"top5_should_match":"치킨·강정·후라이드","top5_should_avoid":null,"notes":"'치킨' 시드 없음 — enrich KEYWORD_RULES에만 있음. 빈 배열 또는 정황 추론"}
