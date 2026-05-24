@@ -81,18 +81,24 @@ def match(
     menu_rows: list[MenuRow],
     top_k: int = 20,
     min_overlap: int = 1,
+    exclude_tags: list[str] | None = None,
 ) -> list[MatchResult]:
     """쿼리 태그로 메뉴 후보를 점수화해 상위 top_k 반환.
 
     양쪽 태그를 normalize로 정규형 통일 후 집합 비교 (방어적).
+    exclude_tags가 주어지면 메뉴 태그와 하나라도 겹치는 후보를 제외한다 (hard filter).
+    이유: 사용자가 "매운 거 말고"라 했는데 매운 메뉴를 추천하면 의도 정반대.
     """
     q = {normalize(t) for t in query_tags if t and t.strip()}
     if not q:
         return []
+    excl = {normalize(t) for t in (exclude_tags or []) if t and t.strip()}
 
     results: list[MatchResult] = []
     for row in menu_rows:
         m = {normalize(t) for t in row.tags}
+        if excl & m:
+            continue  # 거부된 시드가 메뉴에 있으면 후보에서 제외
         inter = q & m
         overlap = len(inter)
         if overlap < min_overlap:
@@ -151,13 +157,15 @@ def to_food(r: MatchResult) -> dict:
 def recommend_foods(query_text: str, top_k: int = 10) -> dict:
     """자연어 → 프론트 계약 그대로의 추천 응답. extract→match→food 객체.
 
-    반환: {"query", "keywords", "foods": [food 객체...]}
+    반환: {"query", "keywords", "excludeKeywords", "foods": [food 객체...]}
     cfScore/contextNote는 빈 칸 — 이후 CF 단계가 같은 객체를 채운다.
+    excludeKeywords가 비어있지 않으면 프론트가 "X 빼고 추천" 표기를 할 수 있다.
     """
-    tags, results = recommend(query_text, top_k=top_k)
+    tags, excludes, results = _recommend_with_excludes(query_text, top_k=top_k)
     return {
         "query": query_text,
         "keywords": tags,
+        "excludeKeywords": excludes,
         "foods": [to_food(r) for r in results],
     }
 
@@ -165,15 +173,26 @@ def recommend_foods(query_text: str, top_k: int = 10) -> dict:
 def recommend(query_text: str, top_k: int = 10) -> tuple[list[str], list[MatchResult]]:
     """자연어 한 줄 → (추출된 태그, 매칭된 메뉴 후보). 파이프라인 end-to-end.
 
-    extract → match를 묶는다. 쿼리·메뉴 둘 다 시드 13개 어휘라 교집합 매칭이 잘 정의된다.
+    extract → match를 묶는다. 쿼리·메뉴 둘 다 시드 14개 어휘라 교집합 매칭이 잘 정의된다.
     extract가 API 키 유무로 mock/Claude 분기되는 것 외엔 이 함수도 키와 무관.
+    부정 시드는 내부적으로 match에 전달돼 후보에서 제외된다.
     """
+    tags, _, results = _recommend_with_excludes(query_text, top_k=top_k)
+    return tags, results
+
+
+def _recommend_with_excludes(
+    query_text: str, top_k: int = 10
+) -> tuple[list[str], list[str], list[MatchResult]]:
+    """recommend()와 recommend_foods()의 공통 엔진. exclude_tags까지 함께 노출."""
     from .extract import extract_tags
 
     extracted = extract_tags(query_text)
     rows = load_menu_tags()
-    results = match(extracted.tags, rows, top_k=top_k)
-    return extracted.tags, results
+    results = match(
+        extracted.tags, rows, top_k=top_k, exclude_tags=extracted.exclude_tags
+    )
+    return extracted.tags, extracted.exclude_tags, results
 
 
 if __name__ == "__main__":
@@ -183,8 +202,9 @@ if __name__ == "__main__":
     rows = load_menu_tags()
     print(f"(매칭 대상 메뉴: {len(rows)}개)\n")
     for qtext in queries:
-        tags, results = recommend(qtext, top_k=8)
-        print(f"■ {qtext!r}  →  추출 태그 {tags}")
+        tags, excludes, results = _recommend_with_excludes(qtext, top_k=8)
+        excl_part = f"  (제외 {excludes})" if excludes else ""
+        print(f"■ {qtext!r}  →  추출 태그 {tags}{excl_part}")
         if not results:
             print("    (매칭 없음)\n")
             continue

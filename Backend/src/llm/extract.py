@@ -16,23 +16,35 @@ CLAUDE_MODEL = "claude-sonnet-4-6"
 
 SYSTEM_PROMPT = """\
 당신은 한국어 음식 추천 시스템의 신호 추출 모듈입니다.
-사용자 자연어 입력에서 '추천에 쓸 핵심 표현' 1~4개를 한국어 형용사/명사구로 추출하세요.
+사용자 자연어 입력을 보고 두 종류의 시드를 분리해서 반환하세요.
+
+시드 어휘(긍정·부정 모두 이 안에서만 고름): {seed}
 
 규칙:
-- 다음 시드 어휘에서만 고릅니다: {seed}
-- 사용자 표현은 의미가 가장 가까운 시드로 매핑합니다 (예: "칼칼한"→"얼큰한",
-  "비 오는 날"→"따뜻한"+"국물있는", "느끼한"→"고소한").
-- 부정은 "X 말고" 형태로 표기 (예: "매운 거 말고").
-- 비음식·노이즈는 무시합니다. 의미가 전혀 없으면 빈 배열을 반환합니다.
+- tags: 사용자가 '원하는' 시드 0~4개.
+  - 사용자 표현은 의미가 가장 가까운 시드로 매핑합니다.
+    (예: "칼칼한"→"얼큰한", "비 오는 날"→"따뜻한"+"국물있는", "느끼한"→"고소한")
+- exclude_tags: 사용자가 '거부한' 시드 0~4개.
+  - 명시적 부정 표현이 붙은 단어는 tags가 아니라 exclude_tags에 넣습니다.
+  - 부정 표지: "X 말고", "X 빼고", "X 말고는", "X 없는", "안 X", "X 제외", "X 싫어".
+  - 예: "매운 거 말고 담백한 거" → tags=["담백한"], exclude_tags=["얼큰한"]
+        "단 거 말고 담백한 야식" → tags=["담백한","야식"], exclude_tags=["달달한"]
+        "느끼한 거 빼고"        → tags=[], exclude_tags=["고소한"]
+  - 부정된 단어를 절대 tags에 넣지 마세요 — 사용자 의도가 정반대가 됩니다.
+  - 중요: 위 부정 표지가 입력에 직접 등장한 경우에만 exclude_tags를 채웁니다.
+    정황·암묵 추론으로 거부를 만들지 마세요. 예: "출근 전 빠르게"는 명시적 부정이
+    아니므로 exclude_tags=[]. 시간·상황 컨텍스트만으로 시드를 거부하지 않습니다.
+- 비음식·노이즈는 둘 다 빈 배열. 의미가 전혀 없으면 빈 배열을 반환합니다.
 
 출력은 JSON 한 줄만:
-{{"tags": ["...", "..."]}}\
+{{"tags": ["...", "..."], "exclude_tags": ["..."]}}\
 """.format(seed=list(SEED_TAGS))
 
 
 # 구조화 출력 스키마 — Claude가 항상 이 JSON 형태로만 응답하게 강제.
-# (output_config.format / Sonnet 4.6 지원). items enum으로 시드 13개 밖 태그를 차단
+# (output_config.format / Sonnet 4.6 지원). items enum으로 시드 14개 밖 태그를 차단
 # → 쿼리·메뉴 양쪽이 같은 어휘를 써서 매칭(교집합)이 항상 잘 정의된다.
+# exclude_tags는 부정 표현을 별도 채널로 받아 enum 잠금과 부정 처리를 양립시킨다.
 TAGS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -40,8 +52,12 @@ TAGS_SCHEMA = {
             "type": "array",
             "items": {"type": "string", "enum": list(SEED_TAGS)},
         },
+        "exclude_tags": {
+            "type": "array",
+            "items": {"type": "string", "enum": list(SEED_TAGS)},
+        },
     },
-    "required": ["tags"],
+    "required": ["tags", "exclude_tags"],
     "additionalProperties": False,
 }
 
@@ -51,6 +67,12 @@ class ExtractResult:
     original_text: str
     tags: list[str]
     source: str  # "claude" | "mock" | "fallback"
+    exclude_tags: list[str] = None  # type: ignore[assignment]
+
+    def __post_init__(self) -> None:
+        # dataclass 기본값을 list로 두면 공유되므로 None → [] 변환을 사후처리한다.
+        if self.exclude_tags is None:
+            self.exclude_tags = []
 
 
 def extract_tags(text: str) -> ExtractResult:
@@ -94,15 +116,24 @@ def _extract_claude(text: str, api_key: str) -> ExtractResult:
             output_config={"format": {"type": "json_schema", "schema": TAGS_SCHEMA}},
         )
         raw = next((b.text for b in resp.content if b.type == "text"), "")
-        tags = _parse_claude_json(raw)
-        return ExtractResult(original_text=text, tags=tags, source="claude")
+        tags, excludes = _parse_claude_json(raw)
+        # exclude_tags ∩ tags가 있으면 의도 모순 — exclude를 우선해 tags에서 제거.
+        excluded_set = set(excludes)
+        tags = [t for t in tags if t not in excluded_set]
+        return ExtractResult(
+            original_text=text, tags=tags, source="claude", exclude_tags=excludes
+        )
     except Exception as e:  # 네트워크/레이트리밋/스키마 등 → mock 폴백
         print(f"[extract] Claude 호출 실패({type(e).__name__}) → mock 폴백")
         return _extract_mock(text)
 
 
 def _extract_mock(text: str) -> ExtractResult:
-    """규칙 기반 mock — SURFACE_TO_CANONICAL 부분문자열 매칭. 시드 정규형만 출력."""
+    """규칙 기반 mock — SURFACE_TO_CANONICAL 부분문자열 매칭. 시드 정규형만 출력.
+
+    mock은 부정 처리를 하지 않는다(어휘에 우연히 빠진 단어가 무시되는 효과로
+    부정처럼 보일 수는 있음). 부정이 필요하면 Claude를 쓸 것.
+    """
     hits: list[str] = []
     lowered = text.lower()
     for surface, canonical in SURFACE_TO_CANONICAL:
@@ -115,11 +146,16 @@ def _extract_mock(text: str) -> ExtractResult:
     return ExtractResult(original_text=text, tags=hits, source="mock")
 
 
-def _parse_claude_json(raw: str) -> list[str]:
-    """Claude 응답 JSON 파싱 + 정규화. _extract_claude 구현 시 사용."""
+def _parse_claude_json(raw: str) -> tuple[list[str], list[str]]:
+    """Claude 응답 JSON 파싱 + 정규화. (tags, exclude_tags) 둘 다 정규화 적용."""
     data = json.loads(raw)
-    tags = data.get("tags", [])
-    return [normalize(t) for t in tags if isinstance(t, str) and t.strip()][:4]
+    tags_raw = data.get("tags", [])
+    excludes_raw = data.get("exclude_tags", [])
+
+    def _clean(items) -> list[str]:
+        return [normalize(t) for t in items if isinstance(t, str) and t.strip()][:4]
+
+    return _clean(tags_raw), _clean(excludes_raw)
 
 
 if __name__ == "__main__":
@@ -133,4 +169,5 @@ if __name__ == "__main__":
     ]
     for s in samples:
         r = extract_tags(s)
-        print(f"[{r.source:8s}] {s!r:40s} → {r.tags}")
+        excl = f"  exclude={r.exclude_tags}" if r.exclude_tags else ""
+        print(f"[{r.source:8s}] {s!r:40s} → {r.tags}{excl}")

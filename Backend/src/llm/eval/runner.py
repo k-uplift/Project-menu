@@ -1,9 +1,10 @@
 """평가셋 러너 — extract_tags() 정확도 측정.
 
-세 메트릭:
-- exact:    set(출력) == set(expected_tags)              ← 엄격
-- lenient:  expected ⊆ 출력 ⊆ accept                     ← 허용범위 (모호·정황 케이스 대응)
-- jaccard:  |교집합| / |합집합|                          ← 정도(부분점수)
+네 메트릭:
+- exact:        set(out.tags) == set(expected_tags)  AND  exclude 정확 일치
+- lenient:      expected_tags ⊆ out.tags ⊆ accept_tags  AND  exclude 정확 일치
+- jaccard:      |out.tags ∩ expected_tags| / |out.tags ∪ expected_tags|
+- excl_exact:   set(out.exclude_tags) == set(expected_exclude_tags) (부정 처리 단독)
 
 사용법:
     cd Backend
@@ -32,11 +33,13 @@ CASES_PATH = Path(__file__).resolve().parent / "cases.jsonl"
 @dataclass
 class CaseResult:
     case: dict
-    output: list[str]
+    output_tags: list[str]
+    output_excludes: list[str]
     source: str  # 'claude'|'mock'|'fallback'
     exact: int
     lenient: int
     jaccard: float
+    excl_exact: int  # 부정 처리 단독 정확도 (0/1)
 
 
 def _jaccard(a: list[str], b: list[str]) -> float:
@@ -48,12 +51,24 @@ def _jaccard(a: list[str], b: list[str]) -> float:
     return len(inter) / len(union) if union else 0.0
 
 
-def _score(out: list[str], expected: list[str], accept: list[str]) -> tuple[int, int, float]:
-    so, se, sa = set(out), set(expected), set(accept)
-    exact = 1 if so == se else 0
-    # lenient: 기대 태그를 모두 포함 + 허용 범위 안. accept가 비면 빈 출력만 통과.
-    lenient = 1 if (se.issubset(so) and so.issubset(sa or se)) else 0
-    return exact, lenient, _jaccard(out, expected)
+def _score(
+    out_tags: list[str],
+    expected: list[str],
+    accept: list[str],
+    out_excludes: list[str],
+    expected_excludes: list[str],
+) -> tuple[int, int, float, int]:
+    so, se, sa = set(out_tags), set(expected), set(accept)
+    sox, sex = set(out_excludes), set(expected_excludes)
+
+    pos_exact = so == se
+    pos_lenient = se.issubset(so) and so.issubset(sa or se)
+    excl_exact = sox == sex
+
+    # combined: 긍정 통과 + 부정 통과 둘 다 만족해야 통과
+    exact = 1 if (pos_exact and excl_exact) else 0
+    lenient = 1 if (pos_lenient and excl_exact) else 0
+    return exact, lenient, _jaccard(out_tags, expected), 1 if excl_exact else 0
 
 
 def load_cases(path: Path = CASES_PATH) -> list[dict]:
@@ -65,18 +80,41 @@ def run(cases: list[dict]) -> list[CaseResult]:
     out: list[CaseResult] = []
     for c in cases:
         r = extract_tags(c["query"])
-        e, l, j = _score(r.tags, c["expected_tags"], c["accept_tags"])
-        out.append(CaseResult(case=c, output=r.tags, source=r.source, exact=e, lenient=l, jaccard=j))
+        e, l, j, ex = _score(
+            r.tags,
+            c["expected_tags"],
+            c["accept_tags"],
+            r.exclude_tags,
+            c.get("expected_exclude_tags", []),
+        )
+        out.append(
+            CaseResult(
+                case=c,
+                output_tags=r.tags,
+                output_excludes=r.exclude_tags,
+                source=r.source,
+                exact=e,
+                lenient=l,
+                jaccard=j,
+                excl_exact=ex,
+            )
+        )
     return out
 
 
 def print_case(res: CaseResult) -> None:
     c = res.case
     mark = "✓" if res.lenient else "✗"
+    excl_out = res.output_excludes
+    excl_exp = c.get("expected_exclude_tags", [])
+    excl_part = ""
+    if excl_out or excl_exp:
+        em = "✓" if res.excl_exact else "✗"
+        excl_part = f"  exclude{em} out={excl_out!s} exp={excl_exp!s}"
     print(
         f"  {mark} [{c['id']:11s}] {c['query']!r:<35s} "
-        f"out={res.output!s:30s} exp={c['expected_tags']!s:25s} "
-        f"acc={c['accept_tags']!s:25s} j={res.jaccard:.2f} ({res.source})"
+        f"out={res.output_tags!s:30s} exp={c['expected_tags']!s:25s} "
+        f"acc={c['accept_tags']!s:25s} j={res.jaccard:.2f}{excl_part}"
     )
 
 
@@ -86,7 +124,7 @@ def summarize(results: list[CaseResult]) -> None:
         by_cat[r.case["category"]].append(r)
 
     print("\n=== 카테고리별 ===")
-    print(f"  {'카테고리':<18s} {'n':>3s}  {'exact':>7s}  {'lenient':>9s}  {'jaccard':>8s}")
+    print(f"  {'카테고리':<18s} {'n':>3s}  {'exact':>7s}  {'lenient':>9s}  {'jaccard':>8s}  {'excl':>6s}")
     for cat in ["명확", "모호", "컨텍스트", "부정", "노이즈", "카테고리축 부재"]:
         rs = by_cat.get(cat, [])
         if not rs:
@@ -95,20 +133,23 @@ def summarize(results: list[CaseResult]) -> None:
         ex = sum(r.exact for r in rs) / n
         le = sum(r.lenient for r in rs) / n
         ja = sum(r.jaccard for r in rs) / n
-        print(f"  {cat:<18s} {n:>3d}  {ex*100:>6.1f}%  {le*100:>8.1f}%  {ja:>8.2f}")
+        ec = sum(r.excl_exact for r in rs) / n
+        print(f"  {cat:<18s} {n:>3d}  {ex*100:>6.1f}%  {le*100:>8.1f}%  {ja:>8.2f}  {ec*100:>5.1f}%")
 
     n = len(results)
     ex = sum(r.exact for r in results) / n
     le = sum(r.lenient for r in results) / n
     ja = sum(r.jaccard for r in results) / n
+    ec = sum(r.excl_exact for r in results) / n
     sources = defaultdict(int)
     for r in results:
         sources[r.source] += 1
     print(f"\n=== 전체 ({n}건) ===")
-    print(f"  exact   : {ex*100:5.1f}%   ({sum(r.exact for r in results)}/{n})")
-    print(f"  lenient : {le*100:5.1f}%   ({sum(r.lenient for r in results)}/{n})  ← 허용 범위 기준")
-    print(f"  jaccard : {ja:5.2f}")
-    print(f"  source  : {dict(sources)}")
+    print(f"  exact      : {ex*100:5.1f}%   ({sum(r.exact for r in results)}/{n})")
+    print(f"  lenient    : {le*100:5.1f}%   ({sum(r.lenient for r in results)}/{n})  ← 허용 범위 기준")
+    print(f"  jaccard    : {ja:5.2f}")
+    print(f"  excl_exact : {ec*100:5.1f}%   ({sum(r.excl_exact for r in results)}/{n})  ← 부정 처리 단독")
+    print(f"  source     : {dict(sources)}")
 
 
 def main() -> None:
