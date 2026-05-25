@@ -16,7 +16,7 @@ CLAUDE_MODEL = "claude-sonnet-4-6"
 
 SYSTEM_PROMPT = """\
 당신은 한국어 음식 추천 시스템의 신호 추출 모듈입니다.
-사용자 자연어 입력을 보고 두 종류의 시드를 분리해서 반환하세요.
+사용자 자연어 입력을 보고 네 종류의 신호를 분리해서 반환하세요.
 
 시드 어휘(긍정·부정 모두 이 안에서만 고름): {seed}
 
@@ -34,17 +34,39 @@ SYSTEM_PROMPT = """\
   - 중요: 위 부정 표지가 입력에 직접 등장한 경우에만 exclude_tags를 채웁니다.
     정황·암묵 추론으로 거부를 만들지 마세요. 예: "출근 전 빠르게"는 명시적 부정이
     아니므로 exclude_tags=[]. 시간·상황 컨텍스트만으로 시드를 거부하지 않습니다.
-- 비음식·노이즈는 둘 다 빈 배열. 의미가 전혀 없으면 빈 배열을 반환합니다.
+- food_keywords: '음식 종류/식재료' 단어 0~6개. (open vocab — 시드 밖 자유 입력)
+  - 시드는 음식의 *속성*만 다룹니다. 카테고리·식재료(고기/면/회/치킨/밥/국수/삼겹살 등)는
+    여기로 넣으세요. 시드에 없는 단어를 억지로 시드로 매핑하지 마세요.
+  - 메뉴명 substring 매칭에 쓰이므로, 가능하면 직접적인 동의어·하위어를 1~3개 함께
+    넣어 검색 폭을 넓힙니다. (예: "고기"→["고기","삼겹살","갈비"],
+    "면"→["면","국수","파스타"], "회"→["회","사시미","초밥"],
+    "치킨"→["치킨","후라이드","강정"])
+  - 단, 너무 멀리 가지 마세요(브랜드명·구체 가게명 X). 같은 음식의 흔한 다른 이름 정도.
+  - 음식 종류 단어가 없는 쿼리(예: "얼큰한 국물")는 빈 배열.
+- exclude_food_keywords: '거부된 음식 종류' 0~4개.
+  - 부정 표지가 붙은 음식 종류만. 예: "고기 말고 면" → food_keywords=["면","국수"],
+    exclude_food_keywords=["고기","삼겹살","갈비"].
+- 부정 채널 우선순위 (중요):
+  - 부정된 단어가 시드로 매핑 가능하면 무조건 exclude_tags를 씁니다 (exclude_food_keywords X).
+    "튀긴 거 말고" → "튀긴 거"는 바삭한 매핑 → exclude_tags=["바삭한"].
+    "기름진 거 말고" → "기름진 거"는 고소한 매핑 → exclude_tags=["고소한"].
+    "단 거 말고" → "단 거"는 달달한 매핑 → exclude_tags=["달달한"].
+  - 시드 매핑 불가한 카테고리·식재료 단어(고기/면/회/치킨…)만 exclude_food_keywords로.
+  - 시드 매핑 가능 단어를 exclude_food_keywords에 넣으면 추천이 망가집니다.
+- 비음식·노이즈는 네 필드 모두 빈 배열.
 
 출력은 JSON 한 줄만:
-{{"tags": ["...", "..."], "exclude_tags": ["..."]}}\
+{{"tags": [...], "exclude_tags": [...], "food_keywords": [...], "exclude_food_keywords": [...]}}\
 """.format(seed=list(SEED_TAGS))
 
 
 # 구조화 출력 스키마 — Claude가 항상 이 JSON 형태로만 응답하게 강제.
-# (output_config.format / Sonnet 4.6 지원). items enum으로 시드 14개 밖 태그를 차단
-# → 쿼리·메뉴 양쪽이 같은 어휘를 써서 매칭(교집합)이 항상 잘 정의된다.
-# exclude_tags는 부정 표현을 별도 채널로 받아 enum 잠금과 부정 처리를 양립시킨다.
+# (output_config.format / Sonnet 4.6 지원).
+#  - tags/exclude_tags: items enum으로 시드 14개 밖을 차단 → 쿼리·메뉴 양쪽이 같은
+#    어휘를 써서 교집합 매칭이 항상 잘 정의된다.
+#  - food_keywords/exclude_food_keywords: 카테고리·식재료(고기·면·회·치킨…)는 시드 차원
+#    이 아니라 메뉴명 substring 차원이라 enum 없이 open vocab. 시드의 '속성' 의미론을
+#    오염시키지 않으면서 카테고리축 부재 문제를 보완한다.
 TAGS_SCHEMA = {
     "type": "object",
     "properties": {
@@ -56,8 +78,16 @@ TAGS_SCHEMA = {
             "type": "array",
             "items": {"type": "string", "enum": list(SEED_TAGS)},
         },
+        "food_keywords": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+        "exclude_food_keywords": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
     },
-    "required": ["tags", "exclude_tags"],
+    "required": ["tags", "exclude_tags", "food_keywords", "exclude_food_keywords"],
     "additionalProperties": False,
 }
 
@@ -68,11 +98,17 @@ class ExtractResult:
     tags: list[str]
     source: str  # "claude" | "mock" | "fallback"
     exclude_tags: list[str] = None  # type: ignore[assignment]
+    food_keywords: list[str] = None  # type: ignore[assignment]
+    exclude_food_keywords: list[str] = None  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
         # dataclass 기본값을 list로 두면 공유되므로 None → [] 변환을 사후처리한다.
         if self.exclude_tags is None:
             self.exclude_tags = []
+        if self.food_keywords is None:
+            self.food_keywords = []
+        if self.exclude_food_keywords is None:
+            self.exclude_food_keywords = []
 
 
 def extract_tags(text: str) -> ExtractResult:
@@ -116,12 +152,20 @@ def _extract_claude(text: str, api_key: str) -> ExtractResult:
             output_config={"format": {"type": "json_schema", "schema": TAGS_SCHEMA}},
         )
         raw = next((b.text for b in resp.content if b.type == "text"), "")
-        tags, excludes = _parse_claude_json(raw)
+        tags, excludes, fkw, excl_fkw = _parse_claude_json(raw)
         # exclude_tags ∩ tags가 있으면 의도 모순 — exclude를 우선해 tags에서 제거.
         excluded_set = set(excludes)
         tags = [t for t in tags if t not in excluded_set]
+        # food_keywords도 대칭으로: exclude_food_keywords와 겹치면 거부 우선.
+        excl_fkw_lower = {k.lower() for k in excl_fkw}
+        fkw = [k for k in fkw if k.lower() not in excl_fkw_lower]
         return ExtractResult(
-            original_text=text, tags=tags, source="claude", exclude_tags=excludes
+            original_text=text,
+            tags=tags,
+            source="claude",
+            exclude_tags=excludes,
+            food_keywords=fkw,
+            exclude_food_keywords=excl_fkw,
         )
     except Exception as e:  # 네트워크/레이트리밋/스키마 등 → mock 폴백
         print(f"[extract] Claude 호출 실패({type(e).__name__}) → mock 폴백")
@@ -146,16 +190,45 @@ def _extract_mock(text: str) -> ExtractResult:
     return ExtractResult(original_text=text, tags=hits, source="mock")
 
 
-def _parse_claude_json(raw: str) -> tuple[list[str], list[str]]:
-    """Claude 응답 JSON 파싱 + 정규화. (tags, exclude_tags) 둘 다 정규화 적용."""
-    data = json.loads(raw)
-    tags_raw = data.get("tags", [])
-    excludes_raw = data.get("exclude_tags", [])
+def _parse_claude_json(
+    raw: str,
+) -> tuple[list[str], list[str], list[str], list[str]]:
+    """Claude 응답 JSON 파싱. (tags, exclude_tags, food_keywords, exclude_food_keywords).
 
-    def _clean(items) -> list[str]:
+    tags/exclude_tags는 시드 정규화(SURFACE_TO_CANONICAL) 적용.
+    food_keywords/exclude_food_keywords는 open vocab이라 정규화 없이 strip+lowercase만.
+    """
+    data = json.loads(raw)
+
+    def _clean_seed(items) -> list[str]:
         return [normalize(t) for t in items if isinstance(t, str) and t.strip()][:4]
 
-    return _clean(tags_raw), _clean(excludes_raw)
+    def _clean_kw(items, cap: int) -> list[str]:
+        # 중복은 보존 순서로 제거. 한국어는 1글자 음식어("회/면/밥/쌀/콩")가 흔해서
+        # 길이 필터를 두지 않는다 — 빈 문자열만 거른다. 단일 알파벳 같은 영문 노이즈는
+        # 메뉴명 매칭에서 자연스럽게 영향 적음.
+        seen: set[str] = set()
+        out: list[str] = []
+        for k in items:
+            if not isinstance(k, str):
+                continue
+            s = k.strip()
+            if not s:
+                continue
+            key = s.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            out.append(s)
+            if len(out) >= cap:
+                break
+        return out
+
+    tags = _clean_seed(data.get("tags", []))
+    excludes = _clean_seed(data.get("exclude_tags", []))
+    fkw = _clean_kw(data.get("food_keywords", []), cap=6)
+    excl_fkw = _clean_kw(data.get("exclude_food_keywords", []), cap=4)
+    return tags, excludes, fkw, excl_fkw
 
 
 if __name__ == "__main__":
@@ -170,4 +243,10 @@ if __name__ == "__main__":
     for s in samples:
         r = extract_tags(s)
         excl = f"  exclude={r.exclude_tags}" if r.exclude_tags else ""
-        print(f"[{r.source:8s}] {s!r:40s} → {r.tags}{excl}")
+        fkw = f"  food={r.food_keywords}" if r.food_keywords else ""
+        excl_fkw = (
+            f"  exclude_food={r.exclude_food_keywords}"
+            if r.exclude_food_keywords
+            else ""
+        )
+        print(f"[{r.source:8s}] {s!r:40s} → {r.tags}{excl}{fkw}{excl_fkw}")
