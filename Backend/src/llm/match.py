@@ -124,14 +124,17 @@ def match(
         m = {normalize(t) for t in row.tags}
         if excl & m:
             continue  # 시드 부정: 거부된 시드가 메뉴에 있으면 제외
-        name_lower = row.menu_name.lower()
-        if any(k in name_lower for k in excl_fkw):
-            continue  # 카테고리 부정: 거부된 음식 종류가 메뉴명에 있으면 제외
+        # substring 매칭 대상은 메뉴명 + 식당 카테고리(네이버 플레이스 업종).
+        # 메뉴 이름은 식재료축('갈비탕·라면·참치회덮밥')을, category는 장르축
+        # ('한식·중식·일식·분식')을 담는 별개 신호. 두 축 모두 무료로 잡힌다.
+        haystack = (row.menu_name + " " + (row.category or "")).lower()
+        if any(k in haystack for k in excl_fkw):
+            continue  # 카테고리 부정: 거부된 음식 종류가 어느 한 곳에 있으면 제외
 
         inter = q & m
         overlap = len(inter)
-        # 메뉴명에 들어간 food_kw 수집 (중복 제거)
-        matched_fkw = [k for k in fkw if k in name_lower]
+        # haystack에 들어간 food_kw 수집 (중복 제거)
+        matched_fkw = [k for k in fkw if k in haystack]
         fkw_hits = len(matched_fkw)
 
         # 후보 조건: tag overlap이 임계 이상이거나, 태그가 비어있을 땐 food_kw 매칭 있으면 OK.
