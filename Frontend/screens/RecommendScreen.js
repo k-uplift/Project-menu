@@ -1,9 +1,9 @@
 /**
  * RecommendScreen — 음식 추천 결과 (STEP 03)
  *
- * 컨텍스트 자동 반영:
- *  - KeywordScreen에서 받은 timeCtx, weatherCtx, conditions, weights 사용
- *  - 추천 이유에 자동 생성된 컨텍스트 문구 반영 ("비 오는 저녁 시간대 선호도가 높아요")
+ * 변경:
+ *  - 음식 카드 클릭 시 행동 추적 이벤트 전송 (+1점)
+ *  - 같은 카드를 연속 클릭해도 중복 전송 방지 (이전 선택 ID와 비교)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -28,6 +28,7 @@ import {
   toggleLikeFood,
   getLikedFoods,
 } from '../services/userStorageService';
+import { trackFoodCardClick } from '../services/behaviorTrackingService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function RecommendScreen({ route, navigation }) {
@@ -110,6 +111,15 @@ export default function RecommendScreen({ route, navigation }) {
     });
   };
 
+  // 음식 카드 클릭 — 행동 점수 +1점
+  // 같은 카드를 다시 누르면 중복 전송 방지
+  const handleFoodCardPress = (food) => {
+    if (selectedFoodId !== food.id) {
+      trackFoodCardClick(food); // fire-and-forget
+    }
+    setSelectedFoodId(food.id);
+  };
+
   const currentList = tab === 'base' ? baseList : cfList;
   const selectedFood = currentList.find((f) => f.id === selectedFoodId) || currentList[0];
 
@@ -118,7 +128,6 @@ export default function RecommendScreen({ route, navigation }) {
     navigation.navigate('Restaurant', { food: selectedFood });
   };
 
-  // 컨텍스트 표시용 문구
   const ctxLine = ctxParam
     ? `${ctxParam.timeCtx?.label || ''} · ${ctxParam.weatherCtx?.label || ''}`
     : '';
@@ -134,7 +143,6 @@ export default function RecommendScreen({ route, navigation }) {
         />
       }
     >
-      {/* 헤드라인 + 키워드 수정 버튼 */}
       <View style={styles.titleRow}>
         <Text style={styles.title}>맞춤 메뉴 추천</Text>
         <Pressable
@@ -146,7 +154,6 @@ export default function RecommendScreen({ route, navigation }) {
         </Pressable>
       </View>
 
-      {/* 키워드 + 컨텍스트 */}
       <View style={styles.metaRow}>
         <View style={styles.keywordRow}>
           {keywords.map((k) => (
@@ -160,7 +167,6 @@ export default function RecommendScreen({ route, navigation }) {
         )}
       </View>
 
-      {/* 탭 */}
       <View style={styles.tabBar}>
         <TabButton
           label="기본 추천"
@@ -215,7 +221,7 @@ export default function RecommendScreen({ route, navigation }) {
               food={food}
               selected={selectedFoodId === food.id}
               liked={likedIds.has(food.id)}
-              onPress={() => setSelectedFoodId(food.id)}
+              onPress={() => handleFoodCardPress(food)}
               onLikePress={() => handleLike(food)}
             />
           ))}
