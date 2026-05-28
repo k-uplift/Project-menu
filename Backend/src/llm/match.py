@@ -429,8 +429,8 @@ def to_food(r: MatchResult) -> dict:
 def to_kind_group(g: KindGroup) -> dict:
     """KindGroup → 프론트 노출 객체. 추천 1차 단위 (§5.12).
 
-    프론트는 음식 이름(kind)만 보여준다. 안쪽 menus 리스트는 클릭 시 식당·메뉴
-    펼침에 쓰는 부가 데이터로 유지. score는 to_food와 같은 0~100 정규화.
+    1차 응답은 *음식 이름만* 가볍게. 식당·메뉴 리스트는 사용자가 음식을 클릭한 뒤
+    별도 API(recommend_stores_for_kind)로 받아온다 — 응답 크기·전송량 절감.
     """
     return {
         "kind": g.kind,
@@ -439,11 +439,70 @@ def to_kind_group(g: KindGroup) -> dict:
             "matchedKeywords": g.matched,
             "matchedFoodKeywords": g.matched_food_keywords,
         },
-        # 안쪽 메뉴 리스트 — 같은 종류 안의 식당/메뉴 펼침. score 내림차순.
+    }
+
+
+@dataclass
+class StoreGroup:
+    """식당 단위 집계 결과 — 2차 추천 (선택된 음식 종류 안의 식당들).
+
+    한 식당이 그 종류 메뉴를 여러 개 가져도 한 그룹으로 묶이고, 그 식당의 대표
+    점수는 가장 높은 메뉴 점수. 안쪽 menus 리스트로 같은 식당의 다른 매칭 메뉴를
+    같이 볼 수 있다.
+    """
+    store_id: int
+    store_name: str | None
+    score: float                 # max(메뉴 score)
+    menus: list[MatchResult]     # score 내림차순. 한 식당의 매칭 메뉴들
+    matched: list[str]
+    matched_food_keywords: list[str]
+
+
+def aggregate_stores(
+    results: list[MatchResult],
+    top_k: int = 10,
+) -> list[StoreGroup]:
+    """매칭된 메뉴들을 식당 단위로 묶는다. 한 식당이 여러 메뉴로 잡혔으면 합쳐서
+    그 식당의 대표 점수(=max) 하나로 노출. CF 재랭킹·식당 카드 노출에 자연스러운 단위.
+    """
+    grouped: dict[int, list[MatchResult]] = {}
+    for r in results:
+        grouped.setdefault(r.store_id, []).append(r)
+
+    groups: list[StoreGroup] = []
+    for sid, menus in grouped.items():
+        menus.sort(key=lambda m: m.score, reverse=True)
+        top = menus[0]
+        all_matched = sorted({t for m in menus for t in m.matched})
+        all_fkw = sorted({k for m in menus for k in m.matched_food_keywords})
+        groups.append(
+            StoreGroup(
+                store_id=sid,
+                store_name=top.store_name,
+                score=top.score,
+                menus=menus,
+                matched=all_matched,
+                matched_food_keywords=all_fkw,
+            )
+        )
+
+    # 점수 동률이면 매칭 메뉴 수가 많은 식당이 위로 — 그 식당이 종류와 잘 맞는다는 신호.
+    groups.sort(key=lambda g: (g.score, len(g.menus)), reverse=True)
+    return groups[:top_k]
+
+
+def to_store_group(g: StoreGroup) -> dict:
+    """StoreGroup → 프론트 식당 카드 객체."""
+    return {
+        "storeId": g.store_id,
+        "storeName": g.store_name,
+        "score": _to_score100(g.score),
+        "reason": {
+            "matchedKeywords": g.matched,
+            "matchedFoodKeywords": g.matched_food_keywords,
+        },
         "menus": [
             {
-                "storeId": m.store_id,
-                "storeName": m.store_name,
                 "menuName": m.menu_name,
                 "score": _to_score100(m.score),
                 "tags": m.tags,
@@ -454,23 +513,18 @@ def to_kind_group(g: KindGroup) -> dict:
     }
 
 
-def recommend_foods(
-    query_text: str, top_k: int = 10, top_k_kinds: int = 10
-) -> dict:
-    """자연어 → 프론트 계약 그대로의 추천 응답. extract→match→food 객체.
+def recommend_foods(query_text: str, top_k: int = 10) -> dict:
+    """1차 단계: 자연어 → 음식 종류 이름 리스트. 가벼운 응답.
 
     반환: {"query", "keywords", "excludeKeywords", "foodKeywords",
-           "excludeFoodKeywords", "kinds": [...], "foods": [food 객체...]}
+           "excludeFoodKeywords", "kinds": [{kind, score, reason}, ...]}.
 
-    kinds (§5.12): 추천 1차 단위. 음식 종류로 집계된 결과. 사이드/음료/주류 제외.
-    foods: 기존 메뉴 단위 결과. 프론트 호환·CF 재랭킹 입력으로 그대로 유지.
-    cfScore/contextNote는 빈 칸 — 이후 CF 단계가 채운다.
+    사용자가 음식을 선택하면 recommend_stores_for_kind(query, kind)를 호출해
+    그 종류의 식당 리스트를 따로 받는다.
     """
-    # 종류 집계용으로 메뉴를 넓게 가져오고(top_k_kinds * 8), 별도로 foods 리스트도 만든다.
-    # 종류 집계 시 사이드/음료가 제외되니 후보를 충분히 잡아야 좋은 종류가 묻히지 않음.
-    extracted, wide_results = _recommend_extracted(query_text, top_k=top_k_kinds * 8)
-    kinds = aggregate_kinds(wide_results, top_k=top_k_kinds)
-    foods_subset = wide_results[:top_k]
+    # 종류 집계용으로 메뉴를 넓게 가져온다 — 사이드/음료가 제외되니 후보 풀이 필요.
+    extracted, wide_results = _recommend_extracted(query_text, top_k=top_k * 8)
+    kinds = aggregate_kinds(wide_results, top_k=top_k)
     return {
         "query": query_text,
         "keywords": extracted.tags,
@@ -478,7 +532,32 @@ def recommend_foods(
         "foodKeywords": extracted.food_keywords,
         "excludeFoodKeywords": extracted.exclude_food_keywords,
         "kinds": [to_kind_group(g) for g in kinds],
-        "foods": [to_food(r) for r in foods_subset],
+    }
+
+
+def recommend_stores_for_kind(
+    query_text: str, kind: str, top_k: int = 10
+) -> dict:
+    """2차 단계: 사용자가 음식 종류를 선택하면, 그 종류를 파는 식당들을 추천.
+
+    같은 쿼리(태그·food_keywords·exclude)를 다시 적용해 *해당 종류 안에서* 점수화.
+    이전 컨텍스트("한식 든든하게")가 살아남아 사용자 취향에 맞는 식당이 위로 온다.
+
+    반환: {"query", "kind", "stores": [식당 객체...]}.
+    프론트의 RestaurantScreen 카드 리스트로 그대로 매핑 가능.
+    """
+    extracted, all_results = _recommend_extracted(query_text, top_k=10**6)
+    # 해당 종류 메뉴만 필터.
+    filtered = [r for r in all_results if r.kind == kind]
+    stores = aggregate_stores(filtered, top_k=top_k)
+    return {
+        "query": query_text,
+        "kind": kind,
+        "keywords": extracted.tags,
+        "excludeKeywords": extracted.exclude_tags,
+        "foodKeywords": extracted.food_keywords,
+        "excludeFoodKeywords": extracted.exclude_food_keywords,
+        "stores": [to_store_group(s) for s in stores],
     }
 
 
@@ -543,10 +622,21 @@ if __name__ == "__main__":
         if not results:
             print("    (매칭 없음)\n")
             continue
-        # 추천 1차 단위 — 음식 종류 (이름만)
+        # 1차: 음식 종류 (이름만)
         kinds = aggregate_kinds(results, top_k=8)
         for g in kinds:
             print(f"    [{g.score:.3f}] {g.kind}")
+        # 2차 데모: 상위 종류를 클릭했다 치고 그 종류의 식당 추천
+        if kinds:
+            picked = kinds[0].kind
+            stores_resp = recommend_stores_for_kind(qtext, picked, top_k=5)
+            print(f"    └ '{picked}' 클릭 시 식당:")
+            for s in stores_resp["stores"]:
+                top_menu = s["menus"][0]["menuName"][:24] if s["menus"] else ""
+                print(
+                    f"        [{s['score']:3d}] {(s['storeName'] or '?')[:20]:20s}"
+                    f"  대표: {top_menu}"
+                )
         print()
 
     # 프론트 계약(food 객체) 출력 샘플 — 첫 쿼리
