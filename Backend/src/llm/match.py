@@ -172,10 +172,70 @@ class StoreInfo:
     category: str | None      # 업태명 (restaurants.UPTAENM): 한식·일식·중식 등
     hours: str | None         # 대표 영업시간 "10:00 ~ 23:00" — 가장 흔한 open-close
     closed_days: list[str]    # 휴무 요일 ["일", "월"]
+    latitude: float | None    # WGS84 위도 — restaurants.X/Y(EPSG:5181) 변환
+    longitude: float | None   # WGS84 경도
+    price_range: str | None   # "8,000~15,000원" — 그 식당 메뉴 price 최소~최대
 
 
 _STORE_INFO_CACHE: dict[int, StoreInfo] | None = None
 DEFAULT_RESTAURANTS_DB = _HERE / ".." / ".." / "db" / "restaurants.db"
+
+
+# 서울 행정데이터 좌표계 — EPSG:5181 (KATEC, 중부원점). always_xy=True로 (lon, lat) 순서.
+# Transformer는 thread-safe 하고 한 번 만들면 재사용 가능 — 모듈 레벨 인스턴스.
+_COORD_TRANSFORMER = None
+
+
+def _coord_to_wgs84(x_str: str | None, y_str: str | None) -> tuple[float | None, float | None]:
+    """restaurants.db의 X/Y 문자열(EPSG:5181) → (lat, lon) WGS84.
+
+    빈 값·변환 실패는 (None, None). pyproj 없으면 (None, None) — 좌표 없어도 응답은 정상.
+    """
+    if not x_str or not y_str:
+        return None, None
+    try:
+        x = float(x_str)
+        y = float(y_str)
+    except (TypeError, ValueError):
+        return None, None
+    global _COORD_TRANSFORMER
+    if _COORD_TRANSFORMER is None:
+        try:
+            from pyproj import Transformer
+            _COORD_TRANSFORMER = Transformer.from_crs("EPSG:5181", "EPSG:4326", always_xy=True)
+        except ImportError:
+            return None, None
+    try:
+        lon, lat = _COORD_TRANSFORMER.transform(x, y)
+        return round(lat, 6), round(lon, 6)
+    except Exception:
+        return None, None
+
+
+_PRICE_DIGIT_RE = re.compile(r"\d[\d,]*")
+
+
+def _parse_prices(prices: list[str]) -> str | None:
+    """가격 문자열 리스트 → '8,000~15,000원' 또는 None.
+
+    DB의 price 포맷이 다양: '8000', '8,000', '22000~41000', '시가', '~12000', '8,000원'.
+    각 문자열에서 숫자 시퀀스 다 뽑아 min/max 계산. 숫자 0개면 None.
+    """
+    nums: list[int] = []
+    for p in prices:
+        if not p:
+            continue
+        for m in _PRICE_DIGIT_RE.findall(p):
+            try:
+                nums.append(int(m.replace(",", "")))
+            except ValueError:
+                pass
+    if not nums:
+        return None
+    lo, hi = min(nums), max(nums)
+    if lo == hi:
+        return f"{lo:,}원"
+    return f"{lo:,}~{hi:,}원"
 
 
 def _load_store_info(
@@ -198,25 +258,30 @@ def _load_store_info(
             conn.execute(f"ATTACH DATABASE 'file:{restaurants_db}?mode=ro' AS r KEY ''")
         except sqlite3.OperationalError:
             conn.execute(f"ATTACH DATABASE '{restaurants_db}' AS r")
-        # 식당 기본 정보 — 이름·주소·업태
+        # 식당 기본 정보 — 이름·주소·업태·좌표
         cur = conn.execute(
             """
-            SELECT s.store_id, s.name, rr.SITEWHLADDR, rr.UPTAENM
+            SELECT s.store_id, s.name, rr.SITEWHLADDR, rr.UPTAENM, rr.X, rr.Y
             FROM stores s
             LEFT JOIN r.restaurants rr ON rr.MGTNO = s.mgtno
             """
         )
         meta = {
-            int(sid): {"name": name, "address": addr, "category": cat}
-            for sid, name, addr, cat in cur.fetchall()
+            int(sid): {"name": name, "address": addr, "category": cat, "x": x, "y": y}
+            for sid, name, addr, cat, x, y in cur.fetchall()
         }
         # 영업시간 — 가장 흔한 open-close 페어 = 대표 시간, is_closed=1 요일 = 휴무.
-        # business_hours가 요일별로 있으니 store_id별로 묶어 처리.
         hours_by_sid: dict[int, list[tuple]] = {}
         for sid, dow, ot, ct, closed in conn.execute(
             "SELECT store_id, day_of_week, open_time, close_time, is_closed FROM business_hours"
         ):
             hours_by_sid.setdefault(int(sid), []).append((dow, ot, ct, closed))
+        # 식당별 가격 — priceRange 계산용
+        prices_by_sid: dict[int, list[str]] = {}
+        for sid, price in conn.execute(
+            "SELECT store_id, price FROM menus WHERE price IS NOT NULL AND price != ''"
+        ):
+            prices_by_sid.setdefault(int(sid), []).append(price)
     finally:
         conn.close()
 
@@ -225,18 +290,22 @@ def _load_store_info(
         rows = hours_by_sid.get(sid, [])
         closed = [dow for dow, _, _, c in rows if c]
         open_pairs = [(ot, ct) for _, ot, ct, c in rows if not c and ot and ct]
-        # 가장 흔한 open-close 페어. 동률이면 첫 등장 순.
         if open_pairs:
             most = Counter(open_pairs).most_common(1)[0][0]
             hours = f"{most[0]} ~ {most[1]}"
         else:
             hours = None
+        lat, lon = _coord_to_wgs84(m["x"], m["y"])
+        price_range = _parse_prices(prices_by_sid.get(sid, []))
         out[sid] = StoreInfo(
             name=m["name"],
             address=m["address"],
             category=m["category"],
             hours=hours,
             closed_days=closed,
+            latitude=lat,
+            longitude=lon,
+            price_range=price_range,
         )
     _STORE_INFO_CACHE = out
     return out
@@ -624,10 +693,11 @@ def to_store_group(g: StoreGroup) -> dict:
         "name": g.store_name,
         "address": info.address if info else None,
         "category": info.category if info else None,
-        "latitude": None,   # TODO: EPSG:5174 → WGS84 변환
-        "longitude": None,
+        "latitude": info.latitude if info else None,
+        "longitude": info.longitude if info else None,
         "hours": info.hours if info else None,
         "closedDay": ", ".join(info.closed_days) if info and info.closed_days else None,
+        "priceRange": info.price_range if info else None,
         "score": _to_score100(g.score),
         "reason": {
             "matchedKeywords": g.matched,
