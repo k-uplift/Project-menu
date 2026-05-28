@@ -1,12 +1,10 @@
 /**
- * RestaurantDetailScreen — 음식점 상세 정보 (STEP 5)
+ * RestaurantDetailScreen — 음식점 상세 (STEP 5)
  *
- * 첨부 이미지 디자인 그대로:
- *  - 상단 대형 헤더 카드 (배달 배지 + 카테고리 + 음식점 이름)
- *  - 평점 표시
- *  - 정보 카드 (주소, 영업시간, 가격대)
- *  - 메뉴 목록 (대표 메뉴 강조)
- *  - 4개 외부 연결 버튼 (배민/요기요/카카오맵/네이버지도)
+ * 변경:
+ *  - "플랫폼에서 보기" → "최종 선택"
+ *  - 4개 버튼 → 2개 버튼 (길찾기, 배달의민족)
+ *  - 행동 추적 이벤트 전송 (CF 학습용)
  */
 
 import React from 'react';
@@ -22,51 +20,62 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import PrimaryButton from '../components/PrimaryButton';
+import {
+  trackNavigateClick,
+  trackDeliveryClick,
+} from '../services/behaviorTrackingService';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
   const { restaurant, food } = route.params;
 
-  // 외부 플랫폼 검색 URL 연결
-  const openExternal = async (platform) => {
+  // 길찾기 (카카오맵으로 연결 — 가장 보편적인 지도 앱)
+  const handleNavigate = async () => {
+    // 행동 점수 +2점 — fire-and-forget (await 없이 호출)
+    trackNavigateClick(restaurant, food);
+
     const query = encodeURIComponent(restaurant.name);
-    let url = '';
-    let appName = '';
-    switch (platform) {
-      case 'baemin':
-        url = `https://baemin.me/search?query=${query}`;
-        appName = '배달의민족';
-        break;
-      case 'yogiyo':
-        url = `https://www.yogiyo.co.kr/mobile/#/?search=${query}`;
-        appName = '요기요';
-        break;
-      case 'kakao':
-        url = `https://map.kakao.com/?q=${query}`;
-        appName = '카카오맵';
-        break;
-      case 'naver':
-        url = `https://map.naver.com/v5/search/${query}`;
-        appName = '네이버지도';
-        break;
-    }
+    const url = `https://map.kakao.com/?q=${query}`;
 
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
         Linking.openURL(url);
       } else {
-        Alert.alert('연결 실패', '해당 앱을 열 수 없어요.');
+        Alert.alert('연결 실패', '지도 앱을 열 수 없어요.');
       }
     } catch (e) {
       Alert.alert(
-        appName,
+        '길찾기',
+        `카카오맵에서 "${restaurant.name}" 검색 결과로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
+      );
+    }
+  };
+
+  // 배달의민족 연결
+  const handleDelivery = async () => {
+    // 행동 점수 +2점
+    trackDeliveryClick(restaurant, food);
+
+    const query = encodeURIComponent(restaurant.name);
+    const url = `https://baemin.me/search?query=${query}`;
+
+    try {
+      const canOpen = await Linking.canOpenURL(url);
+      if (canOpen) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('연결 실패', '배달의민족 앱을 열 수 없어요.');
+      }
+    } catch (e) {
+      Alert.alert(
+        '배달의민족',
         `"${restaurant.name}" 검색 결과로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
       );
     }
   };
 
-  // 별점 렌더링 (5점 만점)
+  // 별점 렌더링
   const renderStars = () => {
     const full = Math.floor(restaurant.rating);
     const half = restaurant.rating - full >= 0.5;
@@ -76,7 +85,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      {/* 상단 헤더 (뒤로가기) */}
+      {/* 상단 헤더 */}
       <View style={styles.topBar}>
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={12}>
           <Text style={styles.backText}>‹ 뒤로</Text>
@@ -95,17 +104,14 @@ export default function RestaurantDetailScreen({ route, navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 헤더 카드 — 첨부 이미지 그대로 */}
+        {/* 헤더 카드 */}
         <View style={[styles.headerCard, SHADOW.card]}>
-          {/* 우측 상단 장식 점 */}
           <View style={styles.headerOrb} />
-
           {restaurant.delivery && (
             <View style={styles.deliveryBadge}>
               <Text style={styles.deliveryText}>배달 가능</Text>
             </View>
           )}
-
           <Text style={styles.headerCategory}>{restaurant.category}</Text>
           <Text style={styles.headerName}>{restaurant.name}</Text>
         </View>
@@ -164,7 +170,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           )}
         </View>
 
-        {/* CF 매칭도 (있을 때만) */}
+        {/* CF 매칭도 */}
         {restaurant.cfMatch && (
           <View style={styles.cfBox}>
             <Text style={styles.cfLabel}>👥 취향 일치도</Text>
@@ -182,30 +188,25 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           </View>
         )}
 
-        <Text style={styles.sectionLabel}>플랫폼에서 보기</Text>
+        {/* === 최종 선택 영역 === */}
+        <Text style={styles.sectionLabel}>최종 선택</Text>
 
-        {/* 외부 연결 버튼 4개 — 첨부 이미지처럼 2x2 그리드 */}
-        <View style={styles.platformGrid}>
-          <PlatformButton
-            label="배달의민족"
-            color="#2AC1BC"
-            onPress={() => openExternal('baemin')}
-          />
-          <PlatformButton
-            label="요기요"
-            color="#FA0050"
-            onPress={() => openExternal('yogiyo')}
-          />
-          <PlatformButton
-            label="카카오맵"
-            color="#FEE500"
-            textColor="#1A0F08"
-            onPress={() => openExternal('kakao')}
-          />
-          <PlatformButton
-            label="네이버지도"
+        <View style={styles.finalRow}>
+          {/* 길찾기 — 카카오맵 그린 */}
+          <FinalButton
+            label="길찾기"
+            icon="🗺️"
             color="#03C75A"
-            onPress={() => openExternal('naver')}
+            textColor="#FFFFFF"
+            onPress={handleNavigate}
+          />
+          {/* 배달의민족 — 배민 청록 */}
+          <FinalButton
+            label="배달의민족"
+            icon="🛵"
+            color="#2AC1BC"
+            textColor="#FFFFFF"
+            onPress={handleDelivery}
           />
         </View>
 
@@ -237,18 +238,19 @@ function InfoRow({ icon, text, accent = false }) {
   );
 }
 
-/** 플랫폼 버튼 */
-function PlatformButton({ label, color, textColor = '#FFFFFF', onPress }) {
+/** 최종 선택 버튼 */
+function FinalButton({ label, icon, color, textColor, onPress }) {
   return (
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [
-        styles.platformBtn,
+        styles.finalBtn,
         { backgroundColor: color },
-        pressed && styles.platformPressed,
+        pressed && styles.finalBtnPressed,
       ]}
     >
-      <Text style={[styles.platformText, { color: textColor }]}>{label}</Text>
+      <Text style={styles.finalIcon}>{icon}</Text>
+      <Text style={[styles.finalLabel, { color: textColor }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -300,7 +302,6 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xxl,
   },
 
-  // === 헤더 카드 ===
   headerCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
@@ -349,7 +350,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
   },
 
-  // === 평점 ===
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -373,7 +373,6 @@ const styles = StyleSheet.create({
     fontSize: FONT.sizeSm,
   },
 
-  // === 정보 카드 ===
   infoCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
@@ -404,7 +403,6 @@ const styles = StyleSheet.create({
     fontWeight: FONT.weightMedium,
   },
 
-  // === 섹션 라벨 ===
   sectionLabel: {
     fontSize: FONT.sizeXs,
     color: COLORS.textMuted,
@@ -415,7 +413,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
 
-  // === 메뉴 카드 ===
   menuCard: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.md,
@@ -469,7 +466,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.lg,
   },
 
-  // === CF 매칭도 ===
   cfBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -506,28 +502,31 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 
-  // === 플랫폼 버튼 그리드 (2x2) ===
-  platformGrid: {
+  // === 최종 선택 영역 (2개 버튼) ===
+  finalRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: SPACING.sm,
     marginBottom: SPACING.lg,
   },
-  platformBtn: {
-    flexBasis: '48%',
-    flexGrow: 1,
-    paddingVertical: SPACING.md,
-    borderRadius: RADIUS.md,
+  finalBtn: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.lg,
   },
-  platformPressed: {
+  finalBtnPressed: {
     opacity: 0.85,
     transform: [{ scale: 0.98 }],
   },
-  platformText: {
-    fontSize: FONT.sizeSm,
-    fontWeight: FONT.weightBold,
+  finalIcon: {
+    fontSize: 20,
+    marginRight: SPACING.sm,
+  },
+  finalLabel: {
+    fontSize: FONT.sizeMd,
+    fontWeight: FONT.weightExtra,
   },
 
   dataNote: {
