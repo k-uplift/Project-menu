@@ -429,14 +429,12 @@ def to_food(r: MatchResult) -> dict:
 def to_kind_group(g: KindGroup) -> dict:
     """KindGroup → 프론트 노출 객체. 추천 1차 단위 (§5.12).
 
-    프론트에서 "[김치찌개] 8개 식당" 같은 카드로 노출, 클릭하면 안쪽 stores 열어서
-    실제 메뉴·식당 목록 보여준다. score는 to_food와 같은 0~100 정규화.
+    프론트는 음식 이름(kind)만 보여준다. 안쪽 menus 리스트는 클릭 시 식당·메뉴
+    펼침에 쓰는 부가 데이터로 유지. score는 to_food와 같은 0~100 정규화.
     """
     return {
         "kind": g.kind,
         "score": _to_score100(g.score),
-        "nStores": g.n_stores,
-        "nMenus": len(g.menus),
         "reason": {
             "matchedKeywords": g.matched,
             "matchedFoodKeywords": g.matched_food_keywords,
@@ -545,28 +543,10 @@ if __name__ == "__main__":
         if not results:
             print("    (매칭 없음)\n")
             continue
-        # 추천 1차 단위 — 음식 종류
-        kinds = aggregate_kinds(results, top_k=6)
-        print(f"    ── 음식 종류 (추천 단위) ──")
+        # 추천 1차 단위 — 음식 종류 (이름만)
+        kinds = aggregate_kinds(results, top_k=8)
         for g in kinds:
-            top = g.menus[0]
-            store_label = f"@{top.store_name}" if top.store_name else f"store{top.store_id}"
-            fkw_label = f" food✓{g.matched_food_keywords}" if g.matched_food_keywords else ""
-            print(
-                f"    [{g.score:.3f}] {g.kind:12s} ({g.n_stores}개 식당, {len(g.menus)}개 메뉴)"
-                f"  대표: {top.menu_name[:20]:20s} {store_label[:16]:16s}"
-                f"  매칭{g.matched}{fkw_label}"
-            )
-        # 디버그: 메뉴 단위 상위 5
-        print(f"    ── 메뉴 단위 (참고) ──")
-        for r in results[:5]:
-            store_label = f"@{r.store_name}" if r.store_name else f"store{r.store_id}"
-            kind_label = f"[{r.kind}]" if r.kind else "[?]"
-            fkw_label = f" food✓{r.matched_food_keywords}" if r.matched_food_keywords else ""
-            print(
-                f"    [{r.score:.3f}] {kind_label:10s} {store_label[:16]:16s} {r.menu_name[:24]:24s}"
-                f" 매칭{r.matched}{fkw_label}"
-            )
+            print(f"    [{g.score:.3f}] {g.kind}")
         print()
 
     # 프론트 계약(food 객체) 출력 샘플 — 첫 쿼리
