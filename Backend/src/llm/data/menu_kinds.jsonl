@@ -62,7 +62,7 @@
 {"store_id": 7, "menu_name": "(깔끔한 구성) 직화구이 삼겹살 도시락 세트+반찬+밥(고기200g)", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 7, "menu_name": "(시그니처)갈비맛 양념구이300", "category": "한식", "kind": "양념갈비", "source": "claude"}
 {"store_id": 7, "menu_name": "(시그니처)물쫄면", "category": "한식", "kind": "냉면", "source": "claude"}
-{"store_id": 7, "menu_name": "(자취생러버) 구운삼겹김치찜+밥N+김N(1인분)", "category": "한식", "kind": "삼겹살", "source": "claude"}
+{"store_id": 7, "menu_name": "(자취생러버) 구운삼겹김치찜+밥N+김N(1인분)", "category": "한식", "kind": "김치찜", "source": "claude_reclassified"}
 {"store_id": 7, "menu_name": "(자취생러버) 구운삼겹김치찜+밥N+김N(2인분)", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 7, "menu_name": "(자취생러버) 구운삼겹김치찜+밥N+김N(3인분)", "category": "한식", "kind": "김치찜", "source": "claude"}
 {"store_id": 7, "menu_name": "(중독된사랑) 구운갈비맛김치찜+밥N+김N(1인분)", "category": "한식", "kind": "김치찜", "source": "claude"}
@@ -78,7 +78,7 @@
 {"store_id": 7, "menu_name": "[2인] 구운갈비듬뿍 김치찜+밥2+김2(2인분)", "category": "한식", "kind": "김치찜", "source": "substring"}
 {"store_id": 7, "menu_name": "[2인] 구운삼겹듬뿍 김치찜+밥2+김2(2인분)", "category": "한식", "kind": "김치찜", "source": "claude"}
 {"store_id": 7, "menu_name": "[2인] 햄폭탄 김치찜+밥2+김2(2인분)", "category": "한식", "kind": "김치찜", "source": "claude"}
-{"store_id": 7, "menu_name": "[가성비킹]2인세트(2인세트)", "category": "한식", "kind": "한정식", "source": "claude"}
+{"store_id": 7, "menu_name": "[가성비킹]2인세트(2인세트)", "category": "한식", "kind": "한상", "source": "claude_reclassified"}
 {"store_id": 7, "menu_name": "[맛집랭킹1위]1인세트(1인세트)", "category": "한식", "kind": "한정식", "source": "claude"}
 {"store_id": 7, "menu_name": "[매콤] 삼겹살도시락 + 반찬 + 밥(1인분)", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 7, "menu_name": "[성북구 콜수1등]고기만300(300g)", "category": "한식", "kind": "목살", "source": "claude"}
@@ -127,11 +127,11 @@
 {"store_id": 11, "menu_name": "[1인세트] 쉬즈베이글&크림치즈베이글&음료(15900)", "category": "기타", "kind": "베이글", "source": "claude"}
 {"store_id": 11, "menu_name": "[3잔] 립톤 아이스티(3잔)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[she's way] 내가 만들어먹는 베이글토스트(1인분)", "category": "기타", "kind": "베이글", "source": "claude"}
-{"store_id": 11, "menu_name": "[가볍고프레쉬한]리코타치즈 샐러드 브런치 SET", "category": "기타", "kind": "샐러드", "source": "claude"}
+{"store_id": 11, "menu_name": "[가볍고프레쉬한]리코타치즈 샐러드 브런치 SET", "category": "기타", "kind": "브런치", "source": "claude_reclassified"}
 {"store_id": 11, "menu_name": "[가심비 세트] 콰트로 햄 플러스 SET", "category": "기타", "kind": "피자", "source": "claude"}
 {"store_id": 11, "menu_name": "[가을엔 달달고소하게]토피넛 라떼(XL)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[갓성비가내려와]에그브런치", "category": "기타", "kind": "브런치", "source": "claude"}
-{"store_id": 11, "menu_name": "[건강&맛둘다챙기자]리코타샌드위치 & 그릭요거트 SET", "category": "기타", "kind": "샌드위치", "source": "claude"}
+{"store_id": 11, "menu_name": "[건강&맛둘다챙기자]리코타샌드위치 & 그릭요거트 SET", "category": "기타", "kind": "그릭요거트", "source": "claude_reclassified"}
 {"store_id": 11, "menu_name": "[건강오곡으로채운]오곡바나나 주스(500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[건강한 단백질 리코타] 리코타치즈 샐러드", "category": "기타", "kind": "샐러드", "source": "claude"}
 {"store_id": 11, "menu_name": "[건강한] 유자차(XL)", "category": "기타", "kind": "기타_음료", "source": "claude"}
@@ -171,7 +171,7 @@
 {"store_id": 11, "menu_name": "[달콤 쌉싸름한 초코의유혹]카페모카(XL)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[담백한 어니언향 솔솔] 싱글 햄치즈 베이글", "category": "기타", "kind": "베이글", "source": "claude"}
 {"store_id": 11, "menu_name": "[담백한] 플레인 크림치즈베이글", "category": "기타", "kind": "베이글", "source": "claude"}
-{"store_id": 11, "menu_name": "[당 충전 세트]카야버터 토스트 쿠키 음료 SET", "category": "기타", "kind": "기타_음료", "source": "claude"}
+{"store_id": 11, "menu_name": "[당 충전 세트]카야버터 토스트 쿠키 음료 SET", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 11, "menu_name": "[대왕 크림치즈] 크림치즈 베이글", "category": "기타", "kind": "베이글", "source": "claude"}
 {"store_id": 11, "menu_name": "[돼지바맛이레오]오레오 딸기 프라페(XL)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[돼지바베이글] 딸기 쿠키 크랜베리베이글", "category": "기타", "kind": "베이글", "source": "claude"}
@@ -183,11 +183,11 @@
 {"store_id": 11, "menu_name": "[맛있는거 다있다] 콰트로 햄 MVP 토스트", "category": "기타", "kind": "토스트", "source": "claude"}
 {"store_id": 11, "menu_name": "[먹어보레오]오레오 밀크쉐이크(550ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[미국맛인데 건강하게]햄&베이컨 샐러드", "category": "기타", "kind": "샐러드", "source": "claude"}
-{"store_id": 11, "menu_name": "[미국맛인데건강하게]햄&베이컨 샐러드 브런치 SET", "category": "기타", "kind": "샐러드", "source": "claude"}
+{"store_id": 11, "menu_name": "[미국맛인데건강하게]햄&베이컨 샐러드 브런치 SET", "category": "기타", "kind": "브런치", "source": "claude_reclassified"}
 {"store_id": 11, "menu_name": "[민초는 포기모태]민트초코커피(500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[바다 보고싶을땐]블루레몬 에이드(XL)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[바삭 달콤 추억 가득]달고나커피(500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
-{"store_id": 11, "menu_name": "[바삭짭짤베이컨까지]콰트로 햄 MVP SET", "category": "기타", "kind": "기타", "source": "fallback"}
+{"store_id": 11, "menu_name": "[바삭짭짤베이컨까지]콰트로 햄 MVP SET", "category": "기타", "kind": "피자", "source": "claude_reclassified"}
 {"store_id": 11, "menu_name": "[배부른 한끼] 크림치즈 베이글 & 샌드위치 & 음료(1인분)", "category": "기타", "kind": "베이글", "source": "claude"}
 {"store_id": 11, "menu_name": "[베트남 안가봤지만, 그맛이야]코코넛커피(500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 11, "menu_name": "[보들보들 폭신하게]싱글 햄치즈 머핀", "category": "기타", "kind": "머핀", "source": "claude"}
@@ -373,7 +373,7 @@
 {"store_id": 18, "menu_name": "제로뚱캔(355ml)", "category": "호프/통닭", "kind": "기타_음료", "source": "claude"}
 {"store_id": 18, "menu_name": "즉석밥 (조리O)", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 18, "menu_name": "즉석밥 (조리X)", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 18, "menu_name": "진.짜.내.맘.대.로 두마리세트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
+{"store_id": 18, "menu_name": "진.짜.내.맘.대.로 두마리세트", "category": "호프/통닭", "kind": "닭한마리", "source": "claude_reclassified"}
 {"store_id": 18, "menu_name": "쫄깃쫄깃 떡튀김 (10p)", "category": "호프/통닭", "kind": "떡볶이", "source": "claude"}
 {"store_id": 18, "menu_name": "치즈볼 (5p)", "category": "호프/통닭", "kind": "디저트", "source": "claude"}
 {"store_id": 18, "menu_name": "코카콜라1.25L(1.25L)", "category": "호프/통닭", "kind": "기타_음료", "source": "claude"}
@@ -532,8 +532,8 @@
 {"store_id": 36, "menu_name": "초이스모듬전", "category": "정종/대포집/소주방", "kind": "전", "source": "claude"}
 {"store_id": 36, "menu_name": "해물전", "category": "정종/대포집/소주방", "kind": "해물파전", "source": "claude"}
 {"store_id": 37, "menu_name": "100%닭다리 순살만 2가지맛세트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
-{"store_id": 37, "menu_name": "100%닭다리 순살만 3가지맛세트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
-{"store_id": 37, "menu_name": "100%닭다리 순살만 4가지맛세트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
+{"store_id": 37, "menu_name": "100%닭다리 순살만 3가지맛세트", "category": "호프/통닭", "kind": "닭다리", "source": "claude_reclassified"}
+{"store_id": 37, "menu_name": "100%닭다리 순살만 4가지맛세트", "category": "호프/통닭", "kind": "닭다리", "source": "claude_reclassified"}
 {"store_id": 37, "menu_name": "무", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 37, "menu_name": "순살만 간장 바베큐", "category": "호프/통닭", "kind": "간장치킨", "source": "claude"}
 {"store_id": 37, "menu_name": "순살만 갈릭다이브 반.반", "category": "호프/통닭", "kind": "닭한마리", "source": "claude"}
@@ -649,8 +649,8 @@
 {"store_id": 45, "menu_name": "볶음밥", "category": "한식", "kind": "볶음밥", "source": "claude"}
 {"store_id": 45, "menu_name": "생삼겹살 180g *미나리포함", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 45, "menu_name": "특 목살 180g *미나리포함", "category": "한식", "kind": "목살", "source": "substring"}
-{"store_id": 46, "menu_name": "매운세트(2인)", "category": "한식", "kind": "한정식", "source": "claude"}
-{"store_id": 46, "menu_name": "매운세트(3인)", "category": "한식", "kind": "한정식", "source": "claude"}
+{"store_id": 46, "menu_name": "매운세트(2인)", "category": "한식", "kind": "떡볶이", "source": "claude_reclassified"}
+{"store_id": 46, "menu_name": "매운세트(3인)", "category": "한식", "kind": "떡볶이", "source": "claude_reclassified"}
 {"store_id": 46, "menu_name": "토치세트(2인)", "category": "한식", "kind": "한정식", "source": "claude"}
 {"store_id": 46, "menu_name": "토치세트(3인)", "category": "한식", "kind": "한정식", "source": "claude"}
 {"store_id": 46, "menu_name": "토치세트(4인)", "category": "한식", "kind": "한정식", "source": "claude"}
@@ -768,14 +768,14 @@
 {"store_id": 55, "menu_name": "수제돈카츠", "category": "한식", "kind": "돈까스", "source": "claude"}
 {"store_id": 55, "menu_name": "직화고기덮밥", "category": "한식", "kind": "소고기덮밥", "source": "claude"}
 {"store_id": 55, "menu_name": "치즈돈카츠", "category": "한식", "kind": "돈까스", "source": "claude"}
-{"store_id": 55, "menu_name": "치즈돈카츠와나베우동셋트", "category": "한식", "kind": "우동", "source": "claude"}
+{"store_id": 55, "menu_name": "치즈돈카츠와나베우동셋트", "category": "한식", "kind": "돈까스", "source": "claude_reclassified"}
 {"store_id": 56, "menu_name": "모주", "category": "한식", "kind": "기타_음료", "source": "claude"}
 {"store_id": 56, "menu_name": "콩나물국밥", "category": "한식", "kind": "콩나물국밥", "source": "claude"}
 {"store_id": 57, "menu_name": "(NEW) 그릴초밥세트 (10PCS)", "category": "기타", "kind": "스시", "source": "claude"}
 {"store_id": 57, "menu_name": "간장새우(10마리)", "category": "기타", "kind": "간장치킨", "source": "claude"}
 {"store_id": 57, "menu_name": "계란(1pcs)", "category": "기타", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 57, "menu_name": "광어(1pcs)", "category": "기타", "kind": "광어회", "source": "claude"}
-{"store_id": 57, "menu_name": "광어+연어사시미(24pcs)", "category": "기타", "kind": "사시미", "source": "claude"}
+{"store_id": 57, "menu_name": "광어+연어사시미(24pcs)", "category": "기타", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 57, "menu_name": "광어사시미", "category": "기타", "kind": "광어회", "source": "claude"}
 {"store_id": 57, "menu_name": "광어지느러미(1pcs)", "category": "기타", "kind": "광어회", "source": "claude"}
 {"store_id": 57, "menu_name": "광어초밥", "category": "기타", "kind": "초밥", "source": "claude"}
@@ -796,7 +796,7 @@
 {"store_id": 57, "menu_name": "미니우동", "category": "기타", "kind": "우동", "source": "claude"}
 {"store_id": 57, "menu_name": "민물장어덮밥", "category": "기타", "kind": "장어덮밥", "source": "claude"}
 {"store_id": 57, "menu_name": "민물장어초밥(10pcs)", "category": "기타", "kind": "초밥", "source": "claude"}
-{"store_id": 57, "menu_name": "반+반 더블초밥(5pcs+5pcs)", "category": "기타", "kind": "초밥", "source": "claude"}
+{"store_id": 57, "menu_name": "반+반 더블초밥(5pcs+5pcs)", "category": "기타", "kind": "스시", "source": "claude_reclassified"}
 {"store_id": 57, "menu_name": "불새우초밥(10pcs)", "category": "기타", "kind": "초밥", "source": "substring"}
 {"store_id": 57, "menu_name": "불새우초밥(1pcs)", "category": "기타", "kind": "스시", "source": "claude"}
 {"store_id": 57, "menu_name": "사시미정식", "category": "기타", "kind": "사시미", "source": "claude"}
@@ -931,7 +931,7 @@
 {"store_id": 66, "menu_name": "급냉삼겹", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 66, "menu_name": "암퇘지생삼겹살", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 66, "menu_name": "제주흑돼지오겹살", "category": "한식", "kind": "삼겹살", "source": "claude"}
-{"store_id": 66, "menu_name": "한돈1+꽃목살", "category": "한식", "kind": "목살", "source": "claude"}
+{"store_id": 66, "menu_name": "한돈1+꽃목살", "category": "한식", "kind": "꽃삼겹", "source": "claude_reclassified"}
 {"store_id": 66, "menu_name": "한돈1+목항정", "category": "한식", "kind": "목살", "source": "claude"}
 {"store_id": 66, "menu_name": "한돈가브리살", "category": "한식", "kind": "갈비", "source": "claude"}
 {"store_id": 66, "menu_name": "한돈덜미살", "category": "한식", "kind": "목살", "source": "claude"}
@@ -960,7 +960,7 @@
 {"store_id": 68, "menu_name": "골뱅이소면", "category": "분식", "kind": "기타", "source": "claude"}
 {"store_id": 68, "menu_name": "국물 떡볶이", "category": "분식", "kind": "떡볶이", "source": "claude"}
 {"store_id": 68, "menu_name": "김치볶음밥", "category": "분식", "kind": "김치볶음밥", "source": "claude"}
-{"store_id": 68, "menu_name": "꼬치모듬세트", "category": "분식", "kind": "꽃등심", "source": "claude"}
+{"store_id": 68, "menu_name": "꼬치모듬세트", "category": "분식", "kind": "꽃삼겹", "source": "claude_reclassified"}
 {"store_id": 68, "menu_name": "나가사끼 오뎅바", "category": "분식", "kind": "어묵", "source": "claude"}
 {"store_id": 68, "menu_name": "노가리", "category": "분식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 68, "menu_name": "닭근위가라아게", "category": "분식", "kind": "닭강정", "source": "claude"}
@@ -981,7 +981,7 @@
 {"store_id": 68, "menu_name": "순살후라이드 꼬치2P", "category": "분식", "kind": "닭꼬치", "source": "claude"}
 {"store_id": 68, "menu_name": "양꼬치 3pcs", "category": "분식", "kind": "양꼬치", "source": "claude"}
 {"store_id": 68, "menu_name": "얼큰오뎅바", "category": "분식", "kind": "어묵", "source": "claude"}
-{"store_id": 68, "menu_name": "오닭세트", "category": "분식", "kind": "닭강정", "source": "claude"}
+{"store_id": 68, "menu_name": "오닭세트", "category": "분식", "kind": "닭볶음탕", "source": "claude_reclassified"}
 {"store_id": 68, "menu_name": "오닭철판치즈", "category": "분식", "kind": "닭볶음탕", "source": "claude"}
 {"store_id": 68, "menu_name": "오리지널 오뎅바", "category": "분식", "kind": "어묵", "source": "claude"}
 {"store_id": 68, "menu_name": "은행꼬치 5pcs", "category": "분식", "kind": "꽃등심", "source": "claude"}
@@ -1098,7 +1098,7 @@
 {"store_id": 76, "menu_name": "깐풍기 로스트", "category": "호프/통닭", "kind": "깐풍기", "source": "claude"}
 {"store_id": 76, "menu_name": "깐풍맛닭 후라이드", "category": "호프/통닭", "kind": "후라이드", "source": "claude"}
 {"store_id": 76, "menu_name": "데리갈릭 로스트", "category": "호프/통닭", "kind": "닭한마리", "source": "claude"}
-{"store_id": 76, "menu_name": "두마리치킨 세트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
+{"store_id": 76, "menu_name": "두마리치킨 세트", "category": "호프/통닭", "kind": "닭한마리", "source": "claude_reclassified"}
 {"store_id": 76, "menu_name": "두반장 로스트", "category": "호프/통닭", "kind": "양념치킨", "source": "claude"}
 {"store_id": 76, "menu_name": "레드맛닭 후라이드", "category": "호프/통닭", "kind": "후라이드", "source": "claude"}
 {"store_id": 76, "menu_name": "레몬파닭 후라이드", "category": "호프/통닭", "kind": "후라이드", "source": "claude"}
@@ -1134,7 +1134,7 @@
 {"store_id": 76, "menu_name": "치즈 순살 퐁닭", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 76, "menu_name": "치즈소스", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 76, "menu_name": "치즈칠리 로스트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
-{"store_id": 76, "menu_name": "치킨떡볶이(대) 세트", "category": "호프/통닭", "kind": "떡볶이", "source": "claude"}
+{"store_id": 76, "menu_name": "치킨떡볶이(대) 세트", "category": "호프/통닭", "kind": "치킨", "source": "claude_reclassified"}
 {"store_id": 76, "menu_name": "치킨무", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 76, "menu_name": "치킨사이드 세트", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 76, "menu_name": "칠리 현미베이크", "category": "호프/통닭", "kind": "베이커리", "source": "claude"}
@@ -1147,7 +1147,7 @@
 {"store_id": 76, "menu_name": "콜라(제로) 500ml", "category": "호프/통닭", "kind": "기타_음료", "source": "claude"}
 {"store_id": 76, "menu_name": "트리플 현미베이크", "category": "호프/통닭", "kind": "베이커리", "source": "claude"}
 {"store_id": 76, "menu_name": "트리플맛닭 후라이드", "category": "호프/통닭", "kind": "후라이드", "source": "claude"}
-{"store_id": 76, "menu_name": "파+파닭소스", "category": "호프/통닭", "kind": "파닭", "source": "substring"}
+{"store_id": 76, "menu_name": "파+파닭소스", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude_reclassified"}
 {"store_id": 76, "menu_name": "파닭소스", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 76, "menu_name": "파추가", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 76, "menu_name": "파파닭 현미베이크", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
@@ -1287,8 +1287,8 @@
 {"store_id": 84, "menu_name": "(NEW) 연유꽃방튀김", "category": "중국식", "kind": "튀김만두", "source": "claude"}
 {"store_id": 84, "menu_name": "(NEW).연유꽃방튀김", "category": "중국식", "kind": "튀김만두", "source": "claude"}
 {"store_id": 84, "menu_name": "(NEW).연유꽃방튀김(6개)", "category": "중국식", "kind": "튀김만두", "source": "claude"}
-{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(육해공곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "(NEW)탕수육+육해공얼큰짬뽕1+만두(육해공곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "(무료배달) [가성비 끝판왕] 팔보해물쟁반짜장(2인분)", "category": "중국식", "kind": "짜장", "source": "claude"}
 {"store_id": 84, "menu_name": "1 셋트 탕수육소+양장피소+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "1. 탕수육+볶음밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
@@ -1298,49 +1298,49 @@
 {"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "10. 탕수육+삼선짬뽕2+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "11.탕수육+고추짬뽕2+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "1.김치치즈탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "짜장", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "10. 탕수육+삼선짬뽕2+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "11.탕수육+고추짬뽕2+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운 비냉 보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운물보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "11.탕수육+매운냉면1+만두(매운비냉곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "12. 사천탕수육+짜장2+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "13. 깐쇼육+짜장2+만두(보통)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
-{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(보통)", "category": "중국식", "kind": "돈까스", "source": "claude"}
-{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(볶음밥변경)", "category": "중국식", "kind": "돈까스", "source": "claude"}
+{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(보통)", "category": "중국식", "kind": "짜장면", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(볶음밥변경)", "category": "중국식", "kind": "짜장면", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "13.돈까스+짜장+만두(짬뽕변경)", "category": "중국식", "kind": "짜장면", "source": "claude"}
-{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(짬짜면 변경)", "category": "중국식", "kind": "돈까스", "source": "claude"}
-{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(해물쟁반짜장변경)", "category": "중국식", "kind": "짜장면", "source": "claude"}
+{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(짬짜면 변경)", "category": "중국식", "kind": "짜장면", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "13.돈까스+짜장+만두(해물쟁반짜장변경)", "category": "중국식", "kind": "짜장", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "14. 깐풍육+짜장2+만두(보통)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 84, "menu_name": "14.깐쇼새우7p+짜장+만두(보통)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 84, "menu_name": "14.깐쇼새우7p+짜장+만두(볶음밥 변경)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 84, "menu_name": "14.깐쇼새우7p+짜장+만두(짬뽕변경)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 84, "menu_name": "14.깐쇼새우7p+짜장+만두(짬짜면 변경)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 84, "menu_name": "14.깐쇼새우7p+짜장+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "깐풍기", "source": "claude"}
-{"store_id": 84, "menu_name": "15. 라조육+짜장2+만두(보통)", "category": "중국식", "kind": "라자냐", "source": "claude"}
-{"store_id": 84, "menu_name": "16. 깐풍기+짜장1+짬뽕1+만두", "category": "중국식", "kind": "중국식", "source": "claude"}
+{"store_id": 84, "menu_name": "15. 라조육+짜장2+만두(보통)", "category": "중국식", "kind": "라자나", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "16. 깐풍기+짜장1+짬뽕1+만두", "category": "중국식", "kind": "깐풍기", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "17. 양장피+짜장2+만두", "category": "중국식", "kind": "양장피", "source": "claude"}
 {"store_id": 84, "menu_name": "18. 팔보채+짜장2+만두", "category": "중국식", "kind": "팔보채", "source": "claude"}
-{"store_id": 84, "menu_name": "19. 유산슬+짜장2+만두", "category": "중국식", "kind": "중국식", "source": "claude"}
+{"store_id": 84, "menu_name": "19. 유산슬+짜장2+만두", "category": "중국식", "kind": "유린기", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "2 셋트 탕수육소+고추잡채소+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "2. 탕수육+제육덮밥1+만두(제육덮밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2. 탕수육+짬뽕1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "20. 사천탕수육+쟁반짜장2인+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "2. 탕수육+짬뽕1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "20. 사천탕수육+쟁반짜장2인+만두(보통)", "category": "중국식", "kind": "짜장", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "21. 양장피+쟁반짜장2인+만두", "category": "중국식", "kind": "양장피", "source": "claude"}
 {"store_id": 84, "menu_name": "22. 고추잡채+쟁반짜장2인+만두", "category": "중국식", "kind": "고추잡채", "source": "claude"}
 {"store_id": 84, "menu_name": "23. 팔보채+쟁반짜장2인+만두", "category": "중국식", "kind": "팔보채", "source": "claude"}
-{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(짬짜곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "2~0. 탕수육+짬짜1+만두(짬짜곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(간짜장곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(보통)", "category": "중국식", "kind": "간짜장", "source": "substring"}
+{"store_id": 84, "menu_name": "2~1. 탕수육+간짜장1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "2~3. 탕수육+쟁반짜장1인+만두(쟁반곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(차돌짬뽕곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(삼선짬뽕곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "2~4. 탕수육+차돌짬뽕1+만두(차돌짬뽕곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "2~6. 탕수육+삼선짬뽕1+만두(삼선짬뽕곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "3 셋트 탕수육소+깐쇼새우소+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
@@ -1349,34 +1349,34 @@
 {"store_id": 84, "menu_name": "3. 마늘탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "3. 탕수육+삼선볶음밥1+만두(삼선볶음밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "4 셋트 탕수육소+양장피소+깐풍기소+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(짬뽕밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "substring"}
+{"store_id": 84, "menu_name": "4 셋트 탕수육소+양장피소+깐풍기소+만두", "category": "중국식", "kind": "양장피", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "4. 탕수육+짬뽕밥1+만두(짬뽕밥곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(볶음밥 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬뽕 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(짬짜면 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "5. 사천탕수육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "5. 탕수육+간짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(삼선짬뽕밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "6. 탕수육+짬뽕2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(차돌짬뽕밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "5. 탕수육+삼선짬뽕밥1+만두(삼선짬뽕밥곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "6. 탕수육+짬뽕2+만두", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "6. 탕수육+차돌짬뽕밥1+만두(차돌짬뽕밥곱배기)", "category": "중국식", "kind": "차돌박이", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(보통)", "category": "중국식", "kind": "라자나", "source": "claude"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(볶음밥 변경)", "category": "중국식", "kind": "라자나", "source": "claude"}
-{"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(짬뽕 변경)", "category": "중국식", "kind": "라자냐", "source": "claude"}
+{"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(짬뽕 변경)", "category": "중국식", "kind": "라자나", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(짬짜면 변경)", "category": "중국식", "kind": "라자나", "source": "claude"}
-{"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "짜장", "source": "claude"}
-{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(육해공짬뽕밥곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "7. 라조육+짜장1+만두(해물쟁반짜장 변경)", "category": "중국식", "kind": "라자나", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "7. 탕수육+육해공짬뽕밥1+만두(육해공짬뽕밥곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "7. 탕수육+쟁반짜장2인+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "8. 탕수육+볶음밥2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(물냉보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉곱배기)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "9. 탕수육+냉면1+만두(비냉보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "9. 탕수육+차돌짬뽕2+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "9. 탕수육+차돌짬뽕2+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "[HIT&HOT] 육해공 얼큰짬뽕(곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 84, "menu_name": "[HIT&HOT] 육해공 얼큰짬뽕(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 84, "menu_name": "[국물일품] 차돌박이짬뽕(곱배기)", "category": "중국식", "kind": "짬뽕", "source": "claude"}
@@ -1387,7 +1387,7 @@
 {"store_id": 84, "menu_name": "[주문수1위] 짜장면", "category": "중국식", "kind": "짜장면", "source": "substring"}
 {"store_id": 84, "menu_name": "[중독성갑] 간짜장", "category": "중국식", "kind": "간짜장", "source": "claude"}
 {"store_id": 84, "menu_name": "[찰떡궁합] 3. 탕수육+짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "[커플추천]4. 탕수육+짜장+짬뽕+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "[커플추천]4. 탕수육+짜장+짬뽕+만두", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "간짜장", "category": "중국식", "kind": "간짜장", "source": "claude"}
 {"store_id": 84, "menu_name": "갈비탕", "category": "중국식", "kind": "갈비탕", "source": "claude"}
 {"store_id": 84, "menu_name": "고기왕만두", "category": "중국식", "kind": "만두", "source": "claude"}
@@ -1504,10 +1504,10 @@
 {"store_id": 84, "menu_name": "유린기(小)", "category": "중국식", "kind": "유린기", "source": "claude"}
 {"store_id": 84, "menu_name": "유린육 간(곱빼기)", "category": "중국식", "kind": "중국식", "source": "claude"}
 {"store_id": 84, "menu_name": "유린육 간(보통)", "category": "중국식", "kind": "중국식", "source": "claude"}
-{"store_id": 84, "menu_name": "유린육 셋트(간짜장)", "category": "중국식", "kind": "간짜장", "source": "claude"}
-{"store_id": 84, "menu_name": "유린육 셋트(볶음밥)", "category": "중국식", "kind": "중국식", "source": "claude"}
-{"store_id": 84, "menu_name": "유린육 셋트(짜장)", "category": "중국식", "kind": "짜장", "source": "claude"}
-{"store_id": 84, "menu_name": "유린육 셋트(짬뽕)", "category": "중국식", "kind": "중국식", "source": "claude"}
+{"store_id": 84, "menu_name": "유린육 셋트(간짜장)", "category": "중국식", "kind": "유린기", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "유린육 셋트(볶음밥)", "category": "중국식", "kind": "유린기", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "유린육 셋트(짜장)", "category": "중국식", "kind": "유린기", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "유린육 셋트(짬뽕)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "유린육 짜(곱배기)", "category": "중국식", "kind": "중국식", "source": "claude"}
 {"store_id": 84, "menu_name": "유린육 짜(보통)", "category": "중국식", "kind": "중국식", "source": "claude"}
 {"store_id": 84, "menu_name": "유린육 짬(곱배기)", "category": "중국식", "kind": "중국식", "source": "claude"}
@@ -1555,15 +1555,15 @@
 {"store_id": 84, "menu_name": "카레볶음밥", "category": "중국식", "kind": "카레라이스", "source": "claude"}
 {"store_id": 84, "menu_name": "콜라 500ml(펩시)", "category": "중국식", "kind": "기타_음료", "source": "claude"}
 {"store_id": 84, "menu_name": "콜라(펩시)(1.25L)", "category": "중국식", "kind": "기타_음료", "source": "claude"}
-{"store_id": 84, "menu_name": "탕간(탕수육+간짜장)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "탕간(탕수육+간짜장)", "category": "중국식", "kind": "간짜장", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "탕볶밥", "category": "중국식", "kind": "볶음밥", "source": "claude"}
 {"store_id": 84, "menu_name": "탕수육(中)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "탕수육(大)", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "탕수육(小)", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+깐풍기+고추잡채+양장피(6~7인기준)", "category": "중국식", "kind": "중국식", "source": "claude"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+고추잡채+양장피+깐쇼새우(8~9인기준)", "category": "중국식", "kind": "중국식", "source": "claude"}
-{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+양장피(4~5인기준)", "category": "중국식", "kind": "중국식", "source": "claude"}
-{"store_id": 84, "menu_name": "탕수육+해물볶음짬뽕2인+만두(보통)", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+깐풍기+고추잡채+양장피(6~7인기준)", "category": "중국식", "kind": "탕수육", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+고추잡채+양장피+깐쇼새우(8~9인기준)", "category": "중국식", "kind": "양장피", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "탕수육+팔보채+유산슬+양장피(4~5인기준)", "category": "중국식", "kind": "양장피", "source": "claude_reclassified"}
+{"store_id": 84, "menu_name": "탕수육+해물볶음짬뽕2인+만두(보통)", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 84, "menu_name": "탕수육돈가스 정식", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 84, "menu_name": "탕짬면", "category": "중국식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 84, "menu_name": "팔보채(中)", "category": "중국식", "kind": "팔보채", "source": "claude"}
@@ -1649,9 +1649,9 @@
 {"store_id": 96, "menu_name": "그릭허니&베이글", "category": "기타", "kind": "베이글", "source": "claude"}
 {"store_id": 96, "menu_name": "꿀이 꽉찬 미니호떡(3개)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "내가 만드는 화채", "category": "기타", "kind": "기타_음료", "source": "claude"}
-{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치꿀(딸기+치즈큐브+초코쉘))", "category": "기타", "kind": "디저트", "source": "claude"}
-{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치연(딸기+치즈큐브+연유))", "category": "기타", "kind": "디저트", "source": "claude"}
-{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치초(딸기+치즈큐브+사양벌꿀))", "category": "기타", "kind": "디저트", "source": "claude"}
+{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치꿀(딸기+치즈큐브+초코쉘))", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
+{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치연(딸기+치즈큐브+연유))", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
+{"store_id": 96, "menu_name": "딸기 삼부작 세트(딸치초(딸기+치즈큐브+사양벌꿀))", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "딸기 치즈  블랜디드 그릭", "category": "기타", "kind": "그릭요거트", "source": "claude"}
 {"store_id": 96, "menu_name": "딸기범벅 세트(Double)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "말차 세트(더블 Double)", "category": "기타", "kind": "기타_음료", "source": "claude"}
@@ -1662,8 +1662,8 @@
 {"store_id": 96, "menu_name": "베리베리 세트(더블 Double)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "베리베리 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "블루베리 치즈  블랜디드 그릭", "category": "기타", "kind": "그릭요거트", "source": "claude"}
-{"store_id": 96, "menu_name": "샹그리아 세트(더블 Double)", "category": "기타", "kind": "기타_주류", "source": "claude"}
-{"store_id": 96, "menu_name": "샹그리아 세트(패밀리 Family)", "category": "기타", "kind": "기타_주류", "source": "claude"}
+{"store_id": 96, "menu_name": "샹그리아 세트(더블 Double)", "category": "기타", "kind": "기타_음료", "source": "claude_reclassified"}
+{"store_id": 96, "menu_name": "샹그리아 세트(패밀리 Family)", "category": "기타", "kind": "기타_음료", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "오레오 세트(더블 Double)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "요거트 아이스크림  더블(380~400g)", "category": "기타", "kind": "아이스크림", "source": "substring"}
 {"store_id": 96, "menu_name": "요거트 아이스크림 Double", "category": "기타", "kind": "아이스크림", "source": "claude"}
@@ -1674,7 +1674,7 @@
 {"store_id": 96, "menu_name": "요거트 아이스크림~딸기범벅 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
 {"store_id": 96, "menu_name": "요거트 아이스크림~벌집꿀&허니피넛", "category": "기타", "kind": "아이스크림", "source": "claude"}
 {"store_id": 96, "menu_name": "요거트 아이스크림~샤인메스캣 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
-{"store_id": 96, "menu_name": "요거트 아이스크림~샹그리아 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
+{"store_id": 96, "menu_name": "요거트 아이스크림~샹그리아 세트", "category": "기타", "kind": "요거트", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "요거트 아이스크림~애플망고 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
 {"store_id": 96, "menu_name": "요거트 아이스크림~오레오 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
 {"store_id": 96, "menu_name": "요거트 아이스크림~오설록 그린티 세트", "category": "기타", "kind": "아이스크림", "source": "claude"}
@@ -1697,7 +1697,7 @@
 {"store_id": 96, "menu_name": "체리 베리 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "체리 체리 세트(더블 Double)", "category": "기타", "kind": "버거", "source": "claude"}
 {"store_id": 96, "menu_name": "체리 체리 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
-{"store_id": 96, "menu_name": "체리삼부작 세트(체치꿀(체리+치즈큐브+사양벌꿀))", "category": "기타", "kind": "기타_음료", "source": "claude"}
+{"store_id": 96, "menu_name": "체리삼부작 세트(체치꿀(체리+치즈큐브+사양벌꿀))", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "체리삼부작 세트(체치연(체리+치즈큐브+연유))", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 96, "menu_name": "체리삼부작 세트(체치초(체리+치즈큐브+초코쉘))", "category": "기타", "kind": "디저트", "source": "claude"}
 {"store_id": 96, "menu_name": "케익  아라모드 세트(더블 Double)", "category": "기타", "kind": "케이크", "source": "claude"}
@@ -1706,15 +1706,15 @@
 {"store_id": 96, "menu_name": "키위 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "트로피칼 세트(더블 Double)", "category": "기타", "kind": "버거", "source": "claude"}
 {"store_id": 96, "menu_name": "트로피칼 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
-{"store_id": 96, "menu_name": "퍼펙트 브라운 세트(더블 Double)", "category": "기타", "kind": "기타", "source": "fallback"}
+{"store_id": 96, "menu_name": "퍼펙트 브라운 세트(더블 Double)", "category": "기타", "kind": "버거", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "퍼펙트 브라운 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "프리미엄 골드망고 세트(500g 특특대)(더블 Double)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "프리미엄 골드망고 세트(500g 특특대)(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude"}
 {"store_id": 96, "menu_name": "피나콜라다  세트(더블 Double)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 96, "menu_name": "피나콜라다  세트(패밀리 Family)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 96, "menu_name": "피스타치오 쉘 세트(더블 Double)", "category": "기타", "kind": "기타", "source": "fallback"}
-{"store_id": 96, "menu_name": "피스타치오 쉘 세트(싱글 Single)", "category": "기타", "kind": "기타", "source": "claude"}
-{"store_id": 96, "menu_name": "피스타치오 쉘 세트(패밀리 Family)", "category": "기타", "kind": "케이크", "source": "claude"}
+{"store_id": 96, "menu_name": "피스타치오 쉘 세트(싱글 Single)", "category": "기타", "kind": "케이크", "source": "claude_reclassified"}
+{"store_id": 96, "menu_name": "피스타치오 쉘 세트(패밀리 Family)", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 96, "menu_name": "필라델피아 오레오 치즈케익 (한조각)(1개)", "category": "기타", "kind": "치즈케이크", "source": "claude"}
 {"store_id": 96, "menu_name": "필라델피아 치즈케익(한조각)(1개)", "category": "기타", "kind": "치즈케이크", "source": "claude"}
 {"store_id": 96, "menu_name": "허니 그릭 &베이글", "category": "기타", "kind": "베이글", "source": "claude"}
@@ -1740,7 +1740,7 @@
 {"store_id": 99, "menu_name": "친신 불맛 마라샹궈", "category": "한식", "kind": "마라샹궈", "source": "substring"}
 {"store_id": 99, "menu_name": "친신마라탕", "category": "한식", "kind": "마라탕", "source": "claude"}
 {"store_id": 100, "menu_name": "(해장 추천)망고 바나나 스무디", "category": "기타", "kind": "기타_음료", "source": "claude"}
-{"store_id": 100, "menu_name": "CHOOSE 브런치 도시락 (SET)", "category": "기타", "kind": "런치박스", "source": "claude"}
+{"store_id": 100, "menu_name": "CHOOSE 브런치 도시락 (SET)", "category": "기타", "kind": "브런치", "source": "claude_reclassified"}
 {"store_id": 100, "menu_name": "CHOOSE 브런치 도시락 (단품)", "category": "기타", "kind": "런치박스", "source": "claude"}
 {"store_id": 100, "menu_name": "과일차", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 100, "menu_name": "그릴드 파니니 세트", "category": "기타", "kind": "파니니", "source": "claude"}
@@ -1772,7 +1772,7 @@
 {"store_id": 100, "menu_name": "아이스티샷추가(아샷추)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 100, "menu_name": "에그 치즈 그릴 토스트", "category": "기타", "kind": "토스트", "source": "claude"}
 {"store_id": 100, "menu_name": "에그타르트", "category": "기타", "kind": "타르트", "source": "claude"}
-{"store_id": 100, "menu_name": "에그타르트 4 SET", "category": "기타", "kind": "파이", "source": "claude"}
+{"store_id": 100, "menu_name": "에그타르트 4 SET", "category": "기타", "kind": "타르트", "source": "claude_reclassified"}
 {"store_id": 100, "menu_name": "연유라떼", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 100, "menu_name": "오트라떼", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 100, "menu_name": "오트밀&견과류바", "category": "기타", "kind": "기타", "source": "claude"}
@@ -1888,7 +1888,7 @@
 {"store_id": 113, "menu_name": "(마루업)콤비네이션 피자", "category": "기타", "kind": "피자", "source": "claude"}
 {"store_id": 113, "menu_name": "(마루업)트리플치즈 피자", "category": "기타", "kind": "피자", "source": "claude"}
 {"store_id": 113, "menu_name": "(마루업)페퍼로니 피자", "category": "기타", "kind": "피자", "source": "claude"}
-{"store_id": 113, "menu_name": "(한정판매) 까르보불닭 치즈폭탄세트", "category": "기타", "kind": "라볶이", "source": "claude"}
+{"store_id": 113, "menu_name": "(한정판매) 까르보불닭 치즈폭탄세트", "category": "기타", "kind": "치킨", "source": "claude_reclassified"}
 {"store_id": 113, "menu_name": "(한정판매) 불닭 치즈폭탄 세트", "category": "기타", "kind": "치킨", "source": "claude"}
 {"store_id": 113, "menu_name": "[일부매장한정]1인 꿀고구마 피자", "category": "기타", "kind": "피자", "source": "claude"}
 {"store_id": 113, "menu_name": "[일부매장한정]1인 바베큐 치킨 피자", "category": "기타", "kind": "피자", "source": "claude"}
@@ -1966,7 +1966,7 @@
 {"store_id": 119, "menu_name": "셋트메뉴1", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 119, "menu_name": "셋트메뉴2", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 119, "menu_name": "셋트메뉴3", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
-{"store_id": 119, "menu_name": "셋트메뉴4", "category": "호프/통닭", "kind": "기타", "source": "fallback"}
+{"store_id": 119, "menu_name": "셋트메뉴4", "category": "호프/통닭", "kind": "치킨", "source": "claude_reclassified"}
 {"store_id": 119, "menu_name": "셋트메뉴5", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 119, "menu_name": "셋트메뉴6", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 119, "menu_name": "셋트메뉴7", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
@@ -2066,7 +2066,7 @@
 {"store_id": 135, "menu_name": "을지로골뱅이", "category": "호프/통닭", "kind": "아구찜", "source": "claude"}
 {"store_id": 135, "menu_name": "장작구이통닭", "category": "호프/통닭", "kind": "닭한마리", "source": "claude"}
 {"store_id": 135, "menu_name": "쥐포", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 135, "menu_name": "한치+땅콩", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
+{"store_id": 135, "menu_name": "한치+땅콩", "category": "호프/통닭", "kind": "기타_주류", "source": "claude_reclassified"}
 {"store_id": 135, "menu_name": "황태계란탕", "category": "호프/통닭", "kind": "해장국", "source": "claude"}
 {"store_id": 135, "menu_name": "황태노가리", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 136, "menu_name": "숙성 제주흑돼지", "category": "한식", "kind": "삼겹살", "source": "claude"}
@@ -2106,7 +2106,7 @@
 {"store_id": 144, "menu_name": "돈카츠", "category": "기타", "kind": "돈까스", "source": "claude"}
 {"store_id": 144, "menu_name": "돌솥알밥(동절기메뉴)", "category": "기타", "kind": "덮밥", "source": "claude"}
 {"store_id": 144, "menu_name": "바삭텐동", "category": "기타", "kind": "텐동", "source": "claude"}
-{"store_id": 144, "menu_name": "바삭텐동정식 (+미니소바)", "category": "기타", "kind": "소바", "source": "substring"}
+{"store_id": 144, "menu_name": "바삭텐동정식 (+미니소바)", "category": "기타", "kind": "텐동", "source": "claude_reclassified"}
 {"store_id": 144, "menu_name": "비빔소바", "category": "기타", "kind": "냉면", "source": "claude"}
 {"store_id": 144, "menu_name": "온기우동", "category": "기타", "kind": "우동", "source": "claude"}
 {"store_id": 144, "menu_name": "온기우동정식(+미니카츠)", "category": "기타", "kind": "우동", "source": "claude"}
@@ -2240,9 +2240,9 @@
 {"store_id": 150, "menu_name": "[부산아재원픽]얼큰섞어국밥(1인분)", "category": "한식", "kind": "국밥", "source": "claude"}
 {"store_id": 150, "menu_name": "[속풀이]황태해장국", "category": "한식", "kind": "해장국", "source": "claude"}
 {"store_id": 150, "menu_name": "[순대국해장甲]얼큰순대만국밥(1인분)", "category": "한식", "kind": "순대국밥", "source": "claude"}
-{"store_id": 150, "menu_name": "[실속]국밥 미니전세트(1.3인)", "category": "한식", "kind": "국밥", "source": "claude"}
+{"store_id": 150, "menu_name": "[실속]국밥 미니전세트(1.3인)", "category": "한식", "kind": "파전", "source": "claude_reclassified"}
 {"store_id": 150, "menu_name": "[실속]국밥 완자세트(1.3인)", "category": "한식", "kind": "국밥", "source": "claude"}
-{"store_id": 150, "menu_name": "[실속]국밥 편육세트(1.3인)", "category": "한식", "kind": "돼지국밥", "source": "claude"}
+{"store_id": 150, "menu_name": "[실속]국밥 편육세트(1.3인)", "category": "한식", "kind": "편육", "source": "claude_reclassified"}
 {"store_id": 150, "menu_name": "[실속]육개장 미니전세트(1.3인)", "category": "한식", "kind": "육개장", "source": "claude"}
 {"store_id": 150, "menu_name": "[양평급해장]얼큰내장국밥(1인분)", "category": "한식", "kind": "내장국밥", "source": "claude"}
 {"store_id": 150, "menu_name": "[열정한가득]돼지국밥(1인분)", "category": "한식", "kind": "돼지국밥", "source": "claude"}
@@ -2273,7 +2273,7 @@
 {"store_id": 150, "menu_name": "매콤불닭완자(3개)", "category": "한식", "kind": "육개장", "source": "claude"}
 {"store_id": 150, "menu_name": "매콤불닭완자[3개]", "category": "한식", "kind": "육개장", "source": "claude"}
 {"store_id": 150, "menu_name": "모둠국밥", "category": "한식", "kind": "국밥", "source": "claude"}
-{"store_id": 150, "menu_name": "모둠완자[깻잎2+부추2+불닭2]", "category": "한식", "kind": "모둠완자", "source": "claude"}
+{"store_id": 150, "menu_name": "모둠완자[깻잎2+부추2+불닭2]", "category": "한식", "kind": "물만두", "source": "claude_reclassified"}
 {"store_id": 150, "menu_name": "모듬완자(6개)", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 150, "menu_name": "모듬전(6개)", "category": "한식", "kind": "전", "source": "claude"}
 {"store_id": 150, "menu_name": "미니감자전[4개]", "category": "한식", "kind": "감자전", "source": "claude"}
@@ -2370,7 +2370,7 @@
 {"store_id": 153, "menu_name": "숭어 한상차림(2인)", "category": "횟집", "kind": "한상", "source": "claude"}
 {"store_id": 153, "menu_name": "숭어반+광어반 한상차림", "category": "횟집", "kind": "회", "source": "claude"}
 {"store_id": 153, "menu_name": "유부우동", "category": "횟집", "kind": "우동", "source": "claude"}
-{"store_id": 153, "menu_name": "유부우동+참치초밥5pcs", "category": "횟집", "kind": "우동", "source": "claude"}
+{"store_id": 153, "menu_name": "유부우동+참치초밥5pcs", "category": "횟집", "kind": "스시", "source": "claude_reclassified"}
 {"store_id": 153, "menu_name": "제철 겨울방어회", "category": "횟집", "kind": "회", "source": "claude"}
 {"store_id": 154, "menu_name": "1인 순살양념게장 비빔밥+숯불갈비", "category": "식육(숯불구이)", "kind": "양념갈비", "source": "claude"}
 {"store_id": 154, "menu_name": "1인 숯불갈비도시락(200g)", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
@@ -2380,30 +2380,30 @@
 {"store_id": 154, "menu_name": "숯불갈비만(1000g) 3인~4인세트", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
 {"store_id": 154, "menu_name": "숯불갈비만(400g)1인~1.5인세트", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
 {"store_id": 154, "menu_name": "숯불갈비만(700g) 2인~3인세트", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
-{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(1인)", "category": "식육(숯불구이)", "kind": "갈비", "source": "substring"}
-{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(2인)", "category": "식육(숯불구이)", "kind": "돼지국밥", "source": "claude"}
-{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(3인)", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
+{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(1인)", "category": "식육(숯불구이)", "kind": "돼지국밥", "source": "claude_reclassified"}
+{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(2인)", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude_reclassified"}
+{"store_id": 154, "menu_name": "온육집 돼지갈비 SET(3인)", "category": "식육(숯불구이)", "kind": "돼지국밥", "source": "claude_reclassified"}
 {"store_id": 154, "menu_name": "온육집 돼지갈비 SET(4인)", "category": "식육(숯불구이)", "kind": "돼지국밥", "source": "claude"}
 {"store_id": 154, "menu_name": "콘치즈퐁듀", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 154, "menu_name": "통마늘 새송이 버섯구이", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 156, "menu_name": "[1인추천]肉육칠이 베스트 세트", "category": "한식", "kind": "한정식", "source": "claude"}
-{"store_id": 156, "menu_name": "[가성비BEST] 肉육칠이 육성비 세트", "category": "한식", "kind": "기타", "source": "fallback"}
-{"store_id": 156, "menu_name": "[겉바속촉] 肉육칠이 훈연막창 세트", "category": "한식", "kind": "막창구이", "source": "claude"}
+{"store_id": 156, "menu_name": "[1인추천]肉육칠이 베스트 세트", "category": "한식", "kind": "삼겹살", "source": "claude_reclassified"}
+{"store_id": 156, "menu_name": "[가성비BEST] 肉육칠이 육성비 세트", "category": "한식", "kind": "삼겹살", "source": "claude_reclassified"}
+{"store_id": 156, "menu_name": "[겉바속촉] 肉육칠이 훈연막창 세트", "category": "한식", "kind": "막창", "source": "claude_reclassified"}
 {"store_id": 156, "menu_name": "[극가성비] 肉육칠이 패밀리 세트", "category": "한식", "kind": "한정식", "source": "claude"}
 {"store_id": 156, "menu_name": "[뜯먹꿀맛] LA소갈비구이(400g)", "category": "한식", "kind": "LA갈비", "source": "claude"}
 {"store_id": 156, "menu_name": "[실속BEST] 肉육칠이 숙성 고기만", "category": "한식", "kind": "불고기", "source": "claude"}
-{"store_id": 156, "menu_name": "[안주1등] 껍데기+소스2개(300g)", "category": "한식", "kind": "삼겹살", "source": "claude"}
+{"store_id": 156, "menu_name": "[안주1등] 껍데기+소스2개(300g)", "category": "한식", "kind": "편육", "source": "claude_reclassified"}
 {"store_id": 156, "menu_name": "[재주문율1등] 肉육칠이 숙성 고기만1kg", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 156, "menu_name": "肉육칠이 숙성 고기만", "category": "한식", "kind": "기타", "source": "claude"}
 {"store_id": 156, "menu_name": "肉육칠이 육성비 세트", "category": "한식", "kind": "삼겹살", "source": "claude"}
-{"store_id": 156, "menu_name": "肉육칠이 패밀리 세트", "category": "한식", "kind": "한정식", "source": "claude"}
+{"store_id": 156, "menu_name": "肉육칠이 패밀리 세트", "category": "한식", "kind": "한상", "source": "claude_reclassified"}
 {"store_id": 156, "menu_name": "갓김치", "category": "한식", "kind": "김치찜", "source": "claude"}
 {"store_id": 156, "menu_name": "계란찜", "category": "한식", "kind": "계란찜", "source": "claude"}
 {"store_id": 156, "menu_name": "고추장 삼겹살 340g", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 156, "menu_name": "공기밥", "category": "한식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 156, "menu_name": "김치볶음밥(기본)", "category": "한식", "kind": "김치볶음밥", "source": "claude"}
 {"store_id": 156, "menu_name": "김치볶음밥(치즈 추가)", "category": "한식", "kind": "김치볶음밥", "source": "claude"}
-{"store_id": 156, "menu_name": "껍데기300g+소스2개", "category": "한식", "kind": "삼겹살", "source": "claude"}
+{"store_id": 156, "menu_name": "껍데기300g+소스2개", "category": "한식", "kind": "돼지국밥", "source": "claude_reclassified"}
 {"store_id": 156, "menu_name": "마늘소스", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 156, "menu_name": "명이나물", "category": "한식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 156, "menu_name": "새송이버섯구이", "category": "한식", "kind": "꽃등심", "source": "claude"}
@@ -2448,13 +2448,13 @@
 {"store_id": 157, "menu_name": "순두부찌개", "category": "한식", "kind": "순두부찌개", "source": "claude"}
 {"store_id": 157, "menu_name": "조기매운탕(1인)", "category": "한식", "kind": "매운탕", "source": "substring"}
 {"store_id": 157, "menu_name": "황태구이 정식", "category": "한식", "kind": "명태회무침", "source": "claude"}
-{"store_id": 158, "menu_name": "[1000원할인세트]짜장+짜장+미니탕수육", "category": "한식", "kind": "짜장면", "source": "claude"}
-{"store_id": 158, "menu_name": "[세트]볶음밥+미니탕수육", "category": "한식", "kind": "볶음밥", "source": "claude"}
+{"store_id": 158, "menu_name": "[1000원할인세트]짜장+짜장+미니탕수육", "category": "한식", "kind": "탕수육", "source": "claude_reclassified"}
+{"store_id": 158, "menu_name": "[세트]볶음밥+미니탕수육", "category": "한식", "kind": "탕수육", "source": "claude_reclassified"}
 {"store_id": 158, "menu_name": "[세트]불고기잡채밥+미니탕수육", "category": "한식", "kind": "잡채", "source": "claude"}
 {"store_id": 158, "menu_name": "[세트]짜장+미니탕수육", "category": "한식", "kind": "짜장면", "source": "claude"}
-{"store_id": 158, "menu_name": "[세트]짜장+짬뽕+미니탕수육", "category": "한식", "kind": "짜장면", "source": "claude"}
+{"store_id": 158, "menu_name": "[세트]짜장+짬뽕+미니탕수육", "category": "한식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 158, "menu_name": "[세트]짬뽕+미니탕수육", "category": "한식", "kind": "짬뽕", "source": "claude"}
-{"store_id": 158, "menu_name": "[세트]짬뽕+짬뽕+미니탕수육", "category": "한식", "kind": "탕수육", "source": "substring"}
+{"store_id": 158, "menu_name": "[세트]짬뽕+짬뽕+미니탕수육", "category": "한식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 158, "menu_name": "[세트]해물쟁반짜장+미니탕수육", "category": "한식", "kind": "짜장면", "source": "claude"}
 {"store_id": 158, "menu_name": "[세트]해물쟁반짬뽕+미니탕수육", "category": "한식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 158, "menu_name": "간짜장", "category": "한식", "kind": "간짜장", "source": "claude"}
@@ -2497,14 +2497,14 @@
 {"store_id": 158, "menu_name": "순두부짬뽕(곱빼기)", "category": "한식", "kind": "순두부찌개", "source": "claude"}
 {"store_id": 158, "menu_name": "순두부짬뽕(보통)", "category": "한식", "kind": "순두부찌개", "source": "claude"}
 {"store_id": 158, "menu_name": "술안주 A set", "category": "한식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 158, "menu_name": "술안주 B set", "category": "한식", "kind": "기타", "source": "claude"}
-{"store_id": 158, "menu_name": "술안주 C set", "category": "한식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 158, "menu_name": "술안주 D set", "category": "한식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 158, "menu_name": "술안주 E set", "category": "한식", "kind": "기타", "source": "claude"}
+{"store_id": 158, "menu_name": "술안주 B set", "category": "한식", "kind": "기타_주류", "source": "claude_reclassified"}
+{"store_id": 158, "menu_name": "술안주 C set", "category": "한식", "kind": "기타_주류", "source": "claude_reclassified"}
+{"store_id": 158, "menu_name": "술안주 D set", "category": "한식", "kind": "기타_주류", "source": "claude_reclassified"}
+{"store_id": 158, "menu_name": "술안주 E set", "category": "한식", "kind": "기타_사이드", "source": "claude_reclassified"}
 {"store_id": 158, "menu_name": "유린기", "category": "한식", "kind": "유린기", "source": "claude"}
 {"store_id": 158, "menu_name": "짜장+군만두(4p)", "category": "한식", "kind": "짜장", "source": "claude"}
 {"store_id": 158, "menu_name": "짜장+짜장+군만두(8p)", "category": "한식", "kind": "짜장면", "source": "claude"}
-{"store_id": 158, "menu_name": "짜장+짬뽕+군만두(8p)", "category": "한식", "kind": "짜장면", "source": "claude"}
+{"store_id": 158, "menu_name": "짜장+짬뽕+군만두(8p)", "category": "한식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 158, "menu_name": "짬뽕+군만두(4p)", "category": "한식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 158, "menu_name": "짬뽕+짬뽕+군만두(8p)", "category": "한식", "kind": "짬뽕", "source": "claude"}
 {"store_id": 158, "menu_name": "짬뽕국물", "category": "한식", "kind": "짬뽕", "source": "claude"}
@@ -2804,7 +2804,7 @@
 {"store_id": 175, "menu_name": "녹차라떼(ICE 500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 175, "menu_name": "누텔라 버터 토스트", "category": "기타", "kind": "토스트", "source": "claude"}
 {"store_id": 175, "menu_name": "누텔라버터토스트", "category": "기타", "kind": "토스트", "source": "claude"}
-{"store_id": 175, "menu_name": "단백질 도시락+음료선택1 세트", "category": "기타", "kind": "런치박스", "source": "claude"}
+{"store_id": 175, "menu_name": "단백질 도시락+음료선택1 세트", "category": "기타", "kind": "도시락", "source": "claude_reclassified"}
 {"store_id": 175, "menu_name": "단백질 스테비아 커피믹스", "category": "기타", "kind": "기타_음료", "source": "substring"}
 {"store_id": 175, "menu_name": "단백질 스테비아 커피믹스(ICE 500ml)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 175, "menu_name": "단호박 샌드위치", "category": "기타", "kind": "샌드위치", "source": "claude"}
@@ -3245,7 +3245,7 @@
 {"store_id": 179, "menu_name": "더블 클래식치즈버거 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "더블 한우불고기", "category": "패스트푸드", "kind": "햄버거", "source": "claude"}
 {"store_id": 179, "menu_name": "더블 한우불고기버거", "category": "패스트푸드", "kind": "불고기", "source": "substring"}
-{"store_id": 179, "menu_name": "더블 한우불고기버거 세트", "category": "패스트푸드", "kind": "햄버거", "source": "claude"}
+{"store_id": 179, "menu_name": "더블 한우불고기버거 세트", "category": "패스트푸드", "kind": "버거", "source": "claude_reclassified"}
 {"store_id": 179, "menu_name": "더블엑스투버거", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "더블엑스투버거 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "더블치킨버거(N)", "category": "패스트푸드", "kind": "버거", "source": "claude"}
@@ -3263,13 +3263,13 @@
 {"store_id": 179, "menu_name": "리아 불고기 더블(빅불) 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "리아 불고기 베이컨", "category": "패스트푸드", "kind": "불고기", "source": "substring"}
 {"store_id": 179, "menu_name": "리아 불고기 베이컨 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
-{"store_id": 179, "menu_name": "리아 불고기 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
+{"store_id": 179, "menu_name": "리아 불고기 세트", "category": "패스트푸드", "kind": "불고기", "source": "claude_reclassified"}
 {"store_id": 179, "menu_name": "리아 사각새우 더블", "category": "패스트푸드", "kind": "버거", "source": "claude"}
-{"store_id": 179, "menu_name": "리아 사각새우 더블 세트", "category": "패스트푸드", "kind": "새우튀김", "source": "claude"}
+{"store_id": 179, "menu_name": "리아 사각새우 더블 세트", "category": "패스트푸드", "kind": "크림새우", "source": "claude_reclassified"}
 {"store_id": 179, "menu_name": "리아 새우", "category": "패스트푸드", "kind": "크림새우", "source": "claude"}
 {"store_id": 179, "menu_name": "리아 새우 베이컨", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "리아 새우 베이컨 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
-{"store_id": 179, "menu_name": "리아 새우 세트", "category": "패스트푸드", "kind": "햄버거", "source": "claude"}
+{"store_id": 179, "menu_name": "리아 새우 세트", "category": "패스트푸드", "kind": "크림새우", "source": "claude_reclassified"}
 {"store_id": 179, "menu_name": "모짜렐라 인 더 버거 베이컨", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "모짜렐라 인 더 버거 베이컨 세트", "category": "패스트푸드", "kind": "버거", "source": "claude"}
 {"store_id": 179, "menu_name": "모짜렐라버거 발사믹바질", "category": "패스트푸드", "kind": "버거", "source": "claude"}
@@ -3311,7 +3311,7 @@
 {"store_id": 179, "menu_name": "코울슬로", "category": "패스트푸드", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 179, "menu_name": "콜라 PET(1.25L)", "category": "패스트푸드", "kind": "기타_음료", "source": "claude"}
 {"store_id": 179, "menu_name": "클래식치즈버거", "category": "패스트푸드", "kind": "버거", "source": "claude"}
-{"store_id": 179, "menu_name": "클래식치즈버거 세트", "category": "패스트푸드", "kind": "햄버거", "source": "claude"}
+{"store_id": 179, "menu_name": "클래식치즈버거 세트", "category": "패스트푸드", "kind": "버거", "source": "claude_reclassified"}
 {"store_id": 179, "menu_name": "토네이도 망고젤리", "category": "패스트푸드", "kind": "기타_음료", "source": "claude"}
 {"store_id": 179, "menu_name": "토네이도더블초코", "category": "패스트푸드", "kind": "아이스크림", "source": "claude"}
 {"store_id": 179, "menu_name": "토네이도스트로베리", "category": "패스트푸드", "kind": "기타_음료", "source": "claude"}
@@ -3432,7 +3432,7 @@
 {"store_id": 193, "menu_name": "가브리살 600g", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 193, "menu_name": "껍데기 600g", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 193, "menu_name": "목살", "category": "한식", "kind": "목살", "source": "claude"}
-{"store_id": 193, "menu_name": "목살반/삼겹반", "category": "한식", "kind": "목살", "source": "substring"}
+{"store_id": 193, "menu_name": "목살반/삼겹반", "category": "한식", "kind": "삼겹살", "source": "claude_reclassified"}
 {"store_id": 193, "menu_name": "방목살 200g", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 193, "menu_name": "삼겹살 600g", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 193, "menu_name": "항정살 600g", "category": "한식", "kind": "항정살", "source": "claude"}
@@ -3488,7 +3488,7 @@
 {"store_id": 199, "menu_name": "[ 쫄깃쫄깃 콜라겐 ] 돼지껍데기(2인분)", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 199, "menu_name": "김치삼겹살", "category": "한식", "kind": "삼겹살", "source": "claude"}
 {"store_id": 199, "menu_name": "김치전", "category": "한식", "kind": "김치전", "source": "claude"}
-{"store_id": 199, "menu_name": "꼼장어(대) 소금/양념 선택가능", "category": "한식", "kind": "아구찜", "source": "claude"}
+{"store_id": 199, "menu_name": "꼼장어(대) 소금/양념 선택가능", "category": "한식", "kind": "꽃등심", "source": "claude_reclassified"}
 {"store_id": 199, "menu_name": "꼼장어(중) 소금/양념 선택가능", "category": "한식", "kind": "꽃등심", "source": "claude"}
 {"store_id": 199, "menu_name": "닭다리살(2인분)", "category": "한식", "kind": "닭목살", "source": "claude"}
 {"store_id": 199, "menu_name": "닭발(2인분)", "category": "한식", "kind": "닭발", "source": "claude"}
@@ -3525,7 +3525,7 @@
 {"store_id": 201, "menu_name": "동그랑땡 4개", "category": "한식", "kind": "동그랑땡", "source": "substring"}
 {"store_id": 201, "menu_name": "동그랑땡 6개", "category": "한식", "kind": "동그랑땡", "source": "substring"}
 {"store_id": 201, "menu_name": "마늘슬라이스", "category": "한식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 201, "menu_name": "무생채 세트메뉴(고기 택1+밥+국+무생채)", "category": "한식", "kind": "한정식", "source": "claude"}
+{"store_id": 201, "menu_name": "무생채 세트메뉴(고기 택1+밥+국+무생채)", "category": "한식", "kind": "잡채", "source": "claude_reclassified"}
 {"store_id": 201, "menu_name": "무생채&달걀프라이비빔밥(1인분)", "category": "한식", "kind": "비빔밥", "source": "claude"}
 {"store_id": 201, "menu_name": "무피클", "category": "한식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 201, "menu_name": "배추된장국", "category": "한식", "kind": "된장찌개", "source": "claude"}
@@ -3631,13 +3631,13 @@
 {"store_id": 206, "menu_name": "한우 안창살", "category": "한식", "kind": "안창살", "source": "claude"}
 {"store_id": 206, "menu_name": "한우 육회", "category": "한식", "kind": "육개장", "source": "claude"}
 {"store_id": 206, "menu_name": "한우새우살", "category": "한식", "kind": "새우볶음밥", "source": "claude"}
-{"store_id": 206, "menu_name": "한우세트 1", "category": "한식", "kind": "기타", "source": "fallback"}
+{"store_id": 206, "menu_name": "한우세트 1", "category": "한식", "kind": "한상", "source": "claude_reclassified"}
 {"store_id": 206, "menu_name": "한우세트 2 (된장찌개서비스제공)", "category": "한식", "kind": "한정식", "source": "claude"}
 {"store_id": 206, "menu_name": "한우업진살", "category": "한식", "kind": "업진살", "source": "claude"}
 {"store_id": 207, "menu_name": "육회덮밥", "category": "김밥(도시락)", "kind": "회덮밥", "source": "claude"}
 {"store_id": 208, "menu_name": "간사이 오뎅모리", "category": "일식", "kind": "오뎅", "source": "claude"}
 {"store_id": 208, "menu_name": "모츠나베", "category": "일식", "kind": "모츠나베", "source": "substring"}
-{"store_id": 208, "menu_name": "야끼토끼 쿠시 세트", "category": "일식", "kind": "야키니쿠", "source": "claude"}
+{"store_id": 208, "menu_name": "야끼토끼 쿠시 세트", "category": "일식", "kind": "야키소바", "source": "claude_reclassified"}
 {"store_id": 208, "menu_name": "토종닭 야키토리 세트", "category": "일식", "kind": "야키니쿠", "source": "claude"}
 {"store_id": 209, "menu_name": "고구마치즈돈까스", "category": "김밥(도시락)", "kind": "돈까스", "source": "claude"}
 {"store_id": 209, "menu_name": "고기만두", "category": "김밥(도시락)", "kind": "만두", "source": "claude"}
@@ -3730,7 +3730,7 @@
 {"store_id": 212, "menu_name": "돈까스 모밀 정식(점심 한정)계절메뉴", "category": "일식", "kind": "돈까스", "source": "claude"}
 {"store_id": 212, "menu_name": "돈까스 우동 정식(점심 한정)", "category": "일식", "kind": "우동", "source": "claude"}
 {"store_id": 212, "menu_name": "돈코츠 라멘 (계절 한정 메뉴)", "category": "일식", "kind": "라멘", "source": "claude"}
-{"store_id": 212, "menu_name": "두가지 저당 초밥 5pc + 5pc", "category": "일식", "kind": "초밥", "source": "claude"}
+{"store_id": 212, "menu_name": "두가지 저당 초밥 5pc + 5pc", "category": "일식", "kind": "스시", "source": "claude_reclassified"}
 {"store_id": 212, "menu_name": "모듬튀김", "category": "일식", "kind": "튀김", "source": "claude"}
 {"store_id": 212, "menu_name": "모듬회", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 212, "menu_name": "빵새우튀김 2~5pc", "category": "일식", "kind": "튀김", "source": "claude"}
@@ -3751,7 +3751,7 @@
 {"store_id": 212, "menu_name": "참치 배꼽살 1pc (한정판매)", "category": "일식", "kind": "참치회", "source": "claude"}
 {"store_id": 212, "menu_name": "참치회덮밥", "category": "일식", "kind": "회덮밥", "source": "claude"}
 {"store_id": 212, "menu_name": "치킨가라아게", "category": "일식", "kind": "아게다시도후", "source": "claude"}
-{"store_id": 212, "menu_name": "커플 세트 2인", "category": "일식", "kind": "초밥", "source": "claude"}
+{"store_id": 212, "menu_name": "커플 세트 2인", "category": "일식", "kind": "스시", "source": "claude_reclassified"}
 {"store_id": 212, "menu_name": "타코와사비", "category": "일식", "kind": "타코", "source": "claude"}
 {"store_id": 212, "menu_name": "특 장어덮밥 세트(200g)", "category": "일식", "kind": "장어덮밥", "source": "claude"}
 {"store_id": 212, "menu_name": "패밀리 세트 3인", "category": "일식", "kind": "초밥", "source": "claude"}
@@ -3820,11 +3820,11 @@
 {"store_id": 215, "menu_name": "우럭회(통영)", "category": "일식", "kind": "회", "source": "substring"}
 {"store_id": 215, "menu_name": "유부초밥(6p)", "category": "일식", "kind": "초밥", "source": "substring"}
 {"store_id": 215, "menu_name": "장어초밥(6p)", "category": "일식", "kind": "스시", "source": "claude"}
-{"store_id": 215, "menu_name": "점심특선 광어연어 반반 + 면 1택", "category": "일식", "kind": "회덮밥", "source": "claude"}
-{"store_id": 215, "menu_name": "점심특선 광어초밥 + 면 1택", "category": "일식", "kind": "초밥", "source": "claude"}
-{"store_id": 215, "menu_name": "점심특선 모듬1 + 면 1택", "category": "일식", "kind": "초밥", "source": "claude"}
-{"store_id": 215, "menu_name": "점심특선 모듬2 + 면 1택", "category": "일식", "kind": "스시", "source": "claude"}
-{"store_id": 215, "menu_name": "점심특선 모듬3 + 면 1택", "category": "일식", "kind": "스시", "source": "claude"}
+{"store_id": 215, "menu_name": "점심특선 광어연어 반반 + 면 1택", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 215, "menu_name": "점심특선 광어초밥 + 면 1택", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 215, "menu_name": "점심특선 모듬1 + 면 1택", "category": "일식", "kind": "사시미동", "source": "claude_reclassified"}
+{"store_id": 215, "menu_name": "점심특선 모듬2 + 면 1택", "category": "일식", "kind": "사시미동", "source": "claude_reclassified"}
+{"store_id": 215, "menu_name": "점심특선 모듬3 + 면 1택", "category": "일식", "kind": "초밥", "source": "claude_reclassified"}
 {"store_id": 215, "menu_name": "점심특선 연어초밥 + 면 1택", "category": "일식", "kind": "연어회", "source": "claude"}
 {"store_id": 215, "menu_name": "진미초밥(6p)", "category": "일식", "kind": "초밥", "source": "substring"}
 {"store_id": 215, "menu_name": "참돔회(통영)", "category": "일식", "kind": "회", "source": "claude"}
@@ -3835,28 +3835,28 @@
 {"store_id": 216, "menu_name": "코다리조림", "category": "한식", "kind": "코다리조림", "source": "claude"}
 {"store_id": 218, "menu_name": "깐풍기+짜장2", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 218, "menu_name": "양장피+짜장2", "category": "중국식", "kind": "양장피", "source": "claude"}
-{"store_id": 218, "menu_name": "양장피+탕수육+짜장2", "category": "중국식", "kind": "양장피", "source": "claude"}
-{"store_id": 218, "menu_name": "유산슬+짜장2", "category": "중국식", "kind": "중국식", "source": "claude"}
+{"store_id": 218, "menu_name": "양장피+탕수육+짜장2", "category": "중국식", "kind": "탕수육", "source": "claude_reclassified"}
+{"store_id": 218, "menu_name": "유산슬+짜장2", "category": "중국식", "kind": "유린기", "source": "claude_reclassified"}
 {"store_id": 218, "menu_name": "탕수육+짜장2", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 218, "menu_name": "팔보채+짜장2", "category": "중국식", "kind": "팔보채", "source": "claude"}
 {"store_id": 219, "menu_name": "0. 등심탕수육+짜장1+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 219, "menu_name": "00.등심탕수육+짬뽕1+만두", "category": "중국식", "kind": "등심탕수육", "source": "claude"}
+{"store_id": 219, "menu_name": "00.등심탕수육+짬뽕1+만두", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "1. 등심사천탕수육+짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 219, "menu_name": "1. 등심탕수육+양장피+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 219, "menu_name": "1. 등심탕수육+양장피+만두", "category": "중국식", "kind": "양장피", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "1. 등심탕수육+짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 219, "menu_name": "2. 깐쇼육+짜장2+만두", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 219, "menu_name": "2. 등심탕수육+고추잡채+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 219, "menu_name": "2. 등심탕수육+짜장+짬뽕+만두", "category": "중국식", "kind": "등심탕수육", "source": "claude"}
+{"store_id": 219, "menu_name": "2. 등심탕수육+짜장+짬뽕+만두", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "3. 깐풍기+짜장2+만두", "category": "중국식", "kind": "깐풍기", "source": "claude"}
-{"store_id": 219, "menu_name": "3. 등심탕수육+짬뽕2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
-{"store_id": 219, "menu_name": "3. 등심탕수육+팔보채+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 219, "menu_name": "3. 등심탕수육+짬뽕2+만두", "category": "중국식", "kind": "짬뽕", "source": "claude_reclassified"}
+{"store_id": 219, "menu_name": "3. 등심탕수육+팔보채+만두", "category": "중국식", "kind": "팔보채", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "4. 고추잡채+짜장2+만두", "category": "중국식", "kind": "고추잡채", "source": "claude"}
 {"store_id": 219, "menu_name": "4. 깐풍기+양장피+만두", "category": "중국식", "kind": "깐풍기", "source": "claude"}
-{"store_id": 219, "menu_name": "4. 등심탕수육+간짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
+{"store_id": 219, "menu_name": "4. 등심탕수육+간짜장2+만두", "category": "중국식", "kind": "등심탕수육", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "5. 깐풍기+팔보채+만두", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 219, "menu_name": "5. 등심탕수육+삼선쟁반짜장2+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 219, "menu_name": "5. 양장피+짜장2+만두", "category": "중국식", "kind": "양장피", "source": "claude"}
-{"store_id": 219, "menu_name": "6. 등심  탕수육+볶음밥2+만두", "category": "중국식", "kind": "볶음밥", "source": "substring"}
+{"store_id": 219, "menu_name": "6. 등심  탕수육+볶음밥2+만두", "category": "중국식", "kind": "탕수육", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "6. 양장피+고추잡채+만두", "category": "중국식", "kind": "양장피", "source": "claude"}
 {"store_id": 219, "menu_name": "7. 양장피+팔보채+만두", "category": "중국식", "kind": "양장피", "source": "claude"}
 {"store_id": 219, "menu_name": "7. 팔보채+짜장2+만두", "category": "중국식", "kind": "팔보채", "source": "claude"}
@@ -3864,7 +3864,7 @@
 {"store_id": 219, "menu_name": "8. 깐쇼새우+짜장2+만두", "category": "중국식", "kind": "깐풍기", "source": "claude"}
 {"store_id": 219, "menu_name": "8. 등심탕수육+양장피+고추잡채+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 219, "menu_name": "8.등심탕수육 + 간짜장 1+만두", "category": "중국식", "kind": "등심탕수육", "source": "claude"}
-{"store_id": 219, "menu_name": "9. 양장피+고추잡채+팔보채+만두", "category": "중국식", "kind": "중국식", "source": "claude"}
+{"store_id": 219, "menu_name": "9. 양장피+고추잡채+팔보채+만두", "category": "중국식", "kind": "양장피", "source": "claude_reclassified"}
 {"store_id": 219, "menu_name": "9.등심탕수육 + 볶음밥 1+만두", "category": "중국식", "kind": "탕수육", "source": "claude"}
 {"store_id": 219, "menu_name": "간짜장", "category": "중국식", "kind": "간짜장", "source": "claude"}
 {"store_id": 219, "menu_name": "갈비탕", "category": "중국식", "kind": "갈비탕", "source": "claude"}
@@ -3962,10 +3962,10 @@
 {"store_id": 220, "menu_name": "보감(보쌈+감자탕) 중", "category": "식육(숯불구이)", "kind": "보쌈", "source": "claude"}
 {"store_id": 220, "menu_name": "보쌈 대", "category": "식육(숯불구이)", "kind": "보쌈", "source": "claude"}
 {"store_id": 220, "menu_name": "보쌈 중", "category": "식육(숯불구이)", "kind": "보쌈", "source": "claude"}
-{"store_id": 220, "menu_name": "보족세트 굴추가시", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
+{"store_id": 220, "menu_name": "보족세트 굴추가시", "category": "식육(숯불구이)", "kind": "꽃등심", "source": "claude_reclassified"}
 {"store_id": 220, "menu_name": "보족세트 대", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
-{"store_id": 220, "menu_name": "보족세트 소", "category": "식육(숯불구이)", "kind": "술국", "source": "claude"}
-{"store_id": 220, "menu_name": "보족세트 중", "category": "식육(숯불구이)", "kind": "목살", "source": "claude"}
+{"store_id": 220, "menu_name": "보족세트 소", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude_reclassified"}
+{"store_id": 220, "menu_name": "보족세트 중", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude_reclassified"}
 {"store_id": 220, "menu_name": "생굴", "category": "식육(숯불구이)", "kind": "회", "source": "claude"}
 {"store_id": 220, "menu_name": "싱글감자탕", "category": "식육(숯불구이)", "kind": "감자탕", "source": "claude"}
 {"store_id": 220, "menu_name": "어리굴젓", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
@@ -4027,7 +4027,7 @@
 {"store_id": 231, "menu_name": "한우설렁탕", "category": "한식", "kind": "설렁탕", "source": "claude"}
 {"store_id": 231, "menu_name": "해물파전", "category": "한식", "kind": "해물파전", "source": "claude"}
 {"store_id": 232, "menu_name": "복불고기", "category": "한식", "kind": "불고기", "source": "claude"}
-{"store_id": 232, "menu_name": "복지리/매운탕", "category": "한식", "kind": "매운탕", "source": "claude"}
+{"store_id": 232, "menu_name": "복지리/매운탕", "category": "한식", "kind": "어묵", "source": "claude_reclassified"}
 {"store_id": 232, "menu_name": "복코스", "category": "한식", "kind": "정식", "source": "claude"}
 {"store_id": 232, "menu_name": "복탕수육", "category": "한식", "kind": "탕수육", "source": "claude"}
 {"store_id": 232, "menu_name": "복튀김", "category": "한식", "kind": "튀김", "source": "claude"}
@@ -4083,7 +4083,7 @@
 {"store_id": 238, "menu_name": "하우스 와인(글래스)", "category": "기타", "kind": "기타_주류", "source": "claude"}
 {"store_id": 239, "menu_name": "두부김치", "category": "한식", "kind": "두부김치", "source": "claude"}
 {"store_id": 239, "menu_name": "삼겹살", "category": "한식", "kind": "삼겹살", "source": "claude"}
-{"store_id": 239, "menu_name": "오징어볶음+소면", "category": "한식", "kind": "오징어볶음", "source": "claude"}
+{"store_id": 239, "menu_name": "오징어볶음+소면", "category": "한식", "kind": "오징어덮밥", "source": "claude_reclassified"}
 {"store_id": 239, "menu_name": "일반식뷔페", "category": "한식", "kind": "뷔페", "source": "claude"}
 {"store_id": 239, "menu_name": "차돌두부전골", "category": "한식", "kind": "차돌박이", "source": "claude"}
 {"store_id": 240, "menu_name": "건두부무침", "category": "정종/대포집/소주방", "kind": "잡채", "source": "claude"}
@@ -4124,7 +4124,7 @@
 {"store_id": 243, "menu_name": "시원한 김치말이국수", "category": "식육(숯불구이)", "kind": "냉면", "source": "claude"}
 {"store_id": 243, "menu_name": "알바생들이 찾는 비빔국수", "category": "식육(숯불구이)", "kind": "비빔국수", "source": "claude"}
 {"store_id": 243, "menu_name": "음료(뚱캔)", "category": "식육(숯불구이)", "kind": "기타_음료", "source": "claude"}
-{"store_id": 243, "menu_name": "주문수1위 목살/삼겹 반반 500g", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
+{"store_id": 243, "menu_name": "주문수1위 목살/삼겹 반반 500g", "category": "식육(숯불구이)", "kind": "꽃삼겹", "source": "claude_reclassified"}
 {"store_id": 243, "menu_name": "회식/단체모임 최고!!삼겹살 250g", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 244, "menu_name": "김치순대", "category": "한식", "kind": "순대", "source": "claude"}
 {"store_id": 244, "menu_name": "순대국", "category": "한식", "kind": "순대국밥", "source": "claude"}
@@ -4138,7 +4138,7 @@
 {"store_id": 245, "menu_name": "감자튀김", "category": "일식", "kind": "감자전", "source": "claude"}
 {"store_id": 245, "menu_name": "기린생맥주360ml", "category": "일식", "kind": "기타_주류", "source": "claude"}
 {"store_id": 245, "menu_name": "나폴리탄 스파게티", "category": "일식", "kind": "스파게티", "source": "claude"}
-{"store_id": 245, "menu_name": "닭대파구이(간장맛/매운맛)2pc", "category": "일식", "kind": "닭꼬치", "source": "claude"}
+{"store_id": 245, "menu_name": "닭대파구이(간장맛/매운맛)2pc", "category": "일식", "kind": "꽃삼겹", "source": "claude_reclassified"}
 {"store_id": 245, "menu_name": "닭안심 구이2pc", "category": "일식", "kind": "닭목살", "source": "claude"}
 {"store_id": 245, "menu_name": "레몬사와", "category": "일식", "kind": "기타_주류", "source": "claude"}
 {"store_id": 245, "menu_name": "리코타 치즈 사라다", "category": "일식", "kind": "샐러드", "source": "claude"}
@@ -4341,7 +4341,7 @@
 {"store_id": 264, "menu_name": "갈비치킨", "category": "한식", "kind": "갈비찜", "source": "claude"}
 {"store_id": 264, "menu_name": "골뱅이소면", "category": "한식", "kind": "아구찜", "source": "claude"}
 {"store_id": 264, "menu_name": "두부김치", "category": "한식", "kind": "두부김치", "source": "claude"}
-{"store_id": 264, "menu_name": "먹태+땅콩", "category": "한식", "kind": "기타", "source": "fallback"}
+{"store_id": 264, "menu_name": "먹태+땅콩", "category": "한식", "kind": "머핀", "source": "claude_reclassified"}
 {"store_id": 264, "menu_name": "모듬감자", "category": "한식", "kind": "감자전", "source": "claude"}
 {"store_id": 264, "menu_name": "모듬만두탕", "category": "한식", "kind": "만두국", "source": "claude"}
 {"store_id": 264, "menu_name": "모듬소세지", "category": "한식", "kind": "기타", "source": "claude"}
@@ -4361,7 +4361,7 @@
 {"store_id": 264, "menu_name": "치킨뱅이", "category": "한식", "kind": "치킨", "source": "claude"}
 {"store_id": 264, "menu_name": "치킨피자세트", "category": "한식", "kind": "피자", "source": "claude"}
 {"store_id": 264, "menu_name": "케이준샐러드", "category": "한식", "kind": "샐러드", "source": "claude"}
-{"store_id": 264, "menu_name": "한치+땅콩", "category": "한식", "kind": "기타_사이드", "source": "claude"}
+{"store_id": 264, "menu_name": "한치+땅콩", "category": "한식", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 264, "menu_name": "후라이드치킨", "category": "한식", "kind": "후라이드", "source": "claude"}
 {"store_id": 265, "menu_name": "고르곤졸라 피자", "category": "경양식", "kind": "피자", "source": "claude"}
 {"store_id": 265, "menu_name": "그린샐러드", "category": "경양식", "kind": "샐러드", "source": "claude"}
@@ -4714,7 +4714,7 @@
 {"store_id": 288, "menu_name": "[신메뉴] 볼카츠 함박튀김 김밥 국내산 100%", "category": "분식", "kind": "김밥", "source": "substring"}
 {"store_id": 288, "menu_name": "[신메뉴] 속이꽉찬 함박튀김도시락(국내산한돈)", "category": "분식", "kind": "도시락", "source": "claude"}
 {"store_id": 288, "menu_name": "[신메뉴] 치즈샐러드 참치 김밥", "category": "분식", "kind": "김밥", "source": "claude"}
-{"store_id": 288, "menu_name": "[신메뉴] 푸짐한 국내산 수제함박 셋트 도시락", "category": "분식", "kind": "런치박스", "source": "claude"}
+{"store_id": 288, "menu_name": "[신메뉴] 푸짐한 국내산 수제함박 셋트 도시락", "category": "분식", "kind": "도시락", "source": "claude_reclassified"}
 {"store_id": 288, "menu_name": "감태", "category": "분식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 288, "menu_name": "감태우동", "category": "분식", "kind": "우동", "source": "substring"}
 {"store_id": 288, "menu_name": "감태주먹밥", "category": "분식", "kind": "주먹밥", "source": "claude"}
@@ -4815,7 +4815,7 @@
 {"store_id": 292, "menu_name": "(도시락반찬) 함박스테이크 (4개)", "category": "한식", "kind": "스테이크", "source": "claude"}
 {"store_id": 292, "menu_name": "(동글바삭) 완자돈까스3개+육장", "category": "한식", "kind": "돈까스", "source": "claude"}
 {"store_id": 292, "menu_name": "(동글바삭) 완자돈까스6개+육장", "category": "한식", "kind": "돈까스", "source": "claude"}
-{"store_id": 292, "menu_name": "(든든함 끝판왕) 얼큰돼지해장국+숙주+당면", "category": "한식", "kind": "해장국", "source": "claude"}
+{"store_id": 292, "menu_name": "(든든함 끝판왕) 얼큰돼지해장국+숙주+당면", "category": "한식", "kind": "돼지국밥", "source": "claude_reclassified"}
 {"store_id": 292, "menu_name": "(땡기는맛) 햄폭탄부대찌개800g+당면(품격높은햄)", "category": "한식", "kind": "부대찌개", "source": "claude"}
 {"store_id": 292, "menu_name": "(매운깔끔맛) 얼큰살코기국밥정식", "category": "한식", "kind": "국밥", "source": "claude"}
 {"store_id": 292, "menu_name": "(매운땡김맛) 얼큰모듬국밥정식", "category": "한식", "kind": "국밥", "source": "claude"}
@@ -4846,12 +4846,12 @@
 {"store_id": 292, "menu_name": "담백모듬전골+당면+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "전골", "source": "claude"}
 {"store_id": 292, "menu_name": "무말랭이 추가", "category": "한식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 292, "menu_name": "밀키스(340ml)", "category": "한식", "kind": "기타_음료", "source": "claude"}
-{"store_id": 292, "menu_name": "뼈다귀전골+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "전골", "source": "claude"}
+{"store_id": 292, "menu_name": "뼈다귀전골+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "뼈해장국", "source": "claude_reclassified"}
 {"store_id": 292, "menu_name": "생부추 추가", "category": "한식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 292, "menu_name": "생수(500ml)", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 292, "menu_name": "식혜(340ml)", "category": "한식", "kind": "기타_음료", "source": "claude"}
 {"store_id": 292, "menu_name": "얇은피왕만두(고기)(4개)", "category": "한식", "kind": "만두", "source": "claude"}
-{"store_id": 292, "menu_name": "얇은피왕만두(고기2+김치2)(4개)", "category": "한식", "kind": "왕만두", "source": "claude"}
+{"store_id": 292, "menu_name": "얇은피왕만두(고기2+김치2)(4개)", "category": "한식", "kind": "만두", "source": "claude_reclassified"}
 {"store_id": 292, "menu_name": "얇은피왕만두(김치)(4개)", "category": "한식", "kind": "왕만두", "source": "substring"}
 {"store_id": 292, "menu_name": "얼큰모듬전골+당면+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "전골", "source": "substring"}
 {"store_id": 292, "menu_name": "왕군만두(고기)(4개)", "category": "한식", "kind": "군만두", "source": "claude"}
@@ -4868,7 +4868,7 @@
 {"store_id": 292, "menu_name": "코카콜라(355ml)", "category": "한식", "kind": "기타_음료", "source": "claude"}
 {"store_id": 292, "menu_name": "펩시 제로(355ml)", "category": "한식", "kind": "기타_음료", "source": "claude"}
 {"store_id": 292, "menu_name": "포도봉봉(355ml)", "category": "한식", "kind": "기타_음료", "source": "claude"}
-{"store_id": 292, "menu_name": "한우곱도리탕전골+당면+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "전골", "source": "claude"}
+{"store_id": 292, "menu_name": "한우곱도리탕전골+당면+밥2+육장2+깍두기1+무말랭이1", "category": "한식", "kind": "곱창전골", "source": "claude_reclassified"}
 {"store_id": 292, "menu_name": "환타 파인애플(355ml)", "category": "한식", "kind": "기타", "source": "fallback"}
 {"store_id": 293, "menu_name": "감바스(시그니쳐 메뉴)", "category": "호프/통닭", "kind": "감자전", "source": "claude"}
 {"store_id": 293, "menu_name": "과일치즈플레터", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
@@ -4897,25 +4897,25 @@
 {"store_id": 295, "menu_name": "공기밥", "category": "일식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 295, "menu_name": "과메기", "category": "일식", "kind": "광어회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어 2인", "category": "일식", "kind": "광어회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+농어 신선모둠회(대)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+농어 신선모둠회(중)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+숭어 인기조합(대)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+숭어 인기조합(소)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+숭어 인기조합(중)", "category": "일식", "kind": "회", "source": "claude"}
+{"store_id": 295, "menu_name": "광어+농어 신선모둠회(대)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "광어+농어 신선모둠회(중)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "광어+숭어 인기조합(대)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "광어+숭어 인기조합(소)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "광어+숭어 인기조합(중)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "광어+연어 2인", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어+연어 3인", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어+연어 4인", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어+연어 한상(대)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어+연어 한상(소)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어+연어 한상(중)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+우럭 신선모둠회(대)", "category": "일식", "kind": "회", "source": "claude"}
+{"store_id": 295, "menu_name": "광어+우럭 신선모둠회(대)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "광어+우럭 신선모둠회(소)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+우럭 신선모둠회(중)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+우럭2인", "category": "일식", "kind": "회", "source": "claude"}
+{"store_id": 295, "menu_name": "광어+우럭 신선모둠회(중)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "광어+우럭2인", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "광어+우럭3인", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+우럭4인", "category": "일식", "kind": "회", "source": "claude"}
+{"store_id": 295, "menu_name": "광어+우럭4인", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "광어+참돔 신선모둠회(대)", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "광어+참돔 신선모둠회(중)", "category": "일식", "kind": "회", "source": "claude"}
+{"store_id": 295, "menu_name": "광어+참돔 신선모둠회(중)", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "광어3인", "category": "일식", "kind": "광어회", "source": "claude"}
 {"store_id": 295, "menu_name": "광어4인", "category": "일식", "kind": "광어회", "source": "claude"}
 {"store_id": 295, "menu_name": "농어", "category": "일식", "kind": "회", "source": "claude"}
@@ -4925,10 +4925,10 @@
 {"store_id": 295, "menu_name": "대방어 (소)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "도다리세꼬시(중)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "도미", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "도미+광어 2인", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "도미+광어3인", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "도미+광어4인", "category": "일식", "kind": "회", "source": "claude"}
-{"store_id": 295, "menu_name": "도미+우럭 2인", "category": "일식", "kind": "기타", "source": "fallback"}
+{"store_id": 295, "menu_name": "도미+광어 2인", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "도미+광어3인", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "도미+광어4인", "category": "일식", "kind": "광어회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "도미+우럭 2인", "category": "일식", "kind": "회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "도미+우럭3인", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "도미+우럭4인", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "두툼 생연어회(대)", "category": "일식", "kind": "연어회", "source": "substring"}
@@ -4961,11 +4961,11 @@
 {"store_id": 295, "menu_name": "연어4인", "category": "일식", "kind": "연어회", "source": "claude"}
 {"store_id": 295, "menu_name": "옥수수콘", "category": "일식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 295, "menu_name": "왕새우튀김", "category": "일식", "kind": "튀김", "source": "claude"}
-{"store_id": 295, "menu_name": "우럭+농어 한상(대)", "category": "일식", "kind": "한상", "source": "claude"}
-{"store_id": 295, "menu_name": "우럭+농어 한상(중)", "category": "일식", "kind": "한상", "source": "claude"}
+{"store_id": 295, "menu_name": "우럭+농어 한상(대)", "category": "일식", "kind": "회", "source": "claude_reclassified"}
+{"store_id": 295, "menu_name": "우럭+농어 한상(중)", "category": "일식", "kind": "회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "우럭+숭어 한상(대)", "category": "일식", "kind": "한상", "source": "claude"}
 {"store_id": 295, "menu_name": "우럭+숭어 한상(소)", "category": "일식", "kind": "한상", "source": "claude"}
-{"store_id": 295, "menu_name": "우럭+숭어 한상(중)", "category": "일식", "kind": "한상", "source": "claude"}
+{"store_id": 295, "menu_name": "우럭+숭어 한상(중)", "category": "일식", "kind": "회", "source": "claude_reclassified"}
 {"store_id": 295, "menu_name": "우럭+연어 신선모둠회(대)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "우럭+연어 신선모둠회(소)", "category": "일식", "kind": "회", "source": "claude"}
 {"store_id": 295, "menu_name": "우럭+연어 신선모둠회(중)", "category": "일식", "kind": "회", "source": "claude"}
@@ -5244,7 +5244,7 @@
 {"store_id": 309, "menu_name": "에그베이컨 크로와상 샌드위치", "category": "기타", "kind": "샌드위치", "source": "substring"}
 {"store_id": 309, "menu_name": "에그샐러드 샌드위치", "category": "기타", "kind": "샌드위치", "source": "claude"}
 {"store_id": 309, "menu_name": "에그타르트", "category": "기타", "kind": "타르트", "source": "claude"}
-{"store_id": 309, "menu_name": "에그타르트 세트", "category": "기타", "kind": "타르트", "source": "claude"}
+{"store_id": 309, "menu_name": "에그타르트 세트", "category": "기타", "kind": "기타", "source": "claude_reclassified"}
 {"store_id": 309, "menu_name": "오곡라떼", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 309, "menu_name": "오곡라떼(only ice)", "category": "기타", "kind": "기타_음료", "source": "claude"}
 {"store_id": 309, "menu_name": "오트라떼", "category": "기타", "kind": "기타_음료", "source": "claude"}
@@ -5384,7 +5384,7 @@
 {"store_id": 318, "menu_name": "제육쌈밥", "category": "분식", "kind": "제육볶음", "source": "claude"}
 {"store_id": 318, "menu_name": "조기매운탕", "category": "분식", "kind": "어묵탕", "source": "claude"}
 {"store_id": 318, "menu_name": "쭈꾸미", "category": "분식", "kind": "낙지볶음", "source": "claude"}
-{"store_id": 319, "menu_name": "[2인한상]고기500G+찌개+대파김치+쌈+공깃밥2([500g/2인정식])", "category": "식육(숯불구이)", "kind": "한정식", "source": "claude"}
+{"store_id": 319, "menu_name": "[2인한상]고기500G+찌개+대파김치+쌈+공깃밥2([500g/2인정식])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[Fresh] 육회물비빔 냉면([1인분])", "category": "식육(숯불구이)", "kind": "냉면", "source": "claude"}
 {"store_id": 319, "menu_name": "[고기단짝] 대파김치 반 통", "category": "식육(숯불구이)", "kind": "김치전", "source": "claude"}
 {"store_id": 319, "menu_name": "[고소한맛] 우삼겹구이([1인]250G)", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
@@ -5400,7 +5400,7 @@
 {"store_id": 319, "menu_name": "[대체육] 제로갈비살 구이 (콩고기)(2인[500G])", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
 {"store_id": 319, "menu_name": "[대체육] 제로갈비살구이 정식 (콩고기)([500g/2인정식])", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
 {"store_id": 319, "menu_name": "[매니아조합]생와사비", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 319, "menu_name": "[매출1위] 고기500G + 냉면 2([2인세트])", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude"}
+{"store_id": 319, "menu_name": "[매출1위] 고기500G + 냉면 2([2인세트])", "category": "식육(숯불구이)", "kind": "냉면", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[매콤달콤] 고추장삼겹([1인]250G)", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 319, "menu_name": "[매콤달콤] 고추장삼겹([2인]500G)", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 319, "menu_name": "[매콤새콤] 비빔쫄면([1인분])", "category": "식육(숯불구이)", "kind": "쫄면", "source": "claude"}
@@ -5419,17 +5419,17 @@
 {"store_id": 319, "menu_name": "[신선고소] 맛보기 육회([160G])", "category": "식육(숯불구이)", "kind": "육개장", "source": "claude"}
 {"store_id": 319, "menu_name": "[신선고소] 맛보기 육회([80G])", "category": "식육(숯불구이)", "kind": "육개장", "source": "claude"}
 {"store_id": 319, "menu_name": "[오픈행사 4000원 할인] 고기250G + 냉면 1([1인세트])", "category": "식육(숯불구이)", "kind": "냉면", "source": "claude"}
-{"store_id": 319, "menu_name": "[오픈행사 5000원할인] 고기만 250G + 250G([더블세트])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
+{"store_id": 319, "menu_name": "[오픈행사 5000원할인] 고기만 250G + 250G([더블세트])", "category": "식육(숯불구이)", "kind": "목살", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[육즙촉촉] 우삼겹구이 정식([500g/2인정식])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 319, "menu_name": "[육향가득] 우삼겹된장찌개([1인분])", "category": "식육(숯불구이)", "kind": "된장찌개", "source": "claude"}
-{"store_id": 319, "menu_name": "[인생조합] 고기500G + 칼국수 2([2인세트])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
+{"store_id": 319, "menu_name": "[인생조합] 고기500G + 칼국수 2([2인세트])", "category": "식육(숯불구이)", "kind": "갈비", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[일품육수] 꽃게된장찌개([1인분])", "category": "식육(숯불구이)", "kind": "된장찌개", "source": "claude"}
 {"store_id": 319, "menu_name": "[입맛도둑] 고추장비빔밥([1인분])", "category": "식육(숯불구이)", "kind": "비빔밥", "source": "claude"}
 {"store_id": 319, "menu_name": "[전쟁준비]고기250G+후라이김치볶음밥1([1인세트])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 319, "menu_name": "[제주맛집] 사골칼국수([1인분])", "category": "식육(숯불구이)", "kind": "칼국수", "source": "claude"}
-{"store_id": 319, "menu_name": "[주문량1위] 고기250G + 칼국수 1([1인세트])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
+{"store_id": 319, "menu_name": "[주문량1위] 고기250G + 칼국수 1([1인세트])", "category": "식육(숯불구이)", "kind": "목살", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[쫄깃담백] 전지목살250g + 껍데기 60g([1인]250G+껍데기60G)", "category": "식육(숯불구이)", "kind": "목살", "source": "claude"}
-{"store_id": 319, "menu_name": "[쫄깃담백] 전지목살250g + 껍데기 60g([2인]500G+껍데기120G)", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
+{"store_id": 319, "menu_name": "[쫄깃담백] 전지목살250g + 껍데기 60g([2인]500G+껍데기120G)", "category": "식육(숯불구이)", "kind": "목살", "source": "claude_reclassified"}
 {"store_id": 319, "menu_name": "[찍먹] 달콤알싸 마늘소스", "category": "식육(숯불구이)", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 319, "menu_name": "[취사병추천] 고기250G + 찌개 1([1인,후라이밥제공])", "category": "식육(숯불구이)", "kind": "삼겹살", "source": "claude"}
 {"store_id": 319, "menu_name": "[특급신병]후라이김치볶음밥(1인분)", "category": "식육(숯불구이)", "kind": "김치볶음밥", "source": "claude"}
@@ -5454,14 +5454,14 @@
 {"store_id": 320, "menu_name": "가츠동", "category": "일식", "kind": "가츠동", "source": "claude"}
 {"store_id": 320, "menu_name": "겉바속촉 고구마춘권6p", "category": "일식", "kind": "기타", "source": "claude"}
 {"store_id": 320, "menu_name": "공기밥", "category": "일식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 320, "menu_name": "돈부리 1인 세트", "category": "일식", "kind": "덮밥", "source": "claude"}
+{"store_id": 320, "menu_name": "돈부리 1인 세트", "category": "일식", "kind": "아구찜", "source": "claude_reclassified"}
 {"store_id": 320, "menu_name": "돈부리 2인 세트", "category": "일식", "kind": "덮밥", "source": "claude"}
 {"store_id": 320, "menu_name": "돈코츠라멘", "category": "일식", "kind": "라멘", "source": "claude"}
 {"store_id": 320, "menu_name": "든든한 돈까스 1p", "category": "일식", "kind": "돈까스", "source": "claude"}
 {"store_id": 320, "menu_name": "라멘 숙주추가", "category": "일식", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 320, "menu_name": "마늘라멘", "category": "일식", "kind": "라멘", "source": "claude"}
 {"store_id": 320, "menu_name": "매운 오일~", "category": "일식", "kind": "기타_사이드", "source": "claude"}
-{"store_id": 320, "menu_name": "모밀 1인 세트", "category": "일식", "kind": "냉면", "source": "claude"}
+{"store_id": 320, "menu_name": "모밀 1인 세트", "category": "일식", "kind": "기스면", "source": "claude_reclassified"}
 {"store_id": 320, "menu_name": "미니차슈동", "category": "일식", "kind": "오야꼬동", "source": "claude"}
 {"store_id": 320, "menu_name": "미소라멘[일식라멘]", "category": "일식", "kind": "라멘", "source": "claude"}
 {"store_id": 320, "menu_name": "버팔로 스틱6p", "category": "일식", "kind": "닭강정", "source": "claude"}
@@ -5565,7 +5565,7 @@
 {"store_id": 324, "menu_name": "치떡 SET (치킨+마루떡볶이)", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 324, "menu_name": "치즈머스타드소스", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 324, "menu_name": "치즈오븐스파게티", "category": "호프/통닭", "kind": "스파게티", "source": "claude"}
-{"store_id": 324, "menu_name": "치즈오븐스파게티 SET (치킨+치즈오븐스파게티)", "category": "호프/통닭", "kind": "스파게티", "source": "claude"}
+{"store_id": 324, "menu_name": "치즈오븐스파게티 SET (치킨+치즈오븐스파게티)", "category": "호프/통닭", "kind": "크림파스타", "source": "claude_reclassified"}
 {"store_id": 324, "menu_name": "치즈칠리 로스트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 324, "menu_name": "치즈칠리로스트", "category": "호프/통닭", "kind": "치킨", "source": "claude"}
 {"store_id": 324, "menu_name": "치킨무 추가", "category": "호프/통닭", "kind": "기타_사이드", "source": "claude"}
@@ -5607,7 +5607,7 @@
 {"store_id": 326, "menu_name": "왕족발(뒷발)", "category": "한식", "kind": "족발", "source": "substring"}
 {"store_id": 326, "menu_name": "왕족발(앞발)", "category": "한식", "kind": "족발", "source": "claude"}
 {"store_id": 326, "menu_name": "족발+보쌈(뒷발)", "category": "한식", "kind": "족발", "source": "claude"}
-{"store_id": 326, "menu_name": "족발+보쌈(앞발)", "category": "한식", "kind": "보쌈", "source": "substring"}
+{"store_id": 326, "menu_name": "족발+보쌈(앞발)", "category": "한식", "kind": "족발", "source": "claude_reclassified"}
 {"store_id": 327, "menu_name": "계란찜", "category": "기타", "kind": "계란찜", "source": "claude"}
 {"store_id": 327, "menu_name": "공기밥", "category": "기타", "kind": "기타_사이드", "source": "claude"}
 {"store_id": 327, "menu_name": "매운닭발(무뼈)", "category": "기타", "kind": "닭발", "source": "claude"}
@@ -5671,7 +5671,7 @@
 {"store_id": 330, "menu_name": "만두국", "category": "기타", "kind": "만두국", "source": "claude"}
 {"store_id": 330, "menu_name": "모듬전", "category": "기타", "kind": "전", "source": "claude"}
 {"store_id": 330, "menu_name": "생물대하구이(10마리*버터구이포함)", "category": "기타", "kind": "염통구이", "source": "claude"}
-{"store_id": 330, "menu_name": "오징어/갑오징어숙회", "category": "기타", "kind": "오징어무침", "source": "claude"}
+{"store_id": 330, "menu_name": "오징어/갑오징어숙회", "category": "기타", "kind": "회", "source": "claude_reclassified"}
 {"store_id": 330, "menu_name": "육회", "category": "기타", "kind": "육개장", "source": "claude"}
 {"store_id": 330, "menu_name": "콩국수", "category": "기타", "kind": "콩국수", "source": "claude"}
 {"store_id": 330, "menu_name": "해물전", "category": "기타", "kind": "해물파전", "source": "claude"}
