@@ -3,3 +3,5 @@ python-dotenv>=1.0
 playwright>=1.40
 pyproj>=3.6
 anthropic>=0.40   # LLM 태그 추출/메뉴 enrichment (src/llm)
+fastapi>=0.110    # api.py HTTP wrapper
+uvicorn>=0.27     # ASGI 서버 (api.py 실행용)

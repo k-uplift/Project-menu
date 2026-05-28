@@ -884,9 +884,9 @@ if __name__ == "__main__":
             stores_resp = recommend_stores_for_kind(qtext, picked, top_k=5)
             print(f"    └ '{picked}' 클릭 시 식당:")
             for s in stores_resp["stores"]:
-                top_menu = s["menus"][0]["menuName"][:24] if s["menus"] else ""
+                top_menu = s["menuItems"][0]["name"][:24] if s["menuItems"] else ""
                 print(
-                    f"        [{s['score']:3d}] {(s['storeName'] or '?')[:20]:20s}"
+                    f"        [{s['score']:3d}] {(s['name'] or '?')[:20]:20s}"
                     f"  대표: {top_menu}"
                 )
         print()
