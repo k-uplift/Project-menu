@@ -125,8 +125,18 @@ KINDS_BY_CATEGORY: dict[str, list[str]] = {
     ],
 }
 
-# 평면화 — 매칭·정규화에 사용
+# 평면화 — 매칭·정규화에 사용. 안정적 정렬(가나다)이라 KIND_TO_FOOD_ID 결정적.
 KINDS: list[str] = sorted({k for terms in KINDS_BY_CATEGORY.values() for k in terms})
+
+# 프론트 호환 food.id — `food-{인덱스 3자리}`. vocab + OTHER 안전망 모두 포함.
+# 정렬된 KINDS 순서대로 1번부터 부여. vocab이 늘어나면 새 종류는 뒷자리, 기존 id는
+# 그대로(가나다 순서 변하지 않음 가정). 프론트 mock의 'food-001'과 모양 동일.
+_ALL_KINDS_FOR_ID: list[str] = KINDS + [
+    "기타", "기타_음료", "기타_주류", "기타_사이드",
+]
+KIND_TO_FOOD_ID: dict[str, str] = {
+    k: f"food-{i + 1:03d}" for i, k in enumerate(_ALL_KINDS_FOR_ID)
+}
 
 # 종류 → 상위 카테고리 매핑 (집계·정렬에 사용 가능)
 KIND_TO_CATEGORY: dict[str, str] = {

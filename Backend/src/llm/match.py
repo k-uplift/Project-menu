@@ -34,7 +34,13 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-from .kinds import KIND_OTHER, KIND_OTHER_ALCOHOL, KIND_OTHER_BEVERAGE, KIND_OTHER_SIDE
+from .kinds import (
+    KIND_OTHER,
+    KIND_OTHER_ALCOHOL,
+    KIND_OTHER_BEVERAGE,
+    KIND_OTHER_SIDE,
+    KIND_TO_FOOD_ID,
+)
 from .tags import normalize
 
 _HERE = Path(__file__).resolve().parent
@@ -84,6 +90,7 @@ class MenuRow:
     tags: list[str]
     store_name: str | None = None
     kind: str | None = None  # menu_kinds.jsonl에서 join (§5.12 추천 단위)
+    price: str | None = None  # details.db.menus.price (원본 문자열)
 
 
 @dataclass
@@ -103,6 +110,7 @@ class MatchResult:
     food_kw_hits: int = 0  # 메뉴명에 들어간 food_keyword 개수(중복 제거)
     store_name: str | None = None  # details.db에서 join. 모호한 메뉴명 식별용
     kind: str | None = None  # 음식 종류 (§5.12). 집계 시 그룹 키
+    price: str | None = None  # details.db.menus.price 원본 문자열
 
     def __post_init__(self) -> None:
         if self.matched_food_keywords is None:
@@ -125,6 +133,7 @@ class KindGroup:
     matched_food_keywords: list[str]
     menus: list[MatchResult]        # score 내림차순. 모든 매칭 메뉴
     n_stores: int                   # distinct store_id 수
+    representative_tags: list[str]  # 종류 대표 태그 — 안쪽 메뉴들의 태그 빈도 top N
 
 
 def compute_idf(rows: list[MenuRow]) -> dict[str, float]:
@@ -155,27 +164,112 @@ def _get_idf(rows: list[MenuRow]) -> dict[str, float]:
     return _IDF_CACHE
 
 
-_STORE_NAME_CACHE: dict[int, str] | None = None
+@dataclass
+class StoreInfo:
+    """식당 메타 — 프론트 RestaurantCard에 필요한 정보. details.db + restaurants.db join."""
+    name: str | None
+    address: str | None       # 지번 주소 (restaurants.SITEWHLADDR)
+    category: str | None      # 업태명 (restaurants.UPTAENM): 한식·일식·중식 등
+    hours: str | None         # 대표 영업시간 "10:00 ~ 23:00" — 가장 흔한 open-close
+    closed_days: list[str]    # 휴무 요일 ["일", "월"]
+
+
+_STORE_INFO_CACHE: dict[int, StoreInfo] | None = None
+DEFAULT_RESTAURANTS_DB = _HERE / ".." / ".." / "db" / "restaurants.db"
+
+
+def _load_store_info(
+    details_db: Path = DEFAULT_DETAILS_DB,
+    restaurants_db: Path = DEFAULT_RESTAURANTS_DB,
+) -> dict[int, StoreInfo]:
+    """details.db + restaurants.db → store_id → StoreInfo 매핑. 모듈 캐시.
+
+    enrich 결과(menu_tags.jsonl)는 LLM 태깅 산출물만 들고, 식당 메타는 source-of-truth인
+    DB에서 join. 데이터 갱신되면 캐시 reset 후 재실행.
+    """
+    global _STORE_INFO_CACHE
+    if _STORE_INFO_CACHE is not None:
+        return _STORE_INFO_CACHE
+    import sqlite3
+
+    conn = sqlite3.connect(f"file:{details_db}?mode=ro", uri=True)
+    try:
+        try:
+            conn.execute(f"ATTACH DATABASE 'file:{restaurants_db}?mode=ro' AS r KEY ''")
+        except sqlite3.OperationalError:
+            conn.execute(f"ATTACH DATABASE '{restaurants_db}' AS r")
+        # 식당 기본 정보 — 이름·주소·업태
+        cur = conn.execute(
+            """
+            SELECT s.store_id, s.name, rr.SITEWHLADDR, rr.UPTAENM
+            FROM stores s
+            LEFT JOIN r.restaurants rr ON rr.MGTNO = s.mgtno
+            """
+        )
+        meta = {
+            int(sid): {"name": name, "address": addr, "category": cat}
+            for sid, name, addr, cat in cur.fetchall()
+        }
+        # 영업시간 — 가장 흔한 open-close 페어 = 대표 시간, is_closed=1 요일 = 휴무.
+        # business_hours가 요일별로 있으니 store_id별로 묶어 처리.
+        hours_by_sid: dict[int, list[tuple]] = {}
+        for sid, dow, ot, ct, closed in conn.execute(
+            "SELECT store_id, day_of_week, open_time, close_time, is_closed FROM business_hours"
+        ):
+            hours_by_sid.setdefault(int(sid), []).append((dow, ot, ct, closed))
+    finally:
+        conn.close()
+
+    out: dict[int, StoreInfo] = {}
+    for sid, m in meta.items():
+        rows = hours_by_sid.get(sid, [])
+        closed = [dow for dow, _, _, c in rows if c]
+        open_pairs = [(ot, ct) for _, ot, ct, c in rows if not c and ot and ct]
+        # 가장 흔한 open-close 페어. 동률이면 첫 등장 순.
+        if open_pairs:
+            most = Counter(open_pairs).most_common(1)[0][0]
+            hours = f"{most[0]} ~ {most[1]}"
+        else:
+            hours = None
+        out[sid] = StoreInfo(
+            name=m["name"],
+            address=m["address"],
+            category=m["category"],
+            hours=hours,
+            closed_days=closed,
+        )
+    _STORE_INFO_CACHE = out
+    return out
 
 
 def _load_store_names(db_path: Path = DEFAULT_DETAILS_DB) -> dict[int, str]:
-    """details.db에서 store_id → name 매핑. 한 번 읽고 모듈 캐싱.
+    """store_id → name (load_menu_tags 호환). 내부적으로 _load_store_info 위에 얹음."""
+    return {sid: info.name for sid, info in _load_store_info().items() if info.name}
 
-    enrich 결과(menu_tags.jsonl)는 LLM 태깅 산출물만 들고, 식당명은 source-of-truth인
-    details.db에서 join한다. 식당명 바뀌면 캐시 reset 후 재실행.
+
+_MENU_PRICE_CACHE: dict[tuple[int, str], str] | None = None
+
+
+def _load_menu_prices(db_path: Path = DEFAULT_DETAILS_DB) -> dict[tuple[int, str], str]:
+    """(store_id, menu_name) → price (원본 문자열). 모듈 캐시.
+
+    DB의 price는 '22000', '22000~41000', '시가' 등 다양한 포맷이라 문자열 그대로 보존.
+    프론트가 표시 형태 결정.
     """
-    global _STORE_NAME_CACHE
-    if _STORE_NAME_CACHE is not None:
-        return _STORE_NAME_CACHE
+    global _MENU_PRICE_CACHE
+    if _MENU_PRICE_CACHE is not None:
+        return _MENU_PRICE_CACHE
     import sqlite3
 
-    conn = sqlite3.connect(str(db_path))
+    conn = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     try:
-        cur = conn.execute("SELECT store_id, name FROM stores")
-        _STORE_NAME_CACHE = {int(sid): name for sid, name in cur.fetchall()}
+        cur = conn.execute("SELECT store_id, menu_name, price FROM menus")
+        _MENU_PRICE_CACHE = {
+            (int(sid), name): price for sid, name, price in cur.fetchall() if price
+        }
     finally:
         conn.close()
-    return _STORE_NAME_CACHE
+    return _MENU_PRICE_CACHE
 
 
 def _load_menu_kinds(path: Path = DEFAULT_MENU_KINDS) -> dict[tuple[int, str], str]:
@@ -196,10 +290,11 @@ def _load_menu_kinds(path: Path = DEFAULT_MENU_KINDS) -> dict[tuple[int, str], s
 def load_menu_tags(path: Path = DEFAULT_MENU_TAGS) -> list[MenuRow]:
     """enrich.py가 만든 menu_tags.jsonl 로드. 태그 없는 메뉴는 매칭 불가라 제외.
 
-    details.db에서 store_name도 함께 join. menu_kinds.jsonl이 있으면 kind 필드도 채움.
+    details.db에서 store_name·price를 함께 join. menu_kinds.jsonl이 있으면 kind도 채움.
     """
     store_names = _load_store_names()
     kinds = _load_menu_kinds()
+    prices = _load_menu_prices()
     rows: list[MenuRow] = []
     with path.open(encoding="utf-8") as f:
         for line in f:
@@ -216,6 +311,7 @@ def load_menu_tags(path: Path = DEFAULT_MENU_TAGS) -> list[MenuRow]:
                     tags=list(d["tags"]),
                     store_name=store_names.get(sid),
                     kind=kinds.get((sid, mname)),
+                    price=prices.get((sid, mname)),
                 )
             )
     return rows
@@ -252,6 +348,14 @@ def aggregate_kinds(
         all_matched = sorted({t for m in menus for t in m.matched})
         all_fkw = sorted({k for m in menus for k in m.matched_food_keywords})
         n_stores = len({m.store_id for m in menus})
+        # 종류의 대표 태그 — 안쪽 메뉴들의 태그 빈도 top 4. 프론트의 food.tags에 매핑.
+        # '한정식' 11메뉴 태그를 다 카운트해 가장 흔한 4개. 매칭 단어가 아니라 종류의
+        # 일반적 속성 표현(따뜻한/국물있는/담백한).
+        tag_freq: Counter[str] = Counter()
+        for m in menus:
+            for t in m.tags:
+                tag_freq[normalize(t)] += 1
+        rep_tags = [t for t, _ in tag_freq.most_common(4)]
         groups.append(
             KindGroup(
                 kind=kind,
@@ -263,6 +367,7 @@ def aggregate_kinds(
                 matched_food_keywords=all_fkw,
                 menus=menus,
                 n_stores=n_stores,
+                representative_tags=rep_tags,
             )
         )
 
@@ -379,6 +484,7 @@ def match(
                 food_kw_hits=fkw_hits,
                 store_name=row.store_name,
                 kind=row.kind,
+                price=row.price,
             )
         )
 
@@ -427,17 +533,29 @@ def to_food(r: MatchResult) -> dict:
 
 
 def to_kind_group(g: KindGroup) -> dict:
-    """KindGroup → 프론트 노출 객체. 추천 1차 단위 (§5.12).
+    """KindGroup → 프론트 FoodItem 계약 (foods.mock.js 형태).
 
     1차 응답은 *음식 이름만* 가볍게. 식당·메뉴 리스트는 사용자가 음식을 클릭한 뒤
     별도 API(recommend_stores_for_kind)로 받아온다 — 응답 크기·전송량 절감.
+
+    id 체계: vocab 인덱스 기반 'food-001'. KIND_TO_FOOD_ID 매핑은 결정적.
+    tags: 그 종류 메뉴들의 태그 빈도 top 4 (대표 태그).
+    cfScore/cfDescription/contextNote: 이후 CF/컨텍스트 단계가 채울 빈 칸.
+    emoji/imageUrl: 프론트 호환성 위해 null로 명시.
     """
     return {
-        "kind": g.kind,
+        "id": KIND_TO_FOOD_ID.get(g.kind, f"food-{g.kind}"),
+        "name": g.kind,
+        "emoji": None,
+        "imageUrl": None,
+        "tags": g.representative_tags,
         "score": _to_score100(g.score),
         "reason": {
             "matchedKeywords": g.matched,
             "matchedFoodKeywords": g.matched_food_keywords,
+            "cfScore": None,
+            "cfDescription": None,
+            "contextNote": None,
         },
     }
 
@@ -492,21 +610,39 @@ def aggregate_stores(
 
 
 def to_store_group(g: StoreGroup) -> dict:
-    """StoreGroup → 프론트 식당 카드 객체."""
+    """StoreGroup → 프론트 Restaurant 계약 (restaurants.mock.js 형태).
+
+    DB에서 가져올 수 있는 필드만 채운다 — id, name, address, category, hours,
+    closedDay, menuItems. mock 전용 필드(rating/reviewCount/priceRange/delivery/
+    signature/cfMatch)는 노출 안 함 — 프론트가 필요하면 기본값 처리.
+    latitude/longitude: 원본이 한국 평면좌표(EPSG)라 변환 필요 — 일단 null.
+    """
+    info = _load_store_info().get(g.store_id)
     return {
+        "id": f"rest-{g.store_id}",
         "storeId": g.store_id,
-        "storeName": g.store_name,
+        "name": g.store_name,
+        "address": info.address if info else None,
+        "category": info.category if info else None,
+        "latitude": None,   # TODO: EPSG:5174 → WGS84 변환
+        "longitude": None,
+        "hours": info.hours if info else None,
+        "closedDay": ", ".join(info.closed_days) if info and info.closed_days else None,
         "score": _to_score100(g.score),
         "reason": {
             "matchedKeywords": g.matched,
             "matchedFoodKeywords": g.matched_food_keywords,
         },
-        "menus": [
+        # 그 식당의 이 종류 매칭 메뉴 — 프론트 menuItems 모양 (name/price). 우리 DB엔
+        # signature 정보가 없어 isSignature는 항상 false.
+        "menuItems": [
             {
-                "menuName": m.menu_name,
-                "score": _to_score100(m.score),
-                "tags": m.tags,
+                "name": m.menu_name,
+                "price": m.price,
+                "isSignature": False,
                 "foodId": stable_food_id(m.store_id, m.menu_name),
+                "tags": m.tags,
+                "score": _to_score100(m.score),
             }
             for m in g.menus
         ],
