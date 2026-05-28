@@ -23,7 +23,7 @@ import { BASE_LOCATION } from '../services/contextService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function RestaurantScreen({ route, navigation }) {
-  const { food } = route.params;
+  const { food, query } = route.params;
 
   const [sort, setSort] = useState('distance');
   const [list, setList] = useState([]);
@@ -34,7 +34,7 @@ export default function RestaurantScreen({ route, navigation }) {
     (async () => {
       setLoading(true);
       try {
-        const data = await getRestaurantsByFood(food.id, { sort });
+        const data = await getRestaurantsByFood(food, { sort, query });
         if (mounted) setList(data);
       } catch (e) {
         console.error(e);
@@ -45,7 +45,7 @@ export default function RestaurantScreen({ route, navigation }) {
     return () => {
       mounted = false;
     };
-  }, [food.id, sort]);
+  }, [food.id, sort, query]);
 
   const handleRestaurantPress = (restaurant) => {
     navigation.navigate('RestaurantDetail', { restaurant, food });

@@ -45,14 +45,14 @@ export default function RecommendScreen({ route, navigation }) {
 
   const loadRecommendations = useCallback(
     async (seed) => {
-      const ctx = { ...ctxParam, refreshSeed: seed };
+      const ctx = { ...ctxParam, originalText, refreshSeed: seed };
       const [base, cf] = await Promise.all([
         getFoodRecommendations(keywords, ctx),
         getPersonalizedRecommendations(keywords, ctx),
       ]);
       return { base, cf };
     },
-    [keywords, ctxParam]
+    [keywords, ctxParam, originalText]
   );
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function RecommendScreen({ route, navigation }) {
 
   const handleNext = () => {
     if (!selectedFood) return;
-    navigation.navigate('Restaurant', { food: selectedFood });
+    navigation.navigate('Restaurant', { food: selectedFood, query: originalText });
   };
 
   const ctxLine = ctxParam
