@@ -164,6 +164,32 @@ def _get_idf(rows: list[MenuRow]) -> dict[str, float]:
     return _IDF_CACHE
 
 
+# kind 대표 태그 — *전체 메뉴* 빈도 기반. aggregate_kinds의 rep_tags가 매칭된
+# 메뉴만 보면 사용자가 '얼큰한 국물' 검색했을 때 짬뽕 카드에 '바삭한'이 끌려오는
+# 등 *매칭 조건*에 따라 카드 표시 태그가 흔들리는 왜곡 발생. kind 전체 메뉴로
+# 계산해야 안정 — '짬뽕'은 검색 무관하게 항상 '얼큰한·국물있는·진한·따뜻한'.
+_KIND_REP_TAGS_CACHE: dict[str, list[str]] | None = None
+
+
+def _get_kind_rep_tags(rows: list[MenuRow] | None = None) -> dict[str, list[str]]:
+    global _KIND_REP_TAGS_CACHE
+    if _KIND_REP_TAGS_CACHE is None:
+        if rows is None:
+            rows = load_menu_tags()
+        kind_tag_counts: dict[str, Counter[str]] = {}
+        for r in rows:
+            if not r.kind:
+                continue
+            c = kind_tag_counts.setdefault(r.kind, Counter())
+            for t in r.tags:
+                c[normalize(t)] += 1
+        _KIND_REP_TAGS_CACHE = {
+            kind: [t for t, _ in counts.most_common(4)]
+            for kind, counts in kind_tag_counts.items()
+        }
+    return _KIND_REP_TAGS_CACHE
+
+
 @dataclass
 class StoreInfo:
     """식당 메타 — 프론트 RestaurantCard에 필요한 정보. details.db + restaurants.db join."""
@@ -458,14 +484,10 @@ def aggregate_kinds(
         all_matched = sorted({t for m in menus for t in m.matched})
         all_fkw = sorted({k for m in menus for k in m.matched_food_keywords})
         n_stores = len({m.store_id for m in menus})
-        # 종류의 대표 태그 — 안쪽 메뉴들의 태그 빈도 top 4. 프론트의 food.tags에 매핑.
-        # '한정식' 11메뉴 태그를 다 카운트해 가장 흔한 4개. 매칭 단어가 아니라 종류의
-        # 일반적 속성 표현(따뜻한/국물있는/담백한).
-        tag_freq: Counter[str] = Counter()
-        for m in menus:
-            for t in m.tags:
-                tag_freq[normalize(t)] += 1
-        rep_tags = [t for t, _ in tag_freq.most_common(4)]
+        # 종류의 대표 태그 — *kind 전체 메뉴* 빈도 기반 (모듈 캐시). 매칭된 메뉴만
+        # 보면 '얼큰한 국물' 검색 시 짬뽕 카드에 '바삭한'(세트 안 탕수육에서 끌려옴)
+        # 같은 잡태그가 끼는 왜곡 발생. 전체 메뉴 기반은 검색 무관하게 안정.
+        rep_tags = _get_kind_rep_tags().get(kind, [])
         groups.append(
             KindGroup(
                 kind=kind,
