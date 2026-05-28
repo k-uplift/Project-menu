@@ -2,10 +2,12 @@
  * MyPageScreen — 마이페이지
  *
  * 표시 항목:
- *  1. 사용자 선호 태그 (좋아요한 메뉴 기반 자동 집계)
- *  2. 좋아요한 메뉴
- *  3. 최근 추천 메뉴
- *  4. 최근 검색 키워드
+ *  1. 사용자 선호 태그 (검색 키워드 빈도 자동 집계)
+ *  2. 최근 추천 메뉴
+ *  3. 최근 검색 키워드
+ *
+ * 좋아요 기능 제거 — CF 신호 단일화(implicit-only). 선호 태그는 검색
+ * 키워드 빈도가 source가 된다 (사용자 자기 발화 = 가장 명확한 선호 표현).
  *
  * 추후 백엔드 연결 시:
  *  - userStorageService 의 함수 시그니처는 그대로 유지
@@ -27,9 +29,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   getRecentSearches,
   getRecentFoods,
-  getLikedFoods,
   getPreferredTags,
-  toggleLikeFood,
   clearAllUserData,
 } from '../services/userStorageService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
@@ -37,25 +37,22 @@ import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 export default function MyPageScreen({ navigation }) {
   const [searches, setSearches] = useState([]);
   const [recentFoods, setRecentFoods] = useState([]);
-  const [likedFoods, setLikedFoods] = useState([]);
   const [preferredTags, setPreferredTags] = useState([]);
 
   // 화면이 포커스될 때마다 데이터 새로 불러오기
-  // (추천 화면에서 좋아요 누르고 돌아왔을 때 즉시 반영되도록)
+  // (검색하고 돌아오면 선호 태그·이력이 즉시 반영되도록)
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       (async () => {
-        const [s, r, l, t] = await Promise.all([
+        const [s, r, t] = await Promise.all([
           getRecentSearches(),
           getRecentFoods(),
-          getLikedFoods(),
           getPreferredTags(),
         ]);
         if (!mounted) return;
         setSearches(s);
         setRecentFoods(r);
-        setLikedFoods(l);
         setPreferredTags(t);
       })();
       return () => {
@@ -63,14 +60,6 @@ export default function MyPageScreen({ navigation }) {
       };
     }, [])
   );
-
-  // 좋아요 해제
-  const handleUnlike = async (food) => {
-    await toggleLikeFood(food);
-    const [l, t] = await Promise.all([getLikedFoods(), getPreferredTags()]);
-    setLikedFoods(l);
-    setPreferredTags(t);
-  };
 
   // 최근 검색 다시 사용
   const handleReuseSearch = (search) => {
@@ -103,7 +92,6 @@ export default function MyPageScreen({ navigation }) {
             await clearAllUserData();
             setSearches([]);
             setRecentFoods([]);
-            setLikedFoods([]);
             setPreferredTags([]);
           },
         },
@@ -112,9 +100,7 @@ export default function MyPageScreen({ navigation }) {
   };
 
   const isEmpty =
-    searches.length === 0 &&
-    recentFoods.length === 0 &&
-    likedFoods.length === 0;
+    searches.length === 0 && recentFoods.length === 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -157,7 +143,7 @@ export default function MyPageScreen({ navigation }) {
         {preferredTags.length > 0 && (
           <Section
             title="내 선호 태그"
-            subtitle="좋아요한 메뉴에서 자주 등장한 키워드예요"
+            subtitle="검색 키워드에서 자주 등장한 표현이에요"
             icon="🏷️"
           >
             <View style={styles.tagWrap}>
@@ -171,36 +157,7 @@ export default function MyPageScreen({ navigation }) {
           </Section>
         )}
 
-        {/* 2. 좋아요한 메뉴 */}
-        {likedFoods.length > 0 && (
-          <Section
-            title="좋아요한 메뉴"
-            subtitle={`${likedFoods.length}개`}
-            icon="♥"
-            iconColor={COLORS.danger}
-          >
-            {likedFoods.map((food) => (
-              <View key={food.id} style={styles.foodRow}>
-                <Text style={styles.foodEmoji}>{food.emoji}</Text>
-                <View style={styles.foodInfo}>
-                  <Text style={styles.foodName}>{food.name}</Text>
-                  <Text style={styles.foodTags}>
-                    {(food.tags || []).slice(0, 3).map((t) => `#${t}`).join(' ')}
-                  </Text>
-                </View>
-                <Pressable
-                  onPress={() => handleUnlike(food)}
-                  hitSlop={10}
-                  style={({ pressed }) => [pressed && { opacity: 0.5 }]}
-                >
-                  <Text style={styles.unlikeIcon}>♥</Text>
-                </Pressable>
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {/* 3. 최근 추천받은 메뉴 */}
+        {/* 2. 최근 추천받은 메뉴 */}
         {recentFoods.length > 0 && (
           <Section
             title="최근 추천 메뉴"
@@ -221,7 +178,7 @@ export default function MyPageScreen({ navigation }) {
           </Section>
         )}
 
-        {/* 4. 최근 검색 */}
+        {/* 3. 최근 검색 */}
         {searches.length > 0 && (
           <Section
             title="최근 검색"
@@ -446,18 +403,9 @@ const styles = StyleSheet.create({
     fontWeight: FONT.weightBold,
     marginBottom: 2,
   },
-  foodTags: {
-    color: COLORS.textMuted,
-    fontSize: FONT.sizeXs,
-  },
   foodTime: {
     color: COLORS.textMuted,
     fontSize: FONT.sizeXs,
-  },
-  unlikeIcon: {
-    color: COLORS.danger,
-    fontSize: 22,
-    paddingHorizontal: SPACING.sm,
   },
 
   // === 최근 검색 ===

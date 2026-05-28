@@ -7,13 +7,7 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import FoodThumbnail from './FoodThumbnail';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
-export default function FoodCard({
-  food,
-  selected = false,
-  liked = false,
-  onPress,
-  onLikePress,
-}) {
+export default function FoodCard({ food, selected = false, onPress }) {
   const { name, score, reason } = food;
 
   return (
@@ -26,7 +20,7 @@ export default function FoodCard({
         pressed && styles.pressed,
       ]}
     >
-      {/* 상단: 썸네일 + 이름 + 좋아요 + 점수 */}
+      {/* 상단: 썸네일 + 이름 + 점수 */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <FoodThumbnail food={food} size="md" imageUrl={food.imageUrl} />
@@ -39,23 +33,6 @@ export default function FoodCard({
         </View>
 
         <View style={styles.headerRight}>
-          {onLikePress && (
-            <Pressable
-              onPress={(e) => {
-                e.stopPropagation && e.stopPropagation();
-                onLikePress();
-              }}
-              hitSlop={10}
-              style={({ pressed }) => [
-                styles.likeBtn,
-                pressed && styles.likeBtnPressed,
-              ]}
-            >
-              <Text style={[styles.likeIcon, liked && styles.likeIconActive]}>
-                {liked ? '♥' : '♡'}
-              </Text>
-            </Pressable>
-          )}
           <ScoreBadge score={score} />
         </View>
       </View>
@@ -152,21 +129,6 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  likeBtn: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    marginRight: SPACING.xs,
-  },
-  likeBtnPressed: {
-    opacity: 0.6,
-  },
-  likeIcon: {
-    fontSize: 22,
-    color: COLORS.textMuted,
-  },
-  likeIconActive: {
-    color: COLORS.danger,
   },
 
   scoreBadge: {

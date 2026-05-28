@@ -1,9 +1,10 @@
 /**
  * RecommendScreen — 음식 추천 결과 (STEP 03)
  *
- * 변경:
- *  - 음식 카드 클릭 시 행동 추적 이벤트 전송 (+1점)
- *  - 같은 카드를 연속 클릭해도 중복 전송 방지 (이전 선택 ID와 비교)
+ * 행동 신호:
+ *  - 음식 카드 클릭 = "메뉴 선택" (+1점, trackFoodCardClick)
+ *  - 길찾기/배달 클릭 = "최종 선택" (+2점, 다음 화면에서 추적)
+ *  좋아요 제거 — CF 신호 단일화(implicit-only).
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -25,8 +26,6 @@ import {
 import {
   addRecentSearch,
   addRecentFood,
-  toggleLikeFood,
-  getLikedFoods,
 } from '../services/userStorageService';
 import { trackFoodCardClick } from '../services/behaviorTrackingService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
@@ -41,7 +40,6 @@ export default function RecommendScreen({ route, navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshSeed, setRefreshSeed] = useState(0);
   const [selectedFoodId, setSelectedFoodId] = useState(null);
-  const [likedIds, setLikedIds] = useState(new Set());
 
   const loadRecommendations = useCallback(
     async (seed) => {
@@ -70,9 +68,6 @@ export default function RecommendScreen({ route, navigation }) {
         for (const food of base.slice(0, 3)) {
           await addRecentFood(food);
         }
-
-        const liked = await getLikedFoods();
-        if (mounted) setLikedIds(new Set(liked.map((f) => f.id)));
       } catch (e) {
         console.error(e);
       } finally {
@@ -99,16 +94,6 @@ export default function RecommendScreen({ route, navigation }) {
     } finally {
       setRefreshing(false);
     }
-  };
-
-  const handleLike = async (food) => {
-    const isNowLiked = await toggleLikeFood(food);
-    setLikedIds((prev) => {
-      const next = new Set(prev);
-      if (isNowLiked) next.add(food.id);
-      else next.delete(food.id);
-      return next;
-    });
   };
 
   // 음식 카드 클릭 — 행동 점수 +1점
@@ -220,9 +205,7 @@ export default function RecommendScreen({ route, navigation }) {
               key={`${food.id}-${refreshSeed}`}
               food={food}
               selected={selectedFoodId === food.id}
-              liked={likedIds.has(food.id)}
               onPress={() => handleFoodCardPress(food)}
-              onLikePress={() => handleLike(food)}
             />
           ))}
 
