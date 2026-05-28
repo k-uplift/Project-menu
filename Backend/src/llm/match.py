@@ -168,13 +168,18 @@ def _get_idf(rows: list[MenuRow]) -> dict[str, float]:
 class StoreInfo:
     """식당 메타 — 프론트 RestaurantCard에 필요한 정보. details.db + restaurants.db join."""
     name: str | None
-    address: str | None       # 지번 주소 (restaurants.SITEWHLADDR)
-    category: str | None      # 업태명 (restaurants.UPTAENM): 한식·일식·중식 등
-    hours: str | None         # 대표 영업시간 "10:00 ~ 23:00" — 가장 흔한 open-close
-    closed_days: list[str]    # 휴무 요일 ["일", "월"]
-    latitude: float | None    # WGS84 위도 — restaurants.X/Y(EPSG:5181) 변환
-    longitude: float | None   # WGS84 경도
-    price_range: str | None   # "8,000~15,000원" — 그 식당 메뉴 price 최소~최대
+    address: str | None        # 지번 주소 (restaurants.SITEWHLADDR)
+    road_address: str | None   # 도로명 주소 (restaurants.RDNWHLADDR) — 더 친화적
+    phone: str | None          # 전화번호 (restaurants.SITETEL)
+    category: str | None       # 업태명 (restaurants.UPTAENM): 한식·일식·중식 등
+    hours: str | None          # 대표 영업시간 "10:00 ~ 23:00"
+    closed_days: list[str]     # 휴무 요일 ["일", "월"]
+    break_time: str | None     # 브레이크타임 "15:00 ~ 17:00" — 가장 흔한 break 페어
+    last_order: str | None     # 라스트오더 — 요일별 다르면 "요일별 상이"
+    latitude: float | None     # WGS84 위도 — restaurants.X/Y(EPSG:5181) 변환
+    longitude: float | None    # WGS84 경도
+    price_range: str | None    # "8,000~15,000원"
+    naver_place_id: str | None # details.stores.naver_place_id — 네이버 외부 링크용
 
 
 _STORE_INFO_CACHE: dict[int, StoreInfo] | None = None
@@ -258,24 +263,39 @@ def _load_store_info(
             conn.execute(f"ATTACH DATABASE 'file:{restaurants_db}?mode=ro' AS r KEY ''")
         except sqlite3.OperationalError:
             conn.execute(f"ATTACH DATABASE '{restaurants_db}' AS r")
-        # 식당 기본 정보 — 이름·주소·업태·좌표
+        # 식당 기본 정보 — 이름·주소(지번/도로명)·전화·업태·좌표·네이버 id
         cur = conn.execute(
             """
-            SELECT s.store_id, s.name, rr.SITEWHLADDR, rr.UPTAENM, rr.X, rr.Y
+            SELECT s.store_id, s.name, s.naver_place_id,
+                   rr.SITEWHLADDR, rr.RDNWHLADDR, rr.SITETEL, rr.UPTAENM,
+                   rr.X, rr.Y
             FROM stores s
             LEFT JOIN r.restaurants rr ON rr.MGTNO = s.mgtno
             """
         )
         meta = {
-            int(sid): {"name": name, "address": addr, "category": cat, "x": x, "y": y}
-            for sid, name, addr, cat, x, y in cur.fetchall()
+            int(sid): {
+                "name": name,
+                "naver_place_id": npid,
+                "address": addr,
+                "road_address": raddr,
+                "phone": tel,
+                "category": cat,
+                "x": x,
+                "y": y,
+            }
+            for sid, name, npid, addr, raddr, tel, cat, x, y in cur.fetchall()
         }
-        # 영업시간 — 가장 흔한 open-close 페어 = 대표 시간, is_closed=1 요일 = 휴무.
+        # 영업시간 — 가장 흔한 open-close 페어 = 대표, is_closed=1 요일 = 휴무.
+        # break_start/break_end·last_order도 같이 수집해 부가 정보 노출.
         hours_by_sid: dict[int, list[tuple]] = {}
-        for sid, dow, ot, ct, closed in conn.execute(
-            "SELECT store_id, day_of_week, open_time, close_time, is_closed FROM business_hours"
+        for sid, dow, ot, ct, closed, bs, be, lo in conn.execute(
+            """SELECT store_id, day_of_week, open_time, close_time, is_closed,
+                      break_start, break_end, last_order FROM business_hours"""
         ):
-            hours_by_sid.setdefault(int(sid), []).append((dow, ot, ct, closed))
+            hours_by_sid.setdefault(int(sid), []).append(
+                (dow, ot, ct, closed, bs, be, lo)
+            )
         # 식당별 가격 — priceRange 계산용
         prices_by_sid: dict[int, list[str]] = {}
         for sid, price in conn.execute(
@@ -288,24 +308,45 @@ def _load_store_info(
     out: dict[int, StoreInfo] = {}
     for sid, m in meta.items():
         rows = hours_by_sid.get(sid, [])
-        closed = [dow for dow, _, _, c in rows if c]
-        open_pairs = [(ot, ct) for _, ot, ct, c in rows if not c and ot and ct]
+        closed = [dow for dow, _, _, c, _, _, _ in rows if c]
+        open_pairs = [(ot, ct) for _, ot, ct, c, _, _, _ in rows if not c and ot and ct]
         if open_pairs:
             most = Counter(open_pairs).most_common(1)[0][0]
             hours = f"{most[0]} ~ {most[1]}"
         else:
             hours = None
+        # 브레이크타임 — 가장 흔한 (break_start, break_end) 페어. 둘 다 있을 때만.
+        break_pairs = [
+            (bs, be) for _, _, _, c, bs, be, _ in rows if not c and bs and be
+        ]
+        if break_pairs:
+            most_break = Counter(break_pairs).most_common(1)[0][0]
+            break_time = f"{most_break[0]} ~ {most_break[1]}"
+        else:
+            break_time = None
+        # 라스트오더 — 가장 흔한 값. 요일별 다르면 그래도 대표값.
+        last_orders = [lo for _, _, _, c, _, _, lo in rows if not c and lo]
+        last_order = Counter(last_orders).most_common(1)[0][0] if last_orders else None
+        # 전화번호 — 공백 패딩 정리
+        phone = (m["phone"] or "").strip() or None
+        address = (m["address"] or "").strip() or None
+        road_address = (m["road_address"] or "").strip() or None
         lat, lon = _coord_to_wgs84(m["x"], m["y"])
         price_range = _parse_prices(prices_by_sid.get(sid, []))
         out[sid] = StoreInfo(
             name=m["name"],
-            address=m["address"],
+            address=address,
+            road_address=road_address,
+            phone=phone,
             category=m["category"],
             hours=hours,
             closed_days=closed,
+            break_time=break_time,
+            last_order=last_order,
             latitude=lat,
             longitude=lon,
             price_range=price_range,
+            naver_place_id=m["naver_place_id"],
         )
     _STORE_INFO_CACHE = out
     return out
@@ -692,12 +733,17 @@ def to_store_group(g: StoreGroup) -> dict:
         "storeId": g.store_id,
         "name": g.store_name,
         "address": info.address if info else None,
+        "roadAddress": info.road_address if info else None,
+        "phone": info.phone if info else None,
         "category": info.category if info else None,
         "latitude": info.latitude if info else None,
         "longitude": info.longitude if info else None,
         "hours": info.hours if info else None,
         "closedDay": ", ".join(info.closed_days) if info and info.closed_days else None,
+        "breakTime": info.break_time if info else None,
+        "lastOrder": info.last_order if info else None,
         "priceRange": info.price_range if info else None,
+        "naverPlaceId": info.naver_place_id if info else None,
         "score": _to_score100(g.score),
         "reason": {
             "matchedKeywords": g.matched,
