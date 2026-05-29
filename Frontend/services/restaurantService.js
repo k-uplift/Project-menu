@@ -103,3 +103,27 @@ export async function getRestaurantsByFood(food, options = {}) {
 
   return enriched;
 }
+
+/**
+ * 한 식당의 *전체* 메뉴 가져오기 — RestaurantDetail용.
+ *
+ * `getRestaurantsByFood`가 반환하는 `menuItems`는 *선택한 kind에 매칭된*
+ * 메뉴들만 들어 있어 식당 상세 화면에선 "메뉴가 적다"는 인상을 줌. 이 함수가
+ * 그 식당의 모든 메뉴(태그·가격·종류 포함)를 별도로 받아와, 화면이
+ * *추천 메뉴 강조 + 전체 메뉴 목록* 두 섹션으로 자연스럽게 구성된다.
+ *
+ * @param {number|string} storeId
+ * @returns {Promise<Array<{name, price, tags, kind}>>}
+ */
+export async function getAllMenusByStore(storeId) {
+  if (!storeId) return [];
+  try {
+    const res = await fetch(`${API_BASE}/restaurants/${storeId}/menus`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data.menus) ? data.menus : [];
+  } catch (e) {
+    console.warn('[restaurantService] /restaurants/:id/menus 실패:', e.message);
+    return [];
+  }
+}

@@ -2,12 +2,13 @@
  * RestaurantDetailScreen — 음식점 상세 (STEP 5)
  *
  * 변경:
- *  - "플랫폼에서 보기" → "최종 선택"
- *  - 4개 버튼 → 2개 버튼 (길찾기, 배달의민족)
- *  - 행동 추적 이벤트 전송 (CF 학습용)
+ *  - 메뉴 섹션을 *추천 메뉴 강조* + *전체 메뉴 목록* 두 섹션으로 분리
+ *  - 진입 시 `getAllMenusByStore`로 그 식당의 *전체* 메뉴 추가 로드
+ *  - 평점·배달·시그니처·CF 매칭도 같은 stub 값이면 안 보이게 가드
+ *  - 길찾기/배달의민족 행동 추적 이벤트 유지
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import {
   Alert,
   Linking,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,10 +26,30 @@ import {
   trackNavigateClick,
   trackDeliveryClick,
 } from '../services/behaviorTrackingService';
+import { getAllMenusByStore } from '../services/restaurantService';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
   const { restaurant, food } = route.params;
+
+  // 그 식당 전체 메뉴 (추천 흐름과 무관하게 그 식당이 파는 모든 메뉴)
+  // restaurant.menuItems는 *선택한 kind에 매칭된* 메뉴만 들어 있어 "메뉴 적다"
+  // 인상을 줘서 별도 fetch.
+  const [allMenus, setAllMenus] = useState([]);
+  const [menusLoading, setMenusLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setMenusLoading(true);
+      const menus = await getAllMenusByStore(restaurant.storeId || restaurant.id);
+      if (mounted) {
+        setAllMenus(menus);
+        setMenusLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [restaurant.storeId, restaurant.id]);
 
   // 길찾기 (카카오맵으로 연결 — 가장 보편적인 지도 앱)
   const handleNavigate = async () => {
@@ -75,13 +97,18 @@ export default function RestaurantDetailScreen({ route, navigation }) {
     }
   };
 
-  // 별점 렌더링
+  // 별점 렌더링 (rating > 0일 때만 표시)
   const renderStars = () => {
-    const full = Math.floor(restaurant.rating);
-    const half = restaurant.rating - full >= 0.5;
-    const stars = '★'.repeat(full) + (half ? '★' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
-    return stars;
+    const r = restaurant.rating || 0;
+    const full = Math.floor(r);
+    const half = r - full >= 0.5;
+    return '★'.repeat(full) + (half ? '★' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
   };
+
+  // 추천 메뉴(매칭) 이름 집합 — 전체 메뉴에서 추천 메뉴 제외 시 사용
+  const recommendedMenus = restaurant.menuItems || [];
+  const recommendedNames = new Set(recommendedMenus.map((m) => m.name));
+  const otherMenus = allMenus.filter((m) => !recommendedNames.has(m.name));
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -116,12 +143,16 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           <Text style={styles.headerName}>{restaurant.name}</Text>
         </View>
 
-        {/* 평점 */}
-        <View style={styles.ratingRow}>
-          <Text style={styles.starText}>{renderStars()}</Text>
-          <Text style={styles.ratingNum}>{restaurant.rating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({restaurant.reviewCount}개 리뷰)</Text>
-        </View>
+        {/* 평점 — 데이터가 있을 때만 (현재 백엔드에 없으면 안 보임) */}
+        {restaurant.rating > 0 && (
+          <View style={styles.ratingRow}>
+            <Text style={styles.starText}>{renderStars()}</Text>
+            <Text style={styles.ratingNum}>{restaurant.rating.toFixed(1)}</Text>
+            {restaurant.reviewCount > 0 && (
+              <Text style={styles.reviewCount}>({restaurant.reviewCount}개 리뷰)</Text>
+            )}
+          </View>
+        )}
 
         {/* 정보 카드 */}
         <View style={styles.infoCard}>
@@ -140,33 +171,47 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           )}
         </View>
 
-        {/* 메뉴 목록 */}
-        <Text style={styles.sectionLabel}>메뉴</Text>
+        {/* 추천 메뉴 — 사용자가 검색한 종류의 매칭 메뉴 강조 */}
+        {recommendedMenus.length > 0 && (
+          <>
+            <Text style={styles.sectionLabel}>
+              🎯 추천 메뉴 {food?.name ? `· ${food.name}` : ''}
+            </Text>
+            <View style={[styles.menuCard, styles.menuCardRecommended]}>
+              {recommendedMenus.map((item, idx) => (
+                <MenuRowItem
+                  key={`rec-${item.name}-${idx}`}
+                  item={item}
+                  isLast={idx === recommendedMenus.length - 1}
+                />
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* 전체 메뉴 — 그 식당의 다른 모든 메뉴 */}
+        <Text style={styles.sectionLabel}>
+          전체 메뉴 {allMenus.length > 0 ? `(${allMenus.length})` : ''}
+        </Text>
         <View style={styles.menuCard}>
-          {restaurant.menuItems && restaurant.menuItems.length > 0 ? (
-            restaurant.menuItems.map((item, idx) => (
-              <View
-                key={`${item.name}-${idx}`}
-                style={[
-                  styles.menuRow,
-                  idx === restaurant.menuItems.length - 1 && styles.menuRowLast,
-                ]}
-              >
-                <View style={styles.menuLeft}>
-                  <Text style={styles.menuName}>{item.name}</Text>
-                  {item.isSignature && (
-                    <View style={styles.signatureBadge}>
-                      <Text style={styles.signatureText}>대표</Text>
-                    </View>
-                  )}
-                </View>
-                <Text style={styles.menuPrice}>
-                  {item.price.toLocaleString()}원
-                </Text>
-              </View>
+          {menusLoading ? (
+            <View style={{ paddingVertical: SPACING.lg, alignItems: 'center' }}>
+              <ActivityIndicator color={COLORS.primary} />
+            </View>
+          ) : otherMenus.length > 0 ? (
+            otherMenus.map((item, idx) => (
+              <MenuRowItem
+                key={`all-${item.name}-${idx}`}
+                item={item}
+                isLast={idx === otherMenus.length - 1}
+              />
             ))
-          ) : (
+          ) : allMenus.length === 0 ? (
             <Text style={styles.menuEmpty}>메뉴 정보가 없어요</Text>
+          ) : (
+            <Text style={styles.menuEmpty}>
+              추천 메뉴 외 다른 메뉴 정보가 없어요
+            </Text>
           )}
         </View>
 
@@ -219,10 +264,6 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           />
         </View>
 
-        <Text style={styles.dataNote}>
-          💡 현재는 더미 데이터입니다.{'\n'}
-          추후 음식점 DB + 공공데이터 메뉴 API와 연결됩니다.
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -234,6 +275,27 @@ function InfoRow({ icon, text, accent = false }) {
     <View style={styles.infoRow}>
       <Text style={styles.infoIcon}>{icon}</Text>
       <Text style={[styles.infoText, accent && styles.infoTextAccent]}>{text}</Text>
+    </View>
+  );
+}
+
+/** 메뉴 한 줄 — 추천/일반 공용. 가격은 백엔드가 원본 문자열로 줌 */
+function MenuRowItem({ item, isLast }) {
+  return (
+    <View style={[styles.menuRow, isLast && styles.menuRowLast]}>
+      <View style={styles.menuLeft}>
+        <Text style={styles.menuName}>{item.name}</Text>
+        {item.isSignature && (
+          <View style={styles.signatureBadge}>
+            <Text style={styles.signatureText}>대표</Text>
+          </View>
+        )}
+      </View>
+      {item.price ? (
+        <Text style={styles.menuPrice}>
+          {String(item.price).includes('원') ? item.price : `${item.price}원`}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -420,6 +482,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  menuCardRecommended: {
+    backgroundColor: COLORS.primarySoft,
+    borderColor: COLORS.primary,
   },
   menuRow: {
     flexDirection: 'row',

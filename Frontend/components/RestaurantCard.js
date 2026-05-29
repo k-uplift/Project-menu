@@ -39,20 +39,29 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
           {delivery && <DeliveryBadge />}
         </View>
 
+        {/* 평점 + 거리 — 평점 데이터 없으면(현재 백엔드) 거리만 표시 */}
         <View style={styles.metaRow}>
-          <Text style={styles.star}>★</Text>
-          <Text style={styles.rating}>{rating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({reviewCount})</Text>
-          <Text style={styles.dot}>·</Text>
-          <Text style={styles.meta}>
-            {distanceKm}km · 도보 {walkMin}분
-          </Text>
+          {rating > 0 && (
+            <>
+              <Text style={styles.star}>★</Text>
+              <Text style={styles.rating}>{rating.toFixed(1)}</Text>
+              {reviewCount > 0 && (
+                <Text style={styles.reviewCount}>({reviewCount})</Text>
+              )}
+              {distanceKm != null && <Text style={styles.dot}>·</Text>}
+            </>
+          )}
+          {distanceKm != null && (
+            <Text style={styles.meta}>
+              {distanceKm}km{walkMin != null ? ` · 도보 ${walkMin}분` : ''}
+            </Text>
+          )}
         </View>
 
-        <Text style={styles.price}>{priceRange}</Text>
+        {priceRange ? <Text style={styles.price}>{priceRange}</Text> : null}
 
-        {/* CF 매칭 표시 — 취향 정렬 모드일 때만 */}
-        {showCfMatch && (
+        {/* CF 매칭 표시 — 취향 정렬 모드 + cfMatch 데이터 있을 때만 */}
+        {showCfMatch && cfMatch != null && (
           <View style={styles.cfBox}>
             <Text style={styles.cfLabel}>👥 취향 일치도</Text>
             <View style={styles.cfBarWrap}>
