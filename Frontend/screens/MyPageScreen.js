@@ -2,16 +2,17 @@
  * MyPageScreen — 마이페이지
  *
  * 표시 항목:
- *  1. 사용자 선호 태그 (검색 키워드 빈도 자동 집계)
- *  2. 최근 추천 메뉴
- *  3. 최근 검색 키워드
+ *  1. 취향 프로필 카드 — 달성한 칭호 1~4개 + 통계 (시도 종류·식당·검색 수)
+ *  2. 내 선호 태그 (검색 키워드 빈도 자동 집계)
+ *  3. 칭호 도감 (X/29) — 5 카테고리(A 시드 / B 장르 / C 음식 / D 행동 / E 메타)
+ *  4. 최근 추천 메뉴
+ *  5. 최근 검색 키워드
  *
  * 좋아요 기능 제거 — CF 신호 단일화(implicit-only). 선호 태그는 검색
  * 키워드 빈도가 source가 된다 (사용자 자기 발화 = 가장 명확한 선호 표현).
  *
- * 추후 백엔드 연결 시:
- *  - userStorageService 의 함수 시그니처는 그대로 유지
- *  - 내부만 fetch 로 교체하면 자동으로 마이페이지도 동기화
+ * 칭호는 behaviorTracking 이벤트 + 검색 이력에서 계산. 5/29 합의 5 카테고리
+ * 29종. badges.js의 getEarnedBadges가 한 줄로 다 처리. CLAUDE.md §5.13 (8).
  */
 
 import React, { useState, useCallback } from 'react';
@@ -32,28 +33,33 @@ import {
   getPreferredTags,
   clearAllUserData,
 } from '../services/userStorageService';
+import { getBehaviorEvents, clearBehaviorEvents } from '../services/behaviorTrackingService';
+import { getEarnedBadges } from '../services/badges';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function MyPageScreen({ navigation }) {
   const [searches, setSearches] = useState([]);
   const [recentFoods, setRecentFoods] = useState([]);
   const [preferredTags, setPreferredTags] = useState([]);
+  const [badges, setBadges] = useState({ earned: [], all: [], stats: {} });
 
-  // 화면이 포커스될 때마다 데이터 새로 불러오기
-  // (검색하고 돌아오면 선호 태그·이력이 즉시 반영되도록)
+  // 화면이 포커스될 때마다 데이터 새로 불러오기 (검색·식당 이동 후 즉시 반영)
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       (async () => {
-        const [s, r, t] = await Promise.all([
+        const [s, r, t, events] = await Promise.all([
           getRecentSearches(),
           getRecentFoods(),
           getPreferredTags(),
+          getBehaviorEvents(),
         ]);
         if (!mounted) return;
         setSearches(s);
         setRecentFoods(r);
         setPreferredTags(t);
+        // 칭호 계산 (events + searches가 둘 다 필요 — D 새벽 사냥꾼 등)
+        setBadges(getEarnedBadges(events, s));
       })();
       return () => {
         mounted = false;
@@ -82,7 +88,7 @@ export default function MyPageScreen({ navigation }) {
   const handleClear = () => {
     Alert.alert(
       '모든 기록을 지울까요?',
-      '검색 이력, 좋아요, 추천 이력이 모두 삭제됩니다.',
+      '검색 이력, 추천 이력, 행동 이벤트, 칭호가 모두 초기화됩니다.',
       [
         { text: '취소', style: 'cancel' },
         {
@@ -90,17 +96,22 @@ export default function MyPageScreen({ navigation }) {
           style: 'destructive',
           onPress: async () => {
             await clearAllUserData();
+            await clearBehaviorEvents();
             setSearches([]);
             setRecentFoods([]);
             setPreferredTags([]);
+            setBadges({ earned: [], all: [], stats: {} });
           },
         },
       ]
     );
   };
 
+  // 빈 상태 — 데이터 + 칭호 둘 다 0일 때만
   const isEmpty =
-    searches.length === 0 && recentFoods.length === 0;
+    searches.length === 0 &&
+    recentFoods.length === 0 &&
+    badges.earned.length === 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -124,8 +135,8 @@ export default function MyPageScreen({ navigation }) {
             <Text style={styles.emptyEmoji}>🍽️</Text>
             <Text style={styles.emptyTitle}>아직 기록이 없어요</Text>
             <Text style={styles.emptyDesc}>
-              메뉴를 추천받고 좋아요를 눌러보세요.{'\n'}
-              사용할수록 더 정확한 추천을 받을 수 있어요.
+              메뉴를 검색하고 식당 길찾기를 눌러보세요.{'\n'}
+              사용할수록 칭호를 모을 수 있어요.
             </Text>
             <Pressable
               onPress={() => navigation.popToTop()}
@@ -138,6 +149,9 @@ export default function MyPageScreen({ navigation }) {
             </Pressable>
           </View>
         )}
+
+        {/* 0. 취향 프로필 카드 — 달성한 칭호 + 통계 (가장 임팩트 큼) */}
+        {!isEmpty && <TasteProfileCard badges={badges} searchCount={searches.length} />}
 
         {/* 1. 선호 태그 */}
         {preferredTags.length > 0 && (
@@ -157,7 +171,10 @@ export default function MyPageScreen({ navigation }) {
           </Section>
         )}
 
-        {/* 2. 최근 추천받은 메뉴 */}
+        {/* 2. 칭호 도감 — 5 카테고리 29종 (CLAUDE.md §5.13 (8)) */}
+        {!isEmpty && badges.all.length > 0 && <BadgeCatalog badges={badges} />}
+
+        {/* 3. 최근 추천받은 메뉴 */}
         {recentFoods.length > 0 && (
           <Section
             title="최근 추천 메뉴"
@@ -178,7 +195,7 @@ export default function MyPageScreen({ navigation }) {
           </Section>
         )}
 
-        {/* 3. 최근 검색 */}
+        {/* 4. 최근 검색 */}
         {searches.length > 0 && (
           <Section
             title="최근 검색"
@@ -224,6 +241,136 @@ export default function MyPageScreen({ navigation }) {
 }
 
 /** 섹션 컴포넌트 */
+/**
+ * 취향 프로필 카드 — 상단 hero
+ *
+ * 달성한 칭호 1~4개를 가장 눈에 띄게 노출.
+ * 메인 칭호(카테고리 A~D)에서 우선 1~3개, 메타(E)에서 0~1개.
+ */
+function TasteProfileCard({ badges, searchCount }) {
+  const earnedMain = badges.earned.filter((b) => b.category !== 'E').slice(0, 3);
+  const earnedMeta = badges.earned.filter((b) => b.category === 'E').slice(0, 1);
+  const chips = [...earnedMain, ...earnedMeta];
+
+  const stats = badges.stats || {};
+  const stat = (label, value) => (
+    <View style={styles.statItem}>
+      <Text style={styles.statNum}>{value ?? 0}</Text>
+      <Text style={styles.statName}>{label}</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.profileCard}>
+      <View style={styles.profileLabelRow}>
+        <View style={styles.profileDot} />
+        <Text style={styles.profileLabel}>YOUR TASTE</Text>
+      </View>
+      {chips.length > 0 ? (
+        <View style={styles.profileChipWrap}>
+          {chips.map((b) => (
+            <View key={b.id} style={styles.profileChip}>
+              <Text style={styles.profileChipIcon}>{b.icon}</Text>
+              <Text style={styles.profileChipName}>{b.name}</Text>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <Text style={styles.profileEmpty}>
+          아직 받은 칭호가 없어요{'\n'}메뉴를 검색하고 길찾기를 눌러 칭호를 모아보세요
+        </Text>
+      )}
+
+      <View style={styles.statRow}>
+        {stat('받은 칭호', badges.earned.length)}
+        {stat('시도 종류', Object.keys(stats.kindCounts || {}).length)}
+        {stat('가본 식당', (stats.finalCount || 0) > 0 ? Object.keys((stats.kindCounts || {})).length : 0)}
+        {stat('검색', searchCount)}
+      </View>
+    </View>
+  );
+}
+
+/**
+ * 칭호 도감 — 5 카테고리 29종 그리드.
+ * 달성=풀컬러, 미달성=회색 + 진행률 안내.
+ */
+function BadgeCatalog({ badges }) {
+  const total = badges.all.length;
+  const earned = badges.earned.length;
+
+  // 카테고리 라벨
+  const CATEGORY_LABELS = {
+    A: '맛 속성', B: '장르', C: '음식', D: '행동 패턴', E: '메타',
+  };
+  const groups = ['A', 'B', 'C', 'D', 'E'].map((cat) => ({
+    cat,
+    label: CATEGORY_LABELS[cat],
+    items: badges.all.filter((b) => b.category === cat),
+  }));
+
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionIcon}>📜</Text>
+        <Text style={styles.sectionTitle}>칭호 도감</Text>
+        <Text style={styles.sectionSub}>· {earned} / {total}</Text>
+      </View>
+      {groups.map((g) => (
+        <View key={g.cat} style={styles.badgeCategoryBlock}>
+          <Text style={styles.badgeCategoryLabel}>
+            {g.cat}. {g.label}  <Text style={styles.badgeCategoryCount}>
+              {g.items.filter((b) => b.earned).length}/{g.items.length}
+            </Text>
+          </Text>
+          <View style={styles.badgeGrid}>
+            {g.items.map((b) => (
+              <BadgeCell key={b.id} badge={b} />
+            ))}
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function BadgeCell({ badge }) {
+  const earned = badge.earned;
+  const progress = badge.progress;
+  const pct = progress && progress.target
+    ? Math.min(1, (progress.current || 0) / progress.target)
+    : 0;
+
+  return (
+    <View style={[styles.badgeCell, !earned && styles.badgeCellLocked]}>
+      <Text style={[styles.badgeIcon, !earned && styles.badgeIconLocked]}>
+        {badge.icon}
+      </Text>
+      <Text
+        style={[styles.badgeName, !earned && styles.badgeNameLocked]}
+        numberOfLines={2}
+      >
+        {badge.name}
+      </Text>
+      {!earned && progress && progress.target ? (
+        <>
+          <View style={styles.badgeProgressBar}>
+            <View
+              style={[
+                styles.badgeProgressFill,
+                { width: `${pct * 100}%` },
+              ]}
+            />
+          </View>
+          <Text style={styles.badgeProgressText}>
+            {progress.current || 0}/{progress.target}
+          </Text>
+        </>
+      ) : null}
+    </View>
+  );
+}
+
 function Section({ title, subtitle, icon, iconColor, children }) {
   return (
     <View style={styles.section}>
@@ -346,6 +493,160 @@ const styles = StyleSheet.create({
     fontSize: FONT.sizeXs,
     color: COLORS.textMuted,
     marginLeft: SPACING.xs,
+  },
+
+  // === 취향 프로필 카드 (TasteProfileCard) ===
+  profileCard: {
+    backgroundColor: COLORS.surfaceAlt,
+    borderColor: COLORS.primary,
+    borderWidth: 1,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  profileLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  profileDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
+    marginRight: SPACING.sm,
+  },
+  profileLabel: {
+    fontSize: 11,
+    fontWeight: FONT.weightBold,
+    color: COLORS.accent,
+    letterSpacing: 1.5,
+  },
+  profileChipWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.md,
+  },
+  profileChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.bg,
+    borderColor: COLORS.primary,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.pill,
+  },
+  profileChipIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  profileChipName: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightBold,
+  },
+  profileEmpty: {
+    color: COLORS.textSecondary,
+    fontSize: FONT.sizeSm,
+    lineHeight: 20,
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.md,
+  },
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statNum: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeMd,
+    fontWeight: FONT.weightExtra,
+  },
+  statName: {
+    color: COLORS.textMuted,
+    fontSize: 11,
+    marginTop: 2,
+  },
+
+  // === 칭호 도감 (BadgeCatalog) ===
+  badgeCategoryBlock: {
+    marginBottom: SPACING.md,
+  },
+  badgeCategoryLabel: {
+    color: COLORS.textSecondary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightBold,
+    marginBottom: SPACING.sm,
+  },
+  badgeCategoryCount: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightRegular,
+  },
+  badgeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+  badgeCell: {
+    width: '23%',
+    aspectRatio: 0.75,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    padding: SPACING.xs,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  badgeCellLocked: {
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.bg,
+    opacity: 0.7,
+  },
+  badgeIcon: {
+    fontSize: 24,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  badgeIconLocked: {
+    opacity: 0.4,
+  },
+  badgeName: {
+    color: COLORS.textPrimary,
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+    textAlign: 'center',
+    lineHeight: 13,
+  },
+  badgeNameLocked: {
+    color: COLORS.textMuted,
+  },
+  badgeProgressBar: {
+    height: 3,
+    backgroundColor: COLORS.border,
+    borderRadius: 2,
+    width: '85%',
+    marginTop: 4,
+    overflow: 'hidden',
+  },
+  badgeProgressFill: {
+    height: '100%',
+    backgroundColor: COLORS.accent,
+  },
+  badgeProgressText: {
+    color: COLORS.textMuted,
+    fontSize: 9,
+    marginTop: 2,
   },
 
   // === 선호 태그 ===
