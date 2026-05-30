@@ -103,7 +103,12 @@ meat/sashimi/noodle/rice는 단일 kind가 아니라 **묶음(set) 합산**으�
 
 ## 4. 판정 흐름
 
-판정에 필요한 통계(`stats`)를 추천 DB 로그에서 집계한 뒤, 칭호별 조건을 평가한다.
+판정에 필요한 통계(`stats`)를 추천 DB 로그에서 집계한 뒤, 칭호별 조건을 평가하고
+결과를 [`UserBadge`](./BADGE_SPEC.md#-유저-칭호-획득-테이블) 에 반영한다.
+
+> **스키마 정합:** 출력은 BADGE_SPEC 의 컬럼만 쓴다. 즉 `is_active`(현재 조건 충족 여부),
+> `earned_at`(최초 획득 이력), `active_since`/`held_total_days`(보유 기간 누적). 옛 설계의
+> `earned`/`progress_current`/`progress_target` 컬럼은 더 이상 없다(진행률 표시는 추후 과제).
 
 ```
 [실시간 — 추천 DB]
@@ -121,11 +126,29 @@ meat/sashimi/noodle/rice는 단일 kind가 아니라 **묶음(set) 합산**으�
        - maxStoreCount           : 같은 식당 반복 수        (D 단골)
        - clickCount/finalCount   : 관심 vs 실행            (E 눈팅러)
        - totalSeedHits/topSeedShare : 시드 점유율          (E 한 우물)
-  2. 각 칭호 조건 평가 → { earned, progress{current,target} }
-  3. UserBadge UPSERT
-       - earned 0→1 전환 시 earned_at = CURRENT_TIMESTAMP 기록
-       - 미달성도 progress_current/target 갱신 (도감 진행률 표시)
+  2. 각 칭호 조건 평가 → meets = (조건 충족 여부, bool)
+  3. (user, badge) 마다 UserBadge UPSERT  ── 아래 상태 전이 규칙대로
 ```
+
+### UserBadge 상태 전이 규칙
+
+재계산 시 `meets`(이번 평가의 조건 충족 여부)와 직전 `is_active` 를 비교해 갱신한다.
+보유 기간은 **일(day) 단위**로 누적한다(BADGE_SPEC 의 `held_total_days`).
+
+| 직전 상태 | 이번 `meets` | 동작 |
+| --- | --- | --- |
+| 행 없음 / `earned_at IS NULL` | true | INSERT. `is_active=1`, `earned_at=now`, `active_since=now` (**최초 획득**) |
+| `is_active=0` (지난 칭호) | true | **재획득.** `is_active=1`, `active_since=now`. `earned_at` 은 **유지**(덮어쓰지 않음) |
+| `is_active=1` | true | 유지. 변경 없음(`active_since`/`held_total_days` 불변) |
+| `is_active=1` | false | **비활성화.** `held_total_days += (now - active_since 의 일수)`, `active_since=NULL`, `is_active=0` |
+| `is_active=0` | false | 유지. 변경 없음 |
+| 행 없음 | false | INSERT 안 함(또는 `is_active=0, earned_at=NULL` 로만 둠) |
+
+- `earned_at` 은 **한번 기록되면 절대 비우거나 덮어쓰지 않는다**(획득 이력의 단일 기준).
+- 비활성화는 행 삭제가 아니라 `is_active=0` 토글로만 한다 → 지난 칭호 이력·보유 기간 보존.
+- `updated_at` 은 트리거 `trg_userbadge_updated_at` 가 자동 갱신하므로 코드에서 건드리지 않는다.
+- **총 보유 기간 조회:** `held_total_days + (is_active=1 이면 now - active_since 일수, 아니면 0)`.
+- 일수 계산은 SQLite `julianday` 기준 예: `CAST(julianday('now') - julianday(active_since) AS INTEGER)`.
 
 ### 재계산 시점 (옵션)
 
