@@ -62,7 +62,6 @@
 | earned_at | TEXT | | 최초 획득 시각. 한번 기록 후 비우지 않음(이력) |
 | active_since | TEXT | | 현재 활성 구간 시작 시각. 비활성이면 NULL |
 | held_total_days | INTEGER | NOT NULL, DEFAULT 0 | 과거(종료된) 활성 구간들의 보유 기간 누적(일) |
-| updated_at | TEXT | DEFAULT CURRENT_TIMESTAMP | 마지막 갱신 시각 |
 
 - _상태 해석:_
   - **보유 중(활성)** = `is_active=1` (당연히 `earned_at IS NOT NULL`)
@@ -82,16 +81,12 @@
   행을 지우면 CASCADE로 획득 이력(`earned_at`)까지 사라지므로, 이력 보존을 위해 소프트 비활성화만 사용한다.
   (칭호 종류 자체를 은퇴시킬 경우에도 `Badge` 행 삭제 대신 추후 `Badge.is_active` 플래그 도입을 권장.)
 - _인덱스:_ `idx_userbadge_user (user_id)` — 마이페이지 도감(유저별 전체 칭호) 조회.
-- **`updated_at` 자동 갱신:** SQLite는 `ON UPDATE CURRENT_TIMESTAMP`를 미지원하므로,
-  트리거 `trg_userbadge_updated_at` (AFTER UPDATE)로 행 갱신 시 `updated_at`을
-  `CURRENT_TIMESTAMP`로 자동 변경한다. ([SPEC.md](./SPEC.md)의 `UserFoodTagWeight`와 동일 패턴)
 
-## 인덱스 / 트리거 요약
+## 인덱스 요약
 
 | 객체 | 종류 | 대상 | 목적 |
 | --- | --- | --- | --- |
 | `idx_userbadge_user` | INDEX | UserBadge(user_id) | 유저별 칭호 도감 조회 |
-| `trg_userbadge_updated_at` | TRIGGER | UserBadge (AFTER UPDATE) | `updated_at` 자동 갱신 |
 
 ## DDL (참고)
 
@@ -113,21 +108,11 @@ CREATE TABLE IF NOT EXISTS UserBadge (
     earned_at           TEXT,                        -- 최초 획득 시각(이력, 비우지 않음)
     active_since        TEXT,                        -- 현재 활성 구간 시작(비활성이면 NULL)
     held_total_days     INTEGER NOT NULL DEFAULT 0,  -- 종료된 활성 구간 보유기간 누적(일)
-    updated_at          TEXT DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, badge_id),
     FOREIGN KEY (user_id)  REFERENCES User(user_id)   ON DELETE CASCADE,
     FOREIGN KEY (badge_id) REFERENCES Badge(badge_id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_userbadge_user ON UserBadge(user_id);
-
-CREATE TRIGGER IF NOT EXISTS trg_userbadge_updated_at
-AFTER UPDATE ON UserBadge
-FOR EACH ROW BEGIN
-    UPDATE UserBadge
-       SET updated_at = CURRENT_TIMESTAMP
-     WHERE user_id  = NEW.user_id
-       AND badge_id = NEW.badge_id;
-END;
 ```
 
 > 칭호 29종의 구체 목록·획득 조건·판정 흐름은 [`BADGE_LOGIC.md`](./BADGE_LOGIC.md) 참조.

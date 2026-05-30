@@ -150,23 +150,12 @@ CREATE TABLE IF NOT EXISTS UserBadge (
     earned_at        TEXT,                          -- 최초 획득 시각(이력, 한번 기록 후 비우지 않음)
     active_since     TEXT,                          -- 현재 활성 구간 시작. 비활성이면 NULL
     held_total_days  INTEGER NOT NULL DEFAULT 0,    -- 종료된 활성 구간 보유 기간 누적(일)
-    updated_at       TEXT DEFAULT CURRENT_TIMESTAMP, -- 마지막 갱신 시각
     PRIMARY KEY (user_id, badge_id),
     FOREIGN KEY (user_id)  REFERENCES User(user_id)   ON DELETE CASCADE,
     FOREIGN KEY (badge_id) REFERENCES Badge(badge_id) ON DELETE CASCADE
 );
 -- 마이페이지 도감(유저별 전체 칭호) 조회
 CREATE INDEX IF NOT EXISTS idx_userbadge_user ON UserBadge(user_id);
-
--- SQLite 는 ON UPDATE CURRENT_TIMESTAMP 를 지원하지 않으므로 트리거로 대체
-CREATE TRIGGER IF NOT EXISTS trg_userbadge_updated_at
-AFTER UPDATE ON UserBadge
-FOR EACH ROW BEGIN
-    UPDATE UserBadge
-       SET updated_at = CURRENT_TIMESTAMP
-     WHERE user_id  = NEW.user_id
-       AND badge_id = NEW.badge_id;
-END;
 """
 
 # 기존 DB 에 누락된 컬럼을 ALTER 로 추가하기 위한 마이그레이션 목록

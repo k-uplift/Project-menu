@@ -146,7 +146,6 @@ meat/sashimi/noodle/rice는 단일 kind가 아니라 **묶음(set) 합산**으�
 
 - `earned_at` 은 **한번 기록되면 절대 비우거나 덮어쓰지 않는다**(획득 이력의 단일 기준).
 - 비활성화는 행 삭제가 아니라 `is_active=0` 토글로만 한다 → 지난 칭호 이력·보유 기간 보존.
-- `updated_at` 은 트리거 `trg_userbadge_updated_at` 가 자동 갱신하므로 코드에서 건드리지 않는다.
 - **총 보유 기간 조회:** `held_total_days + (is_active=1 이면 now - active_since 일수, 아니면 0)`.
 - 일수 계산은 SQLite `julianday` 기준 예: `CAST(julianday('now') - julianday(active_since) AS INTEGER)`.
 
