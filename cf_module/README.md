@@ -5,7 +5,7 @@ me:nu는 성북구 일대 식당을 추천하는 캡스톤 프로젝트입니다
 프로젝트는 React Native 프론트엔드와 FastAPI 백엔드로 구성되어 있으며, 세 팀이 나누어 개발합니다.
 
 - DB 팀: 성북구 일대 식당 283개와 메뉴 5,678개 크롤링 완료
-- LLM 팀: 메뉴를 292개 음식 종류(kind)로 정리하고, 14개 태그 부여 및 자연어 입력을 태그로 추출하는 `extract.py` 구현
+- LLM 팀: 메뉴를 음식 종류(kind) 목록으로 정리하고, 14개 태그 부여 및 자연어 입력을 태그로 추출하는 `extract.py` 구현
 - CF 팀: 행동 기반 추천 알고리즘 구현
 
 이 모듈은 CF 팀의 독립 추천 모듈입니다. 초기 구현은 LLM과 DB에 직접 의존하지 않으며, 합성 데이터(list/dict)로 동작을 검증합니다. 이후 실제 시스템과 병합할 때 DB 연동이 쉽도록 데이터 접근부는 어댑터로 분리합니다.
@@ -18,12 +18,10 @@ me:nu는 성북구 일대 식당을 추천하는 캡스톤 프로젝트입니다
 
 ## Output
 
-추천 메뉴 리스트를 반환합니다. 각 추천 결과는 다음 정보를 포함합니다.
-
-- `tag_score`
-- `cf_score`
-- `matched_tags`
-- `reason`
+추천 메뉴 리스트를 반환합니다. 각 탭의 추천 결과는 `score`, `matched_tags`, `reason`을 포함합니다.
+`tab1_results`의 `score`는 태그 매칭 점수(tag matching score)를 의미하고,
+`tab2_results`의 `score`는 CF 점수(collaborative filtering score)를 의미합니다.
+탭 1과 탭 2의 점수는 병합하지 않고 분리해서 노출합니다.
 
 ## Core Principles
 
