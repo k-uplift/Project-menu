@@ -127,6 +127,46 @@ FOR EACH ROW BEGIN
        AND food_id = NEW.food_id
        AND tag_id  = NEW.tag_id;
 END;
+
+-- ── ④ 칭호(Badge) 테이블 ─────────────────────────────────────────
+-- docs/db/BADGE_SPEC.md. 추천 DB 와 동일 파일에 칭호 테이블을 둔다.
+-- 칭호 정의(메타데이터). 운영자가 시드로 채우는 정적 테이블
+CREATE TABLE IF NOT EXISTS Badge (
+    badge_id     TEXT PRIMARY KEY,                 -- 의미 있는 문자열 코드 (예: spicy, ramen)
+    category     TEXT NOT NULL
+                 CHECK (category IN ('A', 'B', 'C', 'D', 'E')),  -- A맛속성/B장르/C음식/D행동/E메타
+    name         TEXT NOT NULL,                    -- 표시명 (예: 칼칼함 마니아)
+    icon         TEXT,                             -- 이모지 아이콘
+    description  TEXT NOT NULL                     -- 획득 조건 설명 (UI 노출용)
+);
+
+-- 유저별 칭호 획득 상태. (user, badge) 단위 1행, UPSERT.
+-- 획득 '이력'(earned_at)과 현재 '유효 여부'(is_active)를 분리 →
+-- 조건 미달로 비활성화돼도 이력이 남는다. 활성 구간 보유 기간은 일(day) 단위 누적.
+CREATE TABLE IF NOT EXISTS UserBadge (
+    user_id          INTEGER NOT NULL,
+    badge_id         TEXT NOT NULL,
+    is_active        INTEGER NOT NULL DEFAULT 0,    -- 현재 유효(조건 충족) 여부. 미달 시 0
+    earned_at        TEXT,                          -- 최초 획득 시각(이력, 한번 기록 후 비우지 않음)
+    active_since     TEXT,                          -- 현재 활성 구간 시작. 비활성이면 NULL
+    held_total_days  INTEGER NOT NULL DEFAULT 0,    -- 종료된 활성 구간 보유 기간 누적(일)
+    updated_at       TEXT DEFAULT CURRENT_TIMESTAMP, -- 마지막 갱신 시각
+    PRIMARY KEY (user_id, badge_id),
+    FOREIGN KEY (user_id)  REFERENCES User(user_id)   ON DELETE CASCADE,
+    FOREIGN KEY (badge_id) REFERENCES Badge(badge_id) ON DELETE CASCADE
+);
+-- 마이페이지 도감(유저별 전체 칭호) 조회
+CREATE INDEX IF NOT EXISTS idx_userbadge_user ON UserBadge(user_id);
+
+-- SQLite 는 ON UPDATE CURRENT_TIMESTAMP 를 지원하지 않으므로 트리거로 대체
+CREATE TRIGGER IF NOT EXISTS trg_userbadge_updated_at
+AFTER UPDATE ON UserBadge
+FOR EACH ROW BEGIN
+    UPDATE UserBadge
+       SET updated_at = CURRENT_TIMESTAMP
+     WHERE user_id  = NEW.user_id
+       AND badge_id = NEW.badge_id;
+END;
 """
 
 # 기존 DB 에 누락된 컬럼을 ALTER 로 추가하기 위한 마이그레이션 목록
