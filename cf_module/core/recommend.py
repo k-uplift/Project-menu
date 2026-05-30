@@ -61,9 +61,36 @@ def recommend(
 ) -> RecommendationResponse:
     """
     메인 추천 함수. 두 탭 결과를 함께 반환.
-    내부적으로 recommend_tab1과 recommend_tab2_cf를 호출하고 겹침 처리.
+
+    처리 흐름:
+    1. recommend_tab1 호출 → 탭 1 결과 산출
+    2. 탭 1 결과의 kind_id 추출
+    3. recommend_tab2_cf 호출 (tab1_kind_ids 전달해 겹침 처리)
+    4. RecommendationResponse로 묶어 반환
+
+    Args:
+        input_tags: LLM이 추출한 14개 태그 중 일부
+        user_id: 본인 식별자
+        top_k: 각 탭의 추천 개수
+
+    Returns:
+        RecommendationResponse: tab1_results, tab2_results, input_tags, user_id 포함
     """
-    raise NotImplementedError
+    tab1_results = recommend_tab1(input_tags, user_id, top_k=top_k)
+    tab1_kind_ids = [result.kind_id for result in tab1_results]
+    tab2_results = recommend_tab2_cf(
+        input_tags,
+        user_id,
+        top_k=top_k,
+        tab1_kind_ids=tab1_kind_ids,
+    )
+
+    return RecommendationResponse(
+        tab1_results=tab1_results,
+        tab2_results=tab2_results,
+        input_tags=list(input_tags),
+        user_id=user_id,
+    )
 
 
 def recommend_tab1(
