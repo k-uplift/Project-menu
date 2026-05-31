@@ -70,11 +70,41 @@ export async function getFoodRecommendations(keywords, context = {}) {
 }
 
 /**
- * "나를 위한 추천" — CF 기반 정렬
+ * "나를 위한 추천" — CF 기반 정렬 (cf_module, 양혜원)
  *
- * 현재 CF 백엔드 미구현 — base와 동일 결과. CF 엔드포인트가 붙으면
- * 별도 fetch로 교체 예정. 시그니처는 유지해서 화면 변경 0.
+ * 백엔드 /foods_cf 호출. user_id 기본 1 (시연용 합성 페르소나).
+ * 응답 모양은 /foods와 동일 — 카드 컴포넌트 그대로 사용.
+ *
+ * 실 사용자 도입 시 user_id 인자로 받도록 확장. 일단 시연에선 익명 → user_id=1.
  */
 export async function getPersonalizedRecommendations(keywords, context = {}) {
-  return getFoodRecommendations(keywords, context);
+  if (!keywords || keywords.length === 0) return [];
+
+  const q =
+    (context.originalText && context.originalText.trim()) ||
+    keywords.map((k) => k.label).join(' ');
+
+  let kinds = [];
+  try {
+    const url = `${API_BASE}/foods_cf?q=${encodeURIComponent(q)}&user_id=${context.userId || 1}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    kinds = Array.isArray(data.kinds) ? data.kinds : [];
+  } catch (e) {
+    console.warn('[recommendationService] /foods_cf fetch 실패:', e.message);
+    return [];
+  }
+
+  const timeCtx = context.timeCtx || getCurrentTimeContext();
+  const weatherCtx = context.weatherCtx || (await getCurrentWeather());
+  const dynamicContextNote = getCombinedContextReason(timeCtx, weatherCtx);
+
+  return kinds.map((food) => ({
+    ...food,
+    reason: {
+      ...food.reason,
+      contextNote: dynamicContextNote,
+    },
+  }));
 }
