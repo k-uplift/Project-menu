@@ -30,29 +30,35 @@ import {
  */
 
 /**
- * 음식 추천 받기
+ * 음식 추천 받기. sessionId·userId를 응답에 포함해 후속 이벤트 트래킹과 묶을 수 있게 함.
  *
  * @param {import('../types').Keyword[]} keywords
  * @param {RecommendContext} [context]
- * @returns {Promise<import('../types').FoodItem[]>}
+ * @returns {Promise<{ items: import('../types').FoodItem[], sessionId: number|null, userId: number }>}
  */
 export async function getFoodRecommendations(keywords, context = {}) {
-  if (!keywords || keywords.length === 0) return [];
+  if (!keywords || keywords.length === 0) {
+    return { items: [], sessionId: null, userId: context.userId ?? 1 };
+  }
 
   const q =
     (context.originalText && context.originalText.trim()) ||
     keywords.map((k) => k.label).join(' ');
 
   let kinds = [];
+  let sessionId = null;
+  let userId = context.userId ?? 1;
   try {
-    const url = `${API_BASE}/foods?q=${encodeURIComponent(q)}`;
+    const url = `${API_BASE}/foods?q=${encodeURIComponent(q)}&user_id=${userId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     kinds = Array.isArray(data.kinds) ? data.kinds : [];
+    sessionId = data.sessionId ?? null;
+    userId = data.userId ?? userId;
   } catch (e) {
     console.warn('[recommendationService] /foods fetch 실패:', e.message);
-    return [];
+    return { items: [], sessionId: null, userId };
   }
 
   // 동적 contextNote(시간·날씨) — 백엔드 응답에는 항상 null이라 클라가 채움
@@ -60,13 +66,14 @@ export async function getFoodRecommendations(keywords, context = {}) {
   const weatherCtx = context.weatherCtx || (await getCurrentWeather());
   const dynamicContextNote = getCombinedContextReason(timeCtx, weatherCtx);
 
-  return kinds.map((food) => ({
+  const items = kinds.map((food) => ({
     ...food,
     reason: {
       ...food.reason,
       contextNote: dynamicContextNote,
     },
   }));
+  return { items, sessionId, userId };
 }
 
 /**
@@ -78,33 +85,40 @@ export async function getFoodRecommendations(keywords, context = {}) {
  * 실 사용자 도입 시 user_id 인자로 받도록 확장. 일단 시연에선 익명 → user_id=1.
  */
 export async function getPersonalizedRecommendations(keywords, context = {}) {
-  if (!keywords || keywords.length === 0) return [];
+  if (!keywords || keywords.length === 0) {
+    return { items: [], sessionId: null, userId: context.userId ?? 1 };
+  }
 
   const q =
     (context.originalText && context.originalText.trim()) ||
     keywords.map((k) => k.label).join(' ');
 
   let kinds = [];
+  let sessionId = null;
+  let userId = context.userId ?? 1;
   try {
-    const url = `${API_BASE}/foods_cf?q=${encodeURIComponent(q)}&user_id=${context.userId || 1}`;
+    const url = `${API_BASE}/foods_cf?q=${encodeURIComponent(q)}&user_id=${userId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     kinds = Array.isArray(data.kinds) ? data.kinds : [];
+    sessionId = data.sessionId ?? null;
+    userId = data.userId ?? userId;
   } catch (e) {
     console.warn('[recommendationService] /foods_cf fetch 실패:', e.message);
-    return [];
+    return { items: [], sessionId: null, userId };
   }
 
   const timeCtx = context.timeCtx || getCurrentTimeContext();
   const weatherCtx = context.weatherCtx || (await getCurrentWeather());
   const dynamicContextNote = getCombinedContextReason(timeCtx, weatherCtx);
 
-  return kinds.map((food) => ({
+  const items = kinds.map((food) => ({
     ...food,
     reason: {
       ...food.reason,
       contextNote: dynamicContextNote,
     },
   }));
+  return { items, sessionId, userId };
 }

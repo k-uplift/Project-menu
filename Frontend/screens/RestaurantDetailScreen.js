@@ -30,7 +30,7 @@ import { getAllMenusByStore } from '../services/restaurantService';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
-  const { restaurant, food } = route.params;
+  const { restaurant, food, sessionId = null, userId = 1 } = route.params;
 
   // 그 식당 전체 메뉴 (추천 흐름과 무관하게 그 식당이 파는 모든 메뉴)
   // restaurant.menuItems는 *선택한 kind에 매칭된* 메뉴만 들어 있어 "메뉴 적다"
@@ -54,7 +54,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
   // 길찾기 (카카오맵으로 연결 — 가장 보편적인 지도 앱)
   const handleNavigate = async () => {
     // 행동 점수 +2점 — fire-and-forget (await 없이 호출)
-    trackNavigateClick(restaurant, food);
+    trackNavigateClick(restaurant, food, { sessionId, userId });
 
     const query = encodeURIComponent(restaurant.name);
     const url = `https://map.kakao.com/?q=${query}`;
@@ -77,7 +77,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
   // 배달의민족 연결
   const handleDelivery = async () => {
     // 행동 점수 +2점
-    trackDeliveryClick(restaurant, food);
+    trackDeliveryClick(restaurant, food, { sessionId, userId });
 
     const query = encodeURIComponent(restaurant.name);
     const url = `https://baemin.me/search?query=${query}`;

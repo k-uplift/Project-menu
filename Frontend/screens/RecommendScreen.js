@@ -36,6 +36,11 @@ export default function RecommendScreen({ route, navigation }) {
   const [tab, setTab] = useState('base');
   const [baseList, setBaseList] = useState([]);
   const [cfList, setCfList] = useState([]);
+  // 백엔드가 만든 RecommendationSession id. /foods·/foods_cf 각각 따로.
+  // 이후 카드 클릭/길찾기/배달 이벤트가 현재 *탭의* sessionId와 묶여 서버 UPSERT.
+  const [baseSessionId, setBaseSessionId] = useState(null);
+  const [cfSessionId, setCfSessionId] = useState(null);
+  const [userId, setUserId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshSeed, setRefreshSeed] = useState(0);
@@ -43,14 +48,14 @@ export default function RecommendScreen({ route, navigation }) {
 
   const loadRecommendations = useCallback(
     async (seed) => {
-      const ctx = { ...ctxParam, originalText, refreshSeed: seed };
+      const ctx = { ...ctxParam, originalText, refreshSeed: seed, userId };
       const [base, cf] = await Promise.all([
         getFoodRecommendations(keywords, ctx),
         getPersonalizedRecommendations(keywords, ctx),
       ]);
       return { base, cf };
     },
-    [keywords, ctxParam, originalText]
+    [keywords, ctxParam, originalText, userId]
   );
 
   useEffect(() => {
@@ -60,12 +65,15 @@ export default function RecommendScreen({ route, navigation }) {
       try {
         const { base, cf } = await loadRecommendations(0);
         if (!mounted) return;
-        setBaseList(base);
-        setCfList(cf);
-        if (base.length > 0) setSelectedFoodId(base[0].id);
+        setBaseList(base.items);
+        setCfList(cf.items);
+        setBaseSessionId(base.sessionId);
+        setCfSessionId(cf.sessionId);
+        if (base.userId) setUserId(base.userId);
+        if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
 
         await addRecentSearch(originalText, keywords);
-        for (const food of base.slice(0, 3)) {
+        for (const food of base.items.slice(0, 3)) {
           await addRecentFood(food);
         }
       } catch (e) {
@@ -85,10 +93,12 @@ export default function RecommendScreen({ route, navigation }) {
     try {
       const newSeed = refreshSeed + 1;
       const { base, cf } = await loadRecommendations(newSeed);
-      setBaseList(base);
-      setCfList(cf);
+      setBaseList(base.items);
+      setCfList(cf.items);
+      setBaseSessionId(base.sessionId);
+      setCfSessionId(cf.sessionId);
       setRefreshSeed(newSeed);
-      if (base.length > 0) setSelectedFoodId(base[0].id);
+      if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
     } catch (e) {
       console.error(e);
     } finally {
@@ -96,11 +106,14 @@ export default function RecommendScreen({ route, navigation }) {
     }
   };
 
+  // 현재 보고 있는 탭의 sessionId — 클릭 이벤트가 어느 검색 맥락에서 일어났는지 묶음
+  const currentSessionId = tab === 'base' ? baseSessionId : cfSessionId;
+
   // 음식 카드 클릭 — 행동 점수 +1점
   // 같은 카드를 다시 누르면 중복 전송 방지
   const handleFoodCardPress = (food) => {
     if (selectedFoodId !== food.id) {
-      trackFoodCardClick(food); // fire-and-forget
+      trackFoodCardClick(food, { sessionId: currentSessionId, userId }); // fire-and-forget
     }
     setSelectedFoodId(food.id);
   };
@@ -110,7 +123,13 @@ export default function RecommendScreen({ route, navigation }) {
 
   const handleNext = () => {
     if (!selectedFood) return;
-    navigation.navigate('Restaurant', { food: selectedFood, query: originalText });
+    // sessionId/userId를 다음 화면들로 전달해 길찾기·배달 이벤트도 같은 세션에 묶임
+    navigation.navigate('Restaurant', {
+      food: selectedFood,
+      query: originalText,
+      sessionId: currentSessionId,
+      userId,
+    });
   };
 
   const ctxLine = ctxParam

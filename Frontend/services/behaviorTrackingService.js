@@ -9,24 +9,30 @@
  *  - delivery_click     : 2점  (배달의민족, 최종 선택)
  *
  * 저장:
- *  - AsyncStorage 누적 (max 500개) — 마이페이지 칭호의 데이터 source
- *  - userStorageService 패턴 그대로
- *
- * 추후 백엔드 연결:
- *  - 내부만 fetch로 교체 (예: POST /api/events) — 함수 시그니처 유지
- *  - 로컬 누적은 *오프라인 큐* 역할로 남김
+ *  - AsyncStorage 누적 (max 500개) — 마이페이지 칭ho의 데이터 source
+ *  - 서버 POST /events (fire-and-forget) — recommend.db의
+ *    UserInteractionLog + UserFoodTagWeight 갱신용. 양혜원 개인화 CF의 입력.
  *
  * 설계 원칙:
  *  - "fire-and-forget" — UI를 막지 않도록 await 없이 호출 가능
  *  - 저장 실패해도 throw 안 함 (콘솔만)
+ *  - 로컬·서버 둘 다 시도. 서버 실패해도 로컬 누적은 정상 작동.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE } from '../constants/api';
 
 export const BEHAVIOR_SCORES = {
   food_card_click: 1,
   navigate_click: 2,
   delivery_click: 2,
+};
+
+// 서버 측 ENUM과 매핑 — schema.UserInteractionLog.action_type
+const SERVER_ACTION_TYPE = {
+  food_card_click: 'click',
+  navigate_click: 'final_select',
+  delivery_click: 'final_select',
 };
 
 const EVENTS_KEY = '@menu/behavior_events';
@@ -53,13 +59,14 @@ async function writeJSON(key, value) {
 }
 
 /**
- * 행동 이벤트 기록 (메인 함수)
+ * 행동 이벤트 기록 (메인 함수). 로컬 AsyncStorage + 서버 POST 동시.
  *
  * @param {string} eventType  - 'food_card_click' | 'navigate_click' | 'delivery_click'
  * @param {Object} payload    - 추가 데이터 (음식·식당·태그·카테고리 등)
+ * @param {Object} ctx        - { sessionId?:number, userId?:number=1 } — 서버 UPSERT용
  * @returns {Promise<{ok:boolean, event:Object}>}
  */
-export async function trackBehavior(eventType, payload = {}) {
+export async function trackBehavior(eventType, payload = {}, ctx = {}) {
   const event = {
     type: eventType,
     score: BEHAVIOR_SCORES[eventType] || 0,
@@ -67,7 +74,7 @@ export async function trackBehavior(eventType, payload = {}) {
     timestamp: Date.now(),
   };
 
-  // 누적 저장 — 새 이벤트가 맨 앞. max 초과 시 오래된 것 자동 폐기.
+  // (1) 로컬 — 마이페이지 칭호 source. 새 이벤트가 맨 앞. max 초과 시 오래된 것 폐기.
   const list = await readJSON(EVENTS_KEY, []);
   await writeJSON(EVENTS_KEY, [event, ...list].slice(0, MAX_EVENTS));
 
@@ -75,6 +82,27 @@ export async function trackBehavior(eventType, payload = {}) {
     `[BehaviorTracking] ${eventType} (+${event.score}점)`,
     payload
   );
+
+  // (2) 서버 POST — recommend.db UserInteractionLog + UserFoodTagWeight 갱신.
+  //     fire-and-forget. 실패해도 로컬 누적은 정상.
+  const actionType = SERVER_ACTION_TYPE[eventType];
+  const foodName = payload?.foodName;
+  if (actionType && foodName) {
+    fetch(`${API_BASE}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: ctx.userId ?? 1,
+        session_id: ctx.sessionId ?? null,
+        food_name: foodName,
+        action_type: actionType,
+      }),
+    })
+      .then((r) => {
+        if (!r.ok) console.warn(`[behaviorTracking] POST /events HTTP ${r.status}`);
+      })
+      .catch((e) => console.warn('[behaviorTracking] POST /events 실패:', e.message));
+  }
 
   return { ok: true, event };
 }
@@ -102,13 +130,14 @@ export async function clearBehaviorEvents() {
  * 음식 카드 클릭 (+1점, 관심)
  *
  * @param {Object} food - { id, name, tags, ... }
+ * @param {Object} [ctx] - { sessionId, userId } — 서버 UPSERT 묶음용
  */
-export function trackFoodCardClick(food) {
+export function trackFoodCardClick(food, ctx = {}) {
   return trackBehavior('food_card_click', {
     foodId: food?.id,
     foodName: food?.name,             // 칭호 C용 (kind 이름 그대로)
     foodTags: food?.tags,             // 칭호 A용 (시드 14개)
-  });
+  }, ctx);
 }
 
 /**
@@ -116,8 +145,9 @@ export function trackFoodCardClick(food) {
  *
  * @param {Object} restaurant - { id, name, category, ... }
  * @param {Object} food
+ * @param {Object} [ctx] - { sessionId, userId }
  */
-export function trackNavigateClick(restaurant, food) {
+export function trackNavigateClick(restaurant, food, ctx = {}) {
   return trackBehavior('navigate_click', {
     restaurantId: restaurant?.id,
     restaurantName: restaurant?.name,
@@ -125,7 +155,7 @@ export function trackNavigateClick(restaurant, food) {
     foodId: food?.id,
     foodName: food?.name,                      // 칭호 C용
     foodTags: food?.tags,                      // 칭호 A용
-  });
+  }, ctx);
 }
 
 /**
@@ -133,8 +163,9 @@ export function trackNavigateClick(restaurant, food) {
  *
  * @param {Object} restaurant - { id, name, category, ... }
  * @param {Object} food
+ * @param {Object} [ctx] - { sessionId, userId }
  */
-export function trackDeliveryClick(restaurant, food) {
+export function trackDeliveryClick(restaurant, food, ctx = {}) {
   return trackBehavior('delivery_click', {
     restaurantId: restaurant?.id,
     restaurantName: restaurant?.name,
@@ -142,5 +173,5 @@ export function trackDeliveryClick(restaurant, food) {
     foodId: food?.id,
     foodName: food?.name,
     foodTags: food?.tags,
-  });
+  }, ctx);
 }
