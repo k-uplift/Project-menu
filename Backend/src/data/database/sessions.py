@@ -82,11 +82,20 @@ def log_event(
     """클릭/최종선택 이벤트 1건 처리.
 
     1. food_name → food_id 조회 (Food 테이블에 없으면 NULL로 INSERT만, weight 적용 안 함)
-    2. UserInteractionLog INSERT
-    3. session_id가 있으면 그 세션의 UserTagSelection 조회해서
-       (user, food, tag) 각 조합마다 UserFoodTagWeight UPSERT += 가중치
+    2. UserInteractionLog INSERT (raw 이벤트는 항상 보존)
+    3. session_id가 있으면 *세션 내 max 정책*으로 UserFoodTagWeight UPSERT:
+       - 이번 이벤트 *이전*까지 이 세션·food의 max weight 조회 = prev_max
+       - new_max = max(prev_max, 이번 weight)
+       - delta = new_max - prev_max (0이면 UPSERT 없음)
+       - delta > 0이면 그 세션의 UserTagSelection 태그들에 += delta
 
-    Returns: {"log_id", "food_id", "tags_applied", "weight"}
+       정책 의미 (사용자 결정, 6/1):
+         · 같은 세션에 click 100번 = 1점 (인플레 방지)
+         · click + final = 2 (1+2=3 아님, max 의미)
+         · 다른 세션에서 또 final → +2 누적 (세션 사이 합산)
+       양혜원 spec의 += 시멘틱을 *세션 내 dedup*하는 형태로 구체화.
+
+    Returns: {"log_id", "food_id", "tags_applied", "delta", "weight"}
     """
     if action_type not in ALLOWED_ACTIONS:
         raise ValueError(f"action_type must be one of {ALLOWED_ACTIONS}, got {action_type!r}")
@@ -101,14 +110,32 @@ def log_event(
         ).fetchone()
         food_id = food_row[0] if food_row else None
 
+        # 이번 이벤트 *전*까지 세션의 max weight (이 이벤트 INSERT 전에 조회).
+        # CASE로 action_type → weight 매핑 (SPEC.md의 정책과 동일).
+        prev_max = 0
+        if session_id is not None and food_id is not None:
+            row = conn.execute(
+                """
+                SELECT COALESCE(MAX(CASE action_type
+                                       WHEN 'click'        THEN 1
+                                       WHEN 'final_select' THEN 2
+                                     END), 0)
+                  FROM UserInteractionLog
+                 WHERE session_id = ? AND food_id = ?
+                """,
+                (session_id, food_id),
+            ).fetchone()
+            prev_max = int(row[0] or 0)
+
         cur = conn.execute(
             "INSERT INTO UserInteractionLog (session_id, food_id, action_type) VALUES (?, ?, ?)",
             (session_id, food_id, action_type),
         )
         log_id = cur.lastrowid
 
+        delta = max(weight, prev_max) - prev_max  # 새 max가 올라간 만큼만
         tags_applied = 0
-        if session_id is not None and food_id is not None:
+        if delta > 0 and session_id is not None and food_id is not None:
             tag_ids = [
                 row[0]
                 for row in conn.execute(
@@ -116,7 +143,6 @@ def log_event(
                     (session_id,),
                 ).fetchall()
             ]
-            # 같은 (user, food, tag) 조합이면 total_weight 누적. SQLite UPSERT 구문.
             for tag_id in tag_ids:
                 conn.execute(
                     """
@@ -125,7 +151,7 @@ def log_event(
                     ON CONFLICT(user_id, food_id, tag_id)
                     DO UPDATE SET total_weight = total_weight + excluded.total_weight
                     """,
-                    (user_id, food_id, tag_id, weight),
+                    (user_id, food_id, tag_id, delta),
                 )
                 tags_applied += 1
 
@@ -134,6 +160,7 @@ def log_event(
             "log_id": log_id,
             "food_id": food_id,
             "tags_applied": tags_applied,
+            "delta": delta,
             "weight": weight,
         }
     finally:
