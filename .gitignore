@@ -10,3 +10,7 @@ venv/
 # 환경변수 (API 키 등)
 .env
 .env.local
+
+# 에디터 / IDE 설정 (개인 환경)
+.vscode/
+.idea/
