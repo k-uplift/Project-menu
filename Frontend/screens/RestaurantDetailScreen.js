@@ -75,12 +75,15 @@ export default function RestaurantDetailScreen({ route, navigation }) {
   };
 
   // 배달의민족 연결
+  // restaurant.baeminUrl이 있으면 *그 식당 상세 페이지*로 직행 (시연용 5개 식당).
+  // 없으면 *검색 결과 페이지*로 fallback — 사용자가 결과 중 클릭해야 식당 페이지로.
+  // 배민 shopId가 비공개라 자동 매핑 불가, 매핑된 식당만 deep link.
   const handleDelivery = async () => {
     // 행동 점수 +2점
     trackDeliveryClick(restaurant, food, { sessionId, userId });
 
-    const query = encodeURIComponent(restaurant.name);
-    const url = `https://baemin.me/search?query=${query}`;
+    const url = restaurant.baeminUrl
+      || `https://baemin.me/search?query=${encodeURIComponent(restaurant.name)}`;
 
     try {
       const canOpen = await Linking.canOpenURL(url);
@@ -92,7 +95,7 @@ export default function RestaurantDetailScreen({ route, navigation }) {
     } catch (e) {
       Alert.alert(
         '배달의민족',
-        `"${restaurant.name}" 검색 결과로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
+        `"${restaurant.name}" ${restaurant.baeminUrl ? '페이지로' : '검색 결과로'} 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
       );
     }
   };

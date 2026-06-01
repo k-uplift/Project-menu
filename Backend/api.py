@@ -22,6 +22,7 @@ DB 동적 wiring (묶음 X, 6/1):
 """
 
 # api.py는 Backend/ 안에 있지만 cf_module/은 프로젝트 루트에 있다 — sys.path 추가.
+import json
 import sys
 from pathlib import Path
 
@@ -142,15 +143,40 @@ def foods_cf(q: str, user_id: int = 1, top_k: int = 10):
     }
 
 
+# 배민 URL 매핑 — 시연용 식당 N개. 키 = stores.name. 값 = 배민 deep link.
+# 값이 빈 문자열이면 프론트가 검색 URL로 fallback.
+_BAEMIN_URLS_PATH = Path(__file__).parent / "data" / "baemin_urls.json"
+_BAEMIN_URLS_CACHE: dict[str, str] | None = None
+
+
+def _load_baemin_urls() -> dict[str, str]:
+    global _BAEMIN_URLS_CACHE
+    if _BAEMIN_URLS_CACHE is None:
+        try:
+            raw = json.loads(_BAEMIN_URLS_PATH.read_text(encoding="utf-8"))
+            # '_comment' 같은 키는 무시. 빈 값도 그대로 — 프론트에서 분기.
+            _BAEMIN_URLS_CACHE = {k: v for k, v in raw.items() if not k.startswith("_") and v}
+        except FileNotFoundError:
+            _BAEMIN_URLS_CACHE = {}
+    return _BAEMIN_URLS_CACHE
+
+
 @app.get("/restaurants")
 def restaurants(q: str, kind: str, top_k: int = 10):
     """선택한 음식 종류 → 그 종류의 식당 추천 (2차).
 
     q는 1차에서 쓴 쿼리 그대로 — 사용자 취향이 식당 점수에 반영되도록.
+    응답 stores[] 각 item에 baeminUrl 주입 (시연용 매핑에 있는 식당만).
     """
     if not q.strip() or not kind.strip():
         raise HTTPException(status_code=400, detail="q and kind required")
-    return recommend_stores_for_kind(q, kind, top_k=top_k)
+    result = recommend_stores_for_kind(q, kind, top_k=top_k)
+    baemin_urls = _load_baemin_urls()
+    for store in result.get("stores", []):
+        url = baemin_urls.get(store.get("name"))
+        if url:
+            store["baeminUrl"] = url
+    return result
 
 
 @app.get("/restaurants/{store_id}/menus")
