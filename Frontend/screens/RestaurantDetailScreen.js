@@ -74,28 +74,40 @@ export default function RestaurantDetailScreen({ route, navigation }) {
     }
   };
 
-  // 배달의민족 연결
-  // restaurant.baeminUrl이 있으면 *그 식당 상세 페이지*로 직행 (시연용 5개 식당).
-  // 없으면 *검색 결과 페이지*로 fallback — 사용자가 결과 중 클릭해야 식당 페이지로.
-  // 배민 shopId가 비공개라 자동 매핑 불가, 매핑된 식당만 deep link.
+  // 배달 연결 — 3단 우선순위:
+  //   ① restaurant.baeminUrl (시연용 수동 매핑) — 배민 식당 페이지 직행
+  //   ② restaurant.naverPlaceId — 네이버 플레이스 *배달 탭* 직행
+  //                              (배민·요기요·쿠팡이츠 통합 노출. 대부분 식당 보유)
+  //   ③ 배민 검색 fallback — 식당 이름으로 baemin.me/search
+  // 배민 shopId가 비공개라 자동 매핑 불가. naverPlaceId는 details.db 크롤링에
+  // 이미 잡혀 있어 *모든 식당*에 사실상 유효.
   const handleDelivery = async () => {
     // 행동 점수 +2점
     trackDeliveryClick(restaurant, food, { sessionId, userId });
 
-    const url = restaurant.baeminUrl
-      || `https://baemin.me/search?query=${encodeURIComponent(restaurant.name)}`;
+    let url, label;
+    if (restaurant.baeminUrl) {
+      url = restaurant.baeminUrl;
+      label = '배달의민족';
+    } else if (restaurant.naverPlaceId) {
+      url = `https://m.place.naver.com/restaurant/${restaurant.naverPlaceId}/order/delivery`;
+      label = '네이버 주문';
+    } else {
+      url = `https://baemin.me/search?query=${encodeURIComponent(restaurant.name)}`;
+      label = '배민 검색';
+    }
 
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
         Linking.openURL(url);
       } else {
-        Alert.alert('연결 실패', '배달의민족 앱을 열 수 없어요.');
+        Alert.alert('연결 실패', `${label} 페이지를 열 수 없어요.`);
       }
     } catch (e) {
       Alert.alert(
-        '배달의민족',
-        `"${restaurant.name}" ${restaurant.baeminUrl ? '페이지로' : '검색 결과로'} 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
+        label,
+        `"${restaurant.name}" 페이지로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
       );
     }
   };
