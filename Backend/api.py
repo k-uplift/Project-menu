@@ -97,13 +97,13 @@ def extract(q: str):
         raise HTTPException(status_code=400, detail="q is empty")
     e = extract_tags(q)
 
-    # 프론트 Keyword 구조에 맞춰 변환. cap 없음 — Claude가 적극 추론한 키워드
-    # 그대로 노출해 사용자가 *분석 깊이*를 체감하게.
+    # 프론트 Keyword 구조에 맞춰 변환 — *시드만* 노출.
+    # food_keywords는 *내부 메뉴명 매칭 보조* 채널이라 사용자에게 직접 보여주면
+    # 키워드 검수 단계 = 추천 미리보기 효과 → 단계 분리 의미 약화.
+    # 추천 단계(/foods)는 응답의 foodKeywords 필드를 그대로 받아 *내부 매칭에 사용*.
     keywords = []
     for i, t in enumerate(e.tags or []):
         keywords.append({"id": f"kw-tag-{i}", "label": t, "confidence": 0.9, "source": "llm"})
-    for i, f in enumerate((e.food_keywords or [])[:4]):
-        keywords.append({"id": f"kw-fkw-{i}", "label": f, "confidence": 0.7, "source": "llm"})
 
     return {
         "originalText": q,
