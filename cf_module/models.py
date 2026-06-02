@@ -28,6 +28,7 @@ class RecommendationResponse:
     tab2_results: list[RecommendationResult]
     input_tags: list[str]
     user_id: int
+    tab2_empty_reason: str | None = None
 
 
 class ActionWeight(IntEnum):
