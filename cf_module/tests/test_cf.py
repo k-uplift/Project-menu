@@ -7,151 +7,154 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from cf_module.core.actions import (
-    create_search_session,
-    record_click,
-    record_final_select,
+from cf_module.core.actions import create_search_session, record_final_select
+from cf_module.core.recommend import (
+    _get_user_final_selected_only,
+    recommend,
+    recommend_tab2_personalized,
 )
-from cf_module.core.recommend import recommend
+from cf_module.core import recommend as recommend_module
 
 
-def test_new_user_first_search():
-    """
-    행동 기록 없는 신규 사용자가 검색했을 때:
-    - 두 탭 모두 결과가 나옴
-    - 결과는 비어있지 않음
-    - 두 탭의 결과가 서로 다름 (탭 분리 효과)
-    """
-    response = recommend(["얼큰한", "국물있는"], user_id=9999, top_k=5)
+SPICY_SOUP = ["얼큰한", "국물있는"]
+LIGHT_CLEAN = ["담백한", "가벼운"]
+
+
+def _new_user_id() -> int:
+    """Return a user id that is not in the in-memory session dataset."""
+    existing = {session.user_id for session in recommend_module._SESSIONS}
+    return max(existing, default=0) + 100_000
+
+
+def test_tab1_default_works():
+    """탭 1 기본추천은 신규 사용자에게도 결과를 낸다."""
+    response = recommend(SPICY_SOUP, user_id=99999, top_k=10)
 
     assert len(response.tab1_results) > 0
+    assert response.tab2_results == []
+    assert response.tab2_empty_reason == "no_history"
+    assert any(score != float(int(score)) for score in [r.score for r in response.tab1_results])
+
+
+def test_tab2_personalized_works():
+    """탭 2는 행동 이력이 있는 사용자에게 개인화 추천을 낸다."""
+    response = recommend(SPICY_SOUP, user_id=1, top_k=10)
+
     assert len(response.tab2_results) > 0
+    assert response.tab2_empty_reason is None
+    for result in response.tab2_results:
+        assert result.reason
+        assert result.score > 0
+
+
+def test_personalization_same_input_different_user():
+    """같은 입력이라도 사용자가 다르면 탭 2 추천이 달라진다."""
+    input_tags = ["국물있는"]
+    user_1_results, user_1_reason = recommend_tab2_personalized(input_tags, user_id=1, top_k=10)
+    user_14_results, user_14_reason = recommend_tab2_personalized(input_tags, user_id=14, top_k=10)
+
+    print("user 1:", [result.kind_name for result in user_1_results])
+    print("user 14:", [result.kind_name for result in user_14_results])
+
+    assert user_1_reason is None
+    assert user_14_reason is None
+    assert [result.kind_id for result in user_1_results] != [
+        result.kind_id for result in user_14_results
+    ]
+
+
+def test_tab2_no_history():
+    """행동 이력이 없는 사용자는 no_history와 빈 결과를 받는다."""
+    results, reason = recommend_tab2_personalized(["얼큰한"], user_id=99999, top_k=10)
+
+    assert results == []
+    assert reason == "no_history"
+
+
+def test_tab2_empty_reasons():
+    """탭 2 빈 결과 사유를 구분한다."""
+    no_history_results, no_history_reason = recommend_tab2_personalized(
+        ["얼큰한"], user_id=99999
+    )
+    assert no_history_results == []
+    assert no_history_reason == "no_history"
+
+    no_similar_user = _new_user_id()
+    session_id = create_search_session(no_similar_user, SPICY_SOUP)
+    record_final_select(session_id, kind_id=999_999)
+    no_similar_results, no_similar_reason = recommend_tab2_personalized(
+        SPICY_SOUP, user_id=no_similar_user
+    )
+    assert no_similar_results == []
+    assert no_similar_reason == "no_similar_users"
+
+    no_candidate_results, no_candidate_reason = recommend_tab2_personalized(
+        ["시원한"], user_id=1
+    )
+    assert no_candidate_results == []
+    assert no_candidate_reason == "no_candidates"
+
+
+def test_two_tabs_differ():
+    """탭 1과 탭 2는 서로 다른 추천 방식을 쓴다."""
+    response = recommend(SPICY_SOUP, user_id=1, top_k=10)
 
     tab1_ids = {result.kind_id for result in response.tab1_results}
     tab2_ids = {result.kind_id for result in response.tab2_results}
+
+    assert tab1_ids
+    assert tab2_ids
     assert tab1_ids != tab2_ids
 
 
-def test_different_inputs_give_different_results():
-    """다른 입력은 다른 추천을 만든다."""
-    response_a = recommend(["얼큰한", "국물있는"], user_id=9999, top_k=5)
-    response_b = recommend(["담백한", "가벼운"], user_id=9999, top_k=5)
+def test_tab2_excludes_my_final_select():
+    """탭 2는 내가 final_select한 메뉴를 추천하지 않는다."""
+    final_selected = _get_user_final_selected_only(1)
+    results, reason = recommend_tab2_personalized(SPICY_SOUP, user_id=1, top_k=10)
+    result_ids = {result.kind_id for result in results}
 
-    tab1_a = {result.kind_id for result in response_a.tab1_results}
-    tab1_b = {result.kind_id for result in response_b.tab1_results}
-
-    assert tab1_a.isdisjoint(tab1_b) or len(tab1_a & tab1_b) < 2
-
-
-def test_action_recording_excludes_seen_menu():
-    """행동 기록 후 본인이 final_select한 메뉴는 다음 추천에서 제외."""
-    user_id = 9998
-    input_tags = ["얼큰한", "국물있는"]
-
-    before = recommend(input_tags, user_id, top_k=5)
-    before_tab1_ids = {result.kind_id for result in before.tab1_results}
-    assert len(before_tab1_ids) > 0
-
-    first_kind_id = before.tab1_results[0].kind_id
-
-    session_id = create_search_session(user_id, input_tags)
-    record_click(session_id, first_kind_id)
-    record_final_select(session_id, first_kind_id)
-
-    after = recommend(input_tags, user_id, top_k=5)
-    after_tab1_ids = {result.kind_id for result in after.tab1_results}
-
-    assert first_kind_id not in after_tab1_ids
+    assert reason is None
+    assert final_selected.isdisjoint(result_ids)
 
 
-def test_tab_overlap_handling():
-    """탭 1 상위 3개와 탭 2의 겹침은 최대 1개."""
-    response = recommend(["얼큰한", "국물있는"], user_id=9997, top_k=5)
+def test_action_changes_recommendation():
+    """행동 이력이 생기면 no_history 상태를 벗어난다."""
+    user_id = _new_user_id()
 
-    tab1_top3 = [result.kind_id for result in response.tab1_results[:3]]
-    tab2_ids = [result.kind_id for result in response.tab2_results]
+    _, reason_before = recommend_tab2_personalized(SPICY_SOUP, user_id, top_k=10)
+    session_id = create_search_session(user_id, SPICY_SOUP)
+    record_final_select(session_id, kind_id=1)
+    _, reason_after = recommend_tab2_personalized(SPICY_SOUP, user_id, top_k=10)
 
-    overlap = [kind_id for kind_id in tab2_ids if kind_id in tab1_top3]
-    assert len(overlap) <= 1, f"Overlap too high: {overlap}"
-
-
-def test_tab1_vs_tab2_different_logic():
-    """
-    탭 1과 탭 2는 다른 알고리즘을 사용하므로
-    같은 입력에 대해 다른 점수 패턴을 보인다.
-    """
-    response = recommend(["얼큰한", "국물있는"], user_id=9996, top_k=5)
-
-    tab1_scores = [result.score for result in response.tab1_results]
-    tab2_scores = [result.score for result in response.tab2_results]
-
-    for score in tab1_scores:
-        assert score == float(int(score))
-
-    assert any(score != float(int(score)) for score in tab2_scores), (
-        "탭 2 점수가 모두 정수면 CF 작동 의심"
-    )
-
-
-def test_cold_start():
-    """매칭이 거의 없는 입력에도 에러 없이 동작."""
-    response = recommend(["바삭한"], user_id=9995, top_k=5)
-
-    assert isinstance(response.tab1_results, list)
-    assert isinstance(response.tab2_results, list)
+    print(f"before: {reason_before}, after: {reason_after}")
+    assert reason_before == "no_history"
+    assert reason_after != "no_history"
 
 
 def test_input_immutability():
-    """응답을 수정해도 원본 입력은 안 바뀐다."""
-    original_input = ["얼큰한", "국물있는"]
-    response = recommend(original_input, user_id=9994, top_k=5)
+    """응답의 input_tags를 수정해도 원본 입력은 바뀌지 않는다."""
+    original = list(SPICY_SOUP)
+    response = recommend(original, user_id=1, top_k=10)
 
     response.input_tags.append("야식")
-    assert "야식" not in original_input
-
-
-def test_full_user_journey():
-    """
-    실제 시연 시나리오:
-    1. 첫 검색
-    2. 추천 메뉴 클릭
-    3. 최종선택
-    4. 다른 입력으로 두 번째 검색
-    5. 결과가 적절히 변화하는지 확인
-    """
-    user_id = 9993
-
-    response_1 = recommend(["얼큰한", "국물있는"], user_id, top_k=5)
-    assert len(response_1.tab1_results) > 0
-
-    first_kind = response_1.tab1_results[0]
-    session_id_1 = create_search_session(user_id, ["얼큰한", "국물있는"])
-    record_click(session_id_1, first_kind.kind_id)
-
-    record_final_select(session_id_1, first_kind.kind_id)
-
-    response_2 = recommend(["담백한", "가벼운"], user_id, top_k=5)
-    assert len(response_2.tab1_results) > 0
-
-    response_3 = recommend(["얼큰한", "국물있는"], user_id, top_k=5)
-    response_3_ids = {result.kind_id for result in response_3.tab1_results}
-    assert first_kind.kind_id not in response_3_ids
+    assert "야식" not in original
 
 
 TEST_FUNCTIONS = [
-    test_new_user_first_search,
-    test_different_inputs_give_different_results,
-    test_action_recording_excludes_seen_menu,
-    test_tab_overlap_handling,
-    test_tab1_vs_tab2_different_logic,
-    test_cold_start,
+    test_tab1_default_works,
+    test_tab2_personalized_works,
+    test_personalization_same_input_different_user,
+    test_tab2_no_history,
+    test_tab2_empty_reasons,
+    test_two_tabs_differ,
+    test_tab2_excludes_my_final_select,
+    test_action_changes_recommendation,
     test_input_immutability,
-    test_full_user_journey,
 ]
 
 
 def load_tests(loader, tests, pattern):
-    """python -m unittest에서도 함수형 테스트를 실행할 수 있게 연결."""
+    """Allow python -m unittest to run these function-style tests."""
     suite = unittest.TestSuite()
     for test_function in TEST_FUNCTIONS:
         suite.addTest(unittest.FunctionTestCase(test_function))
