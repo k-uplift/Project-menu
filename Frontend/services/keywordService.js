@@ -3,14 +3,15 @@
  *
  * 사용자의 자연어 입력 → 정형 키워드로 변환
  *
- * 현재: mock (간단한 규칙 기반 매칭)
- * 추후: Claude API (Sonnet) 연동 — 함수 시그니처는 그대로 유지
+ * 메인: 백엔드 /extract 호출 (Claude Sonnet 4.6 + 시드 14 enum + food_keywords)
+ *   → 시드 14 안에서 매핑된 *진짜 의미 키워드*. "고기·면·회" 같은 카테고리도
+ *     food_keywords 채널로 함께 노출.
  *
- * 교수님 피드백 반영:
- *  - 키워드가 고정 리스트가 아니라 "확장 가능한 구조"
- *    → 매칭되는 키워드가 없으면 "사용자 표현 그대로" 키워드화
- *    → LLM 연결 시 사용자별로 다르게 해석된 키워드도 그대로 흘러감
+ * Fallback: 백엔드 호출 실패 시 *프론트 규칙 매칭*으로 임시 동작.
+ *   매칭 0이면 입력 자체를 키워드화 (확장 가능 구조 유지).
  */
+
+import { API_BASE } from '../constants/api';
 
 // LoadingOverlay의 총 분석 시간과 동기화
 // (LoadingOverlay.js 의 ANALYSIS_STEPS 합계와 일치)
@@ -36,40 +37,41 @@ const KEYWORD_HINTS = [
 ];
 
 /**
- * 자연어 → 키워드 분석
+ * 자연어 → 키워드 분석. 백엔드 /extract 호출 (Claude). 실패 시 mock fallback.
  *
  * @param {string} text 사용자가 입력한 감성 문장
  * @returns {Promise<import('../types').AnalyzeResult>}
  */
 export async function analyzeKeywords(text) {
-  // === [실제 LLM 연결 시 이 부분을 fetch로 교체] ===
-  //
-  // const res = await fetch('https://api.anthropic.com/v1/messages', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json', /* api key 등 */ },
-  //   body: JSON.stringify({
-  //     model: 'claude-sonnet-4',
-  //     max_tokens: 200,
-  //     messages: [
-  //       { role: 'user', content: `다음 문장에서 음식 추천에 쓸 키워드 1~4개를 추출해줘: "${text}"` }
-  //     ],
-  //   }),
-  // });
-  // const data = await res.json();
-  // → data.content[0].text 를 파싱해서 keywords 배열로 변환
-  //
-  // ===============================================
-
-  // mock: 실제 LLM 호출 시간과 비슷하게 약 3.5초 대기
-  // (LoadingOverlay 의 단계별 애니메이션 시간과 동기화)
-  await delay(MOCK_ANALYZE_DURATION_MS);
-
   if (!text || text.trim().length === 0) {
     return { originalText: text, keywords: [] };
   }
 
+  try {
+    const url = `${API_BASE}/extract?q=${encodeURIComponent(text.trim())}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // 백엔드가 이미 프론트 Keyword 구조로 변환해서 보냄
+    return {
+      originalText: data.originalText || text,
+      keywords: Array.isArray(data.keywords) ? data.keywords : [],
+    };
+  } catch (e) {
+    console.warn('[keywordService] /extract 실패 → mock fallback:', e.message);
+    return analyzeKeywordsMock(text);
+  }
+}
+
+/**
+ * Mock fallback — 백엔드 다운 시 임시 동작. 시드 14개 부분문자열 매칭.
+ */
+async function analyzeKeywordsMock(text) {
+  // 실제 호출과 비슷한 대기 시간
+  await delay(MOCK_ANALYZE_DURATION_MS);
+
   const lower = text.toLowerCase();
-  const found = new Map(); // label → Keyword (중복 제거)
+  const found = new Map();
 
   KEYWORD_HINTS.forEach((hint) => {
     if (hint.match.some((m) => lower.includes(m))) {
@@ -77,19 +79,18 @@ export async function analyzeKeywords(text) {
         id: `kw-${slug(hint.label)}`,
         label: hint.label,
         confidence: 0.9,
-        source: 'llm',
+        source: 'mock',
       });
     }
   });
 
-  // 매칭이 하나도 없으면 fallback
-  // (입력 자체를 그대로 키워드화 — 확장 가능 구조)
+  // 매칭이 하나도 없으면 입력 자체를 키워드화 (확장 가능 구조)
   if (found.size === 0) {
     found.set(text.trim(), {
       id: `kw-${slug(text)}-${Date.now()}`,
-      label: text.trim().slice(0, 12), // 너무 길면 자름
+      label: text.trim().slice(0, 12),
       confidence: 0.5,
-      source: 'llm',
+      source: 'mock',
     });
   }
 

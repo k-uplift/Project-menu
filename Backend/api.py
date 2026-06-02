@@ -81,6 +81,39 @@ def _open_session_and_save_tags(user_id: int, tag_names: list[str]) -> int:
     return session_id
 
 
+@app.get("/extract")
+def extract(q: str):
+    """자연어 → 키워드 추출만 (가벼움, 검수 화면용).
+
+    홈 입력을 키워드 검수 페이지로 넘기기 전에 호출. /foods는 추천까지
+    같이 만드는 무거운 호출이라 *키워드만* 보여줄 단계엔 과함.
+
+    응답 keywords: tags(시드) + food_keywords(카테고리·식재료) 합본.
+      - 시드는 confidence 0.9 (정확)
+      - food_keywords는 confidence 0.7 (보조 — Claude open vocab)
+      - exclude는 별도 필드로 노출 (UI 부정 표시 옵션)
+    """
+    if not q.strip():
+        raise HTTPException(status_code=400, detail="q is empty")
+    e = extract_tags(q)
+
+    # 프론트 Keyword 구조에 맞춰 변환
+    keywords = []
+    for i, t in enumerate(e.tags or []):
+        keywords.append({"id": f"kw-tag-{i}", "label": t, "confidence": 0.9, "source": "llm"})
+    for i, f in enumerate((e.food_keywords or [])[:3]):
+        keywords.append({"id": f"kw-fkw-{i}", "label": f, "confidence": 0.7, "source": "llm"})
+
+    return {
+        "originalText": q,
+        "keywords": keywords,
+        "tags": e.tags or [],
+        "foodKeywords": e.food_keywords or [],
+        "excludeTags": e.exclude_tags or [],
+        "excludeFoodKeywords": e.exclude_food_keywords or [],
+    }
+
+
 @app.get("/foods")
 def foods(q: str, top_k: int = 10, user_id: int = 1):
     """자연어 쿼리 → 음식 종류 추천 (태그 매칭, 1차).
