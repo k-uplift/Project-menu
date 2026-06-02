@@ -153,6 +153,9 @@ def _extract_claude(text: str, api_key: str) -> ExtractResult:
         resp = client.messages.create(
             model=CLAUDE_MODEL,
             max_tokens=256,
+            # 같은 입력에 *같은 응답* 강하게 유도 — 사용자 시연 재현성 위함.
+            # 키워드 추출은 *창의성 불필요*, *일관성 우선*.
+            temperature=0.0,
             system=[
                 {
                     "type": "text",
