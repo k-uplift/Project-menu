@@ -97,14 +97,12 @@ def extract(q: str):
         raise HTTPException(status_code=400, detail="q is empty")
     e = extract_tags(q)
 
-    # 프론트 Keyword 구조에 맞춰 변환. *검수 페이지 노출용 cap*:
-    # 시드 최대 3개 + food_kw 최대 2개 = 최대 5개. Claude가 적극 추론으로
-    # 6~7개 뽑아도 화면이 과혼잡하지 않게. 추천(/foods)은 전체 키워드 사용해
-    # 품질엔 영향 0.
+    # 프론트 Keyword 구조에 맞춰 변환. cap 없음 — Claude가 적극 추론한 키워드
+    # 그대로 노출해 사용자가 *분석 깊이*를 체감하게.
     keywords = []
-    for i, t in enumerate((e.tags or [])[:3]):
+    for i, t in enumerate(e.tags or []):
         keywords.append({"id": f"kw-tag-{i}", "label": t, "confidence": 0.9, "source": "llm"})
-    for i, f in enumerate((e.food_keywords or [])[:2]):
+    for i, f in enumerate((e.food_keywords or [])[:4]):
         keywords.append({"id": f"kw-fkw-{i}", "label": f, "confidence": 0.7, "source": "llm"})
 
     return {
