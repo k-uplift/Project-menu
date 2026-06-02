@@ -29,8 +29,9 @@ DETAILS_DB_PATH = BACKEND_ROOT / "db" / "details.db"
 SCHEMA = """
 -- ── ① 마스터 테이블 (기준 정보) ───────────────────────────────────
 CREATE TABLE IF NOT EXISTS User (
-    user_id  INTEGER PRIMARY KEY AUTOINCREMENT,
-    email    TEXT UNIQUE                          -- 유저 계정
+    user_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    email          TEXT UNIQUE,                    -- 유저 계정(로그인 ID)
+    password_hash  TEXT NOT NULL DEFAULT ''        -- 비밀번호 해시(평문 저장 금지)
 );
 
 -- 표준 음식명. 크롤링된 제각각의 메뉴명이 매핑되는 기준점
@@ -160,7 +161,10 @@ CREATE INDEX IF NOT EXISTS idx_userbadge_user ON UserBadge(user_id);
 
 # 기존 DB 에 누락된 컬럼을 ALTER 로 추가하기 위한 마이그레이션 목록
 # (table, column, type) — init 시 PRAGMA table_info 로 존재 여부 확인 후 추가
-ADD_COLUMNS: list[tuple[str, str, str]] = []
+ADD_COLUMNS: list[tuple[str, str, str]] = [
+    # 회원가입(비밀번호 로그인) 지원: 기존 recommend.db 의 User 에 비밀번호 해시 컬럼 추가
+    ("User", "password_hash", "TEXT NOT NULL DEFAULT ''"),
+]
 
 
 def connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
