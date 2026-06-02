@@ -77,10 +77,10 @@ export default function RestaurantDetailScreen({ route, navigation }) {
   // 배달 연결 — 3단 우선순위:
   //   ① restaurant.baeminUrl (시연용 수동 매핑) — 배민 식당 페이지 직행
   //   ② restaurant.naverPlaceId — 네이버 플레이스 *배달 탭* 직행
-  //                              (배민·요기요·쿠팡이츠 통합 노출. 대부분 식당 보유)
-  //   ③ 배민 검색 fallback — 식당 이름으로 baemin.me/search
-  // 배민 shopId가 비공개라 자동 매핑 불가. naverPlaceId는 details.db 크롤링에
-  // 이미 잡혀 있어 *모든 식당*에 사실상 유효.
+  //                              (배민·요기요·쿠팡이츠 통합 노출. 식당 324/330=98%)
+  //   ③ 카카오맵 검색 fallback — 결손 6개 식당용. 카카오맵은 *반드시* 검색 결과
+  //                              페이지 열림, 매칭 식당의 *카카오 주문 통합* 노출
+  //                              (baemin.me/search는 404 위험 있어 카카오로 교체)
   const handleDelivery = async () => {
     // 행동 점수 +2점
     trackDeliveryClick(restaurant, food, { sessionId, userId });
@@ -93,8 +93,8 @@ export default function RestaurantDetailScreen({ route, navigation }) {
       url = `https://m.place.naver.com/restaurant/${restaurant.naverPlaceId}/order/delivery`;
       label = '네이버 주문';
     } else {
-      url = `https://baemin.me/search?query=${encodeURIComponent(restaurant.name)}`;
-      label = '배민 검색';
+      url = `https://map.kakao.com/?q=${encodeURIComponent(restaurant.name)}`;
+      label = '카카오맵';
     }
 
     try {
