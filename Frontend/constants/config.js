@@ -38,4 +38,7 @@ export const API_MODE = 'mock'; // 'mock' | 'real'
 // - 실제 휴대폰(Expo Go):  http://<개발PC의 LAN IP>:8000  (예: http://192.168.0.10:8000)
 //   → localhost 는 폰 자신을 가리키므로 실기기에서는 반드시 PC 의 IP 로 바꿀 것.
 // 백엔드 실행:  cd Backend && uvicorn auth_app:app --host 0.0.0.0 --port 8000
-export const API_BASE_URL = 'http://localhost:8000';
+// /foods·/foods_cf 등 추천 API 와 /auth/* 모두 같은 호스트.
+// constants/api.js 의 API_BASE 와 동일 경로로 갱신해 일관 유지.
+import { API_BASE } from './api';
+export const API_BASE_URL = API_BASE;

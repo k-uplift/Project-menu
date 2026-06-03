@@ -18,6 +18,18 @@ import {
   getCurrentWeather,
   getCombinedContextReason,
 } from './contextService';
+import { getCurrentUser } from './authService';
+
+
+/** 현재 로그인 사용자의 user_id. 비로그인이면 1 (시연용 Alice = T1 매운국물파). */
+async function getDefaultUserId() {
+  try {
+    const user = await getCurrentUser();
+    return user?.user_id ?? 1;
+  } catch {
+    return 1;
+  }
+}
 
 /**
  * @typedef {Object} RecommendContext
@@ -37,8 +49,9 @@ import {
  * @returns {Promise<{ items: import('../types').FoodItem[], sessionId: number|null, userId: number }>}
  */
 export async function getFoodRecommendations(keywords, context = {}) {
+  const defaultUid = await getDefaultUserId();
   if (!keywords || keywords.length === 0) {
-    return { items: [], sessionId: null, userId: context.userId ?? 1 };
+    return { items: [], sessionId: null, userId: context.userId ?? defaultUid };
   }
 
   // 사용자가 KeywordScreen 에서 *직접 확인·수정*한 시드 태그를 그대로 백엔드에
@@ -51,7 +64,7 @@ export async function getFoodRecommendations(keywords, context = {}) {
 
   let kinds = [];
   let sessionId = null;
-  let userId = context.userId ?? 1;
+  let userId = context.userId ?? defaultUid;
   try {
     const fkwParam = fkwList ? `&food_keywords=${encodeURIComponent(fkwList)}` : '';
     const url = `${API_BASE}/foods?tags=${encodeURIComponent(tagList)}${fkwParam}&user_id=${userId}`;
@@ -90,8 +103,9 @@ export async function getFoodRecommendations(keywords, context = {}) {
  * 실 사용자 도입 시 user_id 인자로 받도록 확장. 일단 시연에선 익명 → user_id=1.
  */
 export async function getPersonalizedRecommendations(keywords, context = {}) {
+  const defaultUid = await getDefaultUserId();
   if (!keywords || keywords.length === 0) {
-    return { items: [], sessionId: null, userId: context.userId ?? 1 };
+    return { items: [], sessionId: null, userId: context.userId ?? defaultUid };
   }
 
   // /foods 와 동일 패턴 — 사용자 선택 시드를 tags 파라미터로 직접 전달.
@@ -101,7 +115,7 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
 
   let kinds = [];
   let sessionId = null;
-  let userId = context.userId ?? 1;
+  let userId = context.userId ?? defaultUid;
   try {
     const fkwParam = fkwList ? `&food_keywords=${encodeURIComponent(fkwList)}` : '';
     const url = `${API_BASE}/foods_cf?tags=${encodeURIComponent(tagList)}${fkwParam}&user_id=${userId}`;

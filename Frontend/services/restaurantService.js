@@ -18,6 +18,15 @@ import {
   haversineDistance,
   walkMinutesFromKm,
 } from './contextService';
+import { getCurrentUser } from './authService';
+
+
+async function getDefaultUserId() {
+  try {
+    const u = await getCurrentUser();
+    return u?.user_id ?? 1;
+  } catch { return 1; }
+}
 
 /**
  * @typedef {'distance'|'cf'} SortMode
@@ -34,7 +43,9 @@ import {
  * @returns {Promise<import('../types').Restaurant[]>}
  */
 export async function getRestaurantsByFood(food, options = {}) {
-  const { sort = 'distance', userLocation, query, userId = 1 } = options;
+  // 로그인 사용자의 user_id 를 식당 cfScore(취향 매칭)에 반영. 비로그인이면 1(Alice).
+  const defaultUid = await getDefaultUserId();
+  const { sort = 'distance', userLocation, query, userId = defaultUid } = options;
 
   // 백엔드는 q + kind 둘 다 필수. q가 없으면 종류 이름을 자기 자신을 쿼리로.
   const kind = food?.name || '';
