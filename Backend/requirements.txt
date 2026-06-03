@@ -2,3 +2,9 @@ requests>=2.31
 python-dotenv>=1.0
 playwright>=1.40
 pyproj>=3.6
+
+# 인증(로그인/회원가입) API 서버 — auth_app.py / src/auth
+# ⚠️ llm-tag 병합 시 이 블록이 충돌합니다. 해소법: docs/MERGE_auth_to_llm-tag.md §4
+fastapi>=0.110
+uvicorn[standard]>=0.27   # [standard] 는 llm-tag 의 plain uvicorn 을 포함(상위호환)
+pydantic>=2

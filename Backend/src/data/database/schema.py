@@ -19,11 +19,13 @@ SQLite 는 DB 간 FK 를 걸 수 없어 값으로만 연결한다(FK 미강제).
 """
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 
 BACKEND_ROOT = Path(__file__).resolve().parents[3]
-DB_PATH = BACKEND_ROOT / "db" / "recommend.db"
+# 기본은 db/recommend.db. 테스트/스테이징에서 RECOMMEND_DB_PATH 로 다른 파일 지정 가능.
+DB_PATH = Path(os.environ.get("RECOMMEND_DB_PATH", BACKEND_ROOT / "db" / "recommend.db"))
 DETAILS_DB_PATH = BACKEND_ROOT / "db" / "details.db"
 
 SCHEMA = """

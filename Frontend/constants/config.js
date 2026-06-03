@@ -30,3 +30,11 @@ export const SUGGESTED_KEYWORDS = [
 
 // API 모드 — 나중에 실제 API로 교체할 때 'real'로 바꾸기만 하면 됨
 export const API_MODE = 'mock'; // 'mock' | 'real'
+
+// 백엔드(인증 API) 주소.
+// - iOS 시뮬레이터 / 웹:   http://localhost:8000
+// - Android 에뮬레이터:    http://10.0.2.2:8000
+// - 실제 휴대폰(Expo Go):  http://<개발PC의 LAN IP>:8000  (예: http://192.168.0.10:8000)
+//   → localhost 는 폰 자신을 가리키므로 실기기에서는 반드시 PC 의 IP 로 바꿀 것.
+// 백엔드 실행:  cd Backend && uvicorn auth_app:app --host 0.0.0.0 --port 8000
+export const API_BASE_URL = 'http://localhost:8000';
