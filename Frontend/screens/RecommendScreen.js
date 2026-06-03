@@ -40,6 +40,8 @@ export default function RecommendScreen({ route, navigation }) {
   // 이후 카드 클릭/길찾기/배달 이벤트가 현재 *탭의* sessionId와 묶여 서버 UPSERT.
   const [baseSessionId, setBaseSessionId] = useState(null);
   const [cfSessionId, setCfSessionId] = useState(null);
+  // CF 탭이 cold start(신규 사용자, 행동 이력 없음)라 기본 추천으로 대체됐는지
+  const [cfFallback, setCfFallback] = useState(false);
   const [userId, setUserId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -69,6 +71,7 @@ export default function RecommendScreen({ route, navigation }) {
         setCfList(cf.items);
         setBaseSessionId(base.sessionId);
         setCfSessionId(cf.sessionId);
+        setCfFallback(!!cf.fallback);
         if (base.userId) setUserId(base.userId);
         if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
 
@@ -97,6 +100,7 @@ export default function RecommendScreen({ route, navigation }) {
       setCfList(cf.items);
       setBaseSessionId(base.sessionId);
       setCfSessionId(cf.sessionId);
+      setCfFallback(!!cf.fallback);
       setRefreshSeed(newSeed);
       if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
     } catch (e) {
@@ -219,6 +223,15 @@ export default function RecommendScreen({ route, navigation }) {
         </View>
       ) : (
         <>
+          {tab === 'cf' && cfFallback && (
+            <View style={styles.cfFallbackBanner}>
+              <Text style={styles.cfFallbackText}>
+                아직 취향 학습 전이에요 — 카드를 눌러보거나 길찾기를 하면
+                비슷한 취향의 사용자 기반 맞춤 추천이 생겨요. 지금은 키워드
+                기본 추천을 보여드릴게요.
+              </Text>
+            </View>
+          )}
           {currentList.map((food) => (
             <FoodCard
               key={`${food.id}-${refreshSeed}`}
@@ -428,6 +441,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: SPACING.sm,
     marginBottom: SPACING.sm,
+  },
+  cfFallbackBanner: {
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  cfFallbackText: {
+    fontSize: FONT.sizeXs,
+    color: COLORS.primary,
+    lineHeight: 18,
   },
   dataNote: {
     fontSize: FONT.sizeXs,

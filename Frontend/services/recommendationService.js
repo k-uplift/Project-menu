@@ -116,6 +116,7 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
   let kinds = [];
   let sessionId = null;
   let userId = context.userId ?? defaultUid;
+  let emptyReason = null;
   try {
     const fkwParam = fkwList ? `&food_keywords=${encodeURIComponent(fkwList)}` : '';
     const url = `${API_BASE}/foods_cf?tags=${encodeURIComponent(tagList)}${fkwParam}&user_id=${userId}`;
@@ -125,9 +126,18 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
     kinds = Array.isArray(data.kinds) ? data.kinds : [];
     sessionId = data.sessionId ?? null;
     userId = data.userId ?? userId;
+    emptyReason = data.emptyReason ?? null;
   } catch (e) {
     console.warn('[recommendationService] /foods_cf fetch 실패:', e.message);
     return { items: [], sessionId: null, userId };
+  }
+
+  // Cold start — 아직 행동 이력이 없는(신규 가입) 사용자는 CF가 닮은 사용자를
+  // 못 찾아 빈 결과(emptyReason='no_history')를 준다. 빈 화면 대신 기본 추천으로
+  // 대체하고 fallback 플래그를 띄워 '취향 학습 전' 배너를 보여준다.
+  if (kinds.length === 0) {
+    const base = await getFoodRecommendations(keywords, context);
+    return { ...base, fallback: true, fallbackReason: emptyReason || 'no_history' };
   }
 
   const timeCtx = context.timeCtx || getCurrentTimeContext();
@@ -141,5 +151,5 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
       contextNote: dynamicContextNote,
     },
   }));
-  return { items, sessionId, userId };
+  return { items, sessionId, userId, fallback: false };
 }
