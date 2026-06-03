@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from cf_module.core.similarity import jaccard_similarity
-from cf_module.data.synthetic import get_synthetic_dataset
+from cf_module.data.adapter import get_db_dataset
 from cf_module.models import (
     FoodKind,
     SearchSession,
@@ -10,10 +10,11 @@ from cf_module.models import (
 )
 
 
-# 추후 DB/서비스 연동 시 어댑터 주입으로 교체될 부분.
+# 실 DB (recommend.db) 기반. 합성 데이터는 cf_module/data/synthetic.py 에 보존.
+# 풀: Food 296 kind / RecommendationSession 192 세션 / User 24명.
 _KINDS: list[FoodKind]
 _SESSIONS: list[SearchSession]
-_KINDS, _SESSIONS = get_synthetic_dataset()
+_KINDS, _SESSIONS = get_db_dataset()
 
 
 def _get_user_final_selected_kinds(user_id: int) -> set[int]:

@@ -1,7 +1,14 @@
 """me:nu 추천 HTTP wrapper.
 
-src/llm/match.py(태그 매칭)와 cf_module(세션 기반 CF)을 HTTP로 노출.
-프론트(React Native + Expo)가 mock 대신 이 API를 호출.
+두 추천 채널을 동시 노출:
+  - /foods    = src/llm/match.py — 363 kind 풀 + IDF + food_kw + 사이드 디부스트.
+                평가셋 lenient 97.2% 검증된 콘텐츠 매칭. *기본 추천 탭*.
+  - /foods_cf = cf_module Tab2 (사용자 기반 CF, recommend.db 기반) —
+                "나와 취향이 비슷한 사용자들이 고른 메뉴". *개인화 추천 탭*.
+
+cf_module 의 Tab1 (세션 기반)은 *호출 X*. recommend_foods 가 더 풍부한 풀과
+다듬어진 알고리즘으로 같은 자리를 더 잘 채움. cf_module 코드 자체는 보존 —
+adapter.py 가 recommend.db 를 본 채로 살아있어 Tab2 가 그대로 동작.
 
 실행:
     cd Backend
@@ -9,8 +16,9 @@ src/llm/match.py(태그 매칭)와 cf_module(세션 기반 CF)을 HTTP로 노출
 
 엔드포인트:
     GET  /                                 헬스체크
-    GET  /foods?q=...                      자연어 → 음식 종류 추천 (태그 매칭)
-    GET  /foods_cf?q=...&user_id=1         자연어 → 세션 기반 CF 추천 (cf_module)
+    GET  /extract?q=...                    자연어 → 시드 14 태그 추출 (검수용)
+    GET  /foods?q=...&user_id=1            자연어 → 콘텐츠 매칭 추천 (match.py)
+    GET  /foods_cf?q=...&user_id=1         자연어 → 개인화 CF 추천 (cf_module Tab2)
     GET  /restaurants?q=...&kind=...       선택 종류 → 식당 추천
     GET  /restaurants/{store_id}/menus     그 식당의 전체 메뉴 (RestaurantDetail용)
     POST /events                           클릭/최종선택 이벤트 기록 (DB 동적 wiring)
@@ -115,12 +123,44 @@ def extract(q: str):
     }
 
 
+def _cf_results_to_kinds(results, rep_tags) -> list[dict]:
+    """cf_module RecommendationResult[] → 프론트 카드 계약(kinds[]) 변환.
+
+    /foods·/foods_cf 양쪽에서 동일 패턴이라 헬퍼로 추출.
+    tags 는 *rep_tags 캐시* (kind 자체 대표 태그 top 4) 우선, 폴백으로 matched_tags.
+    score 0~100 매핑은 시연용 (raw float → 정수). cf_module Tab1 score 범위는
+    대체로 0~10, Tab2 는 0~5 정도 → ×5+50 으로 펴면 50~100 사이로 안착.
+    """
+    kinds = []
+    for r in results:
+        kinds.append({
+            "id": KIND_TO_FOOD_ID.get(r.kind_name, f"food-{r.kind_name}"),
+            "name": r.kind_name,
+            "emoji": None,
+            "imageUrl": None,
+            "tags": rep_tags.get(r.kind_name, list(r.matched_tags)),
+            "score": min(100, 50 + int(r.score * 5)),
+            "reason": {
+                "matchedKeywords": list(r.matched_tags),
+                "matchedFoodKeywords": [],
+                "cfScore": round(r.score, 2),
+                "cfDescription": r.reason,
+                "contextNote": None,
+            },
+        })
+    return kinds
+
+
 @app.get("/foods")
 def foods(q: str, top_k: int = 10, user_id: int = 1):
-    """자연어 쿼리 → 음식 종류 추천 (태그 매칭, 1차).
+    """자연어 쿼리 → 기본 추천 (콘텐츠 매칭, match.py).
 
-    응답에 session_id 포함 — 프론트가 보관해 후속 /restaurants·/events 호출 시
-    같이 보내면 동일 검색 맥락의 행동이 (user, food, tag) 가중치에 묶임.
+    363 kind vocab + IDF 가중 + food_keywords 채널 + 사이드 디부스트.
+    평가셋 lenient 97.2% 검증된 알고리즘. 추천 결과는 *DB 행동 데이터와 무관* —
+    정적 menu_tags.jsonl + menu_kinds.jsonl + details.db.stores 만 본다.
+
+    DB 동적 wiring (Session/Tag/Log/Weight) 은 그대로. 검색마다 RecommendationSession
+    + UserTagSelection INSERT — 후속 CF 신호로 흘러간다.
     """
     if not q.strip():
         raise HTTPException(status_code=400, detail="q is empty")
@@ -133,13 +173,12 @@ def foods(q: str, top_k: int = 10, user_id: int = 1):
 
 @app.get("/foods_cf")
 def foods_cf(q: str, user_id: int = 1, top_k: int = 10):
-    """세션 기반 CF 추천 (cf_module).
+    """개인화 추천 (cf_module Tab2 personalized, 사용자 기반 CF).
 
-    우리 extract.py로 입력 태그를 뽑은 뒤 cf_module.recommend로 tab2(CF)만 사용.
-    cf_module의 tab1(태그 매칭)은 합성 50 kind 한정이라 사용 X — 메인 /foods가 우리
-    match.py로 363 kind 풀 전체에서 더 풍부하게 잡는다.
+    "나와 *행동 윤곽이 닮은 사용자들*이 고른 메뉴". user_id 의 final_select 한 kind 는
+    재추천에서 제외 (이미 먹어본 거). click 만 한 kind 는 후보로 남김 (관심 단계).
 
-    응답 모양은 /foods와 동일 (kinds[]·sessionId·userId) — 프론트가 같은 카드 컴포넌트 재사용.
+    응답 모양은 /foods 와 동일 (kinds[]·sessionId·userId).
     """
     if not q.strip():
         raise HTTPException(status_code=400, detail="q is empty")
@@ -148,24 +187,7 @@ def foods_cf(q: str, user_id: int = 1, top_k: int = 10):
     cf_response = cf_recommend(extracted.tags, user_id=user_id, top_k=top_k)
 
     rep_tags = _get_kind_rep_tags()
-    kinds = []
-    for r in cf_response.tab2_results:
-        kinds.append({
-            "id": KIND_TO_FOOD_ID.get(r.kind_name, f"food-{r.kind_name}"),
-            "name": r.kind_name,
-            "emoji": None,
-            "imageUrl": None,
-            "tags": rep_tags.get(r.kind_name, list(r.matched_tags)),
-            # cf_module score는 raw float (~0~수십). 시연용으로 50~100 사이로 매핑.
-            "score": min(100, 50 + int(r.score * 5)),
-            "reason": {
-                "matchedKeywords": list(r.matched_tags),
-                "matchedFoodKeywords": [],
-                "cfScore": round(r.score, 2),
-                "cfDescription": r.reason,
-                "contextNote": None,
-            },
-        })
+    kinds = _cf_results_to_kinds(cf_response.tab2_results, rep_tags)
 
     session_id = _open_session_and_save_tags(user_id, extracted.tags)
     return {
@@ -174,6 +196,7 @@ def foods_cf(q: str, user_id: int = 1, top_k: int = 10):
         "sessionId": session_id,
         "keywords": extracted.tags,
         "kinds": kinds,
+        "emptyReason": cf_response.tab2_empty_reason,
     }
 
 
