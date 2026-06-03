@@ -4,3 +4,10 @@
 
 # OS 가 생성하는 파일
 .DS_Store
+
+# Expo 로컬 개발 상태 (기기 정보 등 — 커밋 불필요)
+Frontend/.expo/
+
+# Python 캐시
+__pycache__/
+*.pyc
