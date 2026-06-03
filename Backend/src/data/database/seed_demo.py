@@ -38,6 +38,7 @@ TYPES: list[tuple[str, str, str, str]] = [
 
 USERS_PER_TYPE = 3
 PICKS_PER_USER = 8       # 기존 호환 — 한 세션당 음식 수가 아니라 *기본 모드* 한 사람당 final 수
+CLICKS_PER_USER = 5      # 확장 모드: 사용자당 click 5건 (관심만 보이고 final 안 한 행동) — Tab2 신호 다양화
 DEMO_PASSWORD = "demo1234"
 
 # 기존 8건 오프셋 — 호환용. 확장 모드에서는 _day_offset() 헬퍼가 N 세션에 균등 분산.
@@ -152,24 +153,38 @@ def _session_tags(a: str, b: str, idx: int, n: int) -> tuple[str, str]:
 
 
 def _clear_demo(conn: sqlite3.Connection) -> None:
-    """email 이 '@demo' 로 끝나는 더미와 그 세션/로그 삭제(순서 중요)."""
-    rows = conn.execute("SELECT user_id FROM User WHERE email LIKE '%@demo'").fetchall()
+    """더미 사용자 + 세션/로그 삭제 + sqlite_sequence 리셋 (순서 중요).
+
+    삭제 대상:
+      - email LIKE '%@demo' (T1~T8 더미)
+      - email LIKE 'demo%@menu.local' (ensure_demo_user 가 만든 데모)
+
+    sqlite_sequence 를 리셋해 다음 seed_demo 가 user_id 를 항상 1 부터 채번하도록.
+    UserFoodTagWeight 도 통째로 비움 (정책 변경 또는 누적 흔적 정리).
+    """
+    rows = conn.execute(
+        "SELECT user_id FROM User WHERE email LIKE '%@demo' OR email LIKE 'demo%@menu.local'"
+    ).fetchall()
     uids = [r[0] for r in rows]
-    if not uids:
-        return
-    qs = ",".join("?" * len(uids))
-    conn.execute(
-        f"DELETE FROM UserInteractionLog WHERE session_id IN "
-        f"(SELECT session_id FROM RecommendationSession WHERE user_id IN ({qs}))",
-        uids,
-    )
-    conn.execute(
-        f"DELETE FROM UserTagSelection WHERE session_id IN "
-        f"(SELECT session_id FROM RecommendationSession WHERE user_id IN ({qs}))",
-        uids,
-    )
-    conn.execute(f"DELETE FROM RecommendationSession WHERE user_id IN ({qs})", uids)
-    conn.execute(f"DELETE FROM User WHERE user_id IN ({qs})", uids)
+    if uids:
+        qs = ",".join("?" * len(uids))
+        conn.execute(
+            f"DELETE FROM UserInteractionLog WHERE session_id IN "
+            f"(SELECT session_id FROM RecommendationSession WHERE user_id IN ({qs}))",
+            uids,
+        )
+        conn.execute(
+            f"DELETE FROM UserTagSelection WHERE session_id IN "
+            f"(SELECT session_id FROM RecommendationSession WHERE user_id IN ({qs}))",
+            uids,
+        )
+        conn.execute(f"DELETE FROM UserFoodTagWeight WHERE user_id IN ({qs})", uids)
+        conn.execute(f"DELETE FROM RecommendationSession WHERE user_id IN ({qs})", uids)
+        conn.execute(f"DELETE FROM User WHERE user_id IN ({qs})", uids)
+
+    # AUTOINCREMENT 리셋 — User·RecommendationSession·UserInteractionLog·UserTagSelection 다 1 부터
+    for table in ("User", "RecommendationSession", "UserInteractionLog", "UserTagSelection"):
+        conn.execute("UPDATE sqlite_sequence SET seq = 0 WHERE name = ?", (table,))
 
 
 def seed(
@@ -178,15 +193,18 @@ def seed(
     sessions_per_user: int = PICKS_PER_USER,
     use_type_offset: bool = False,
     variants: bool = False,
+    users_per_type: int = USERS_PER_TYPE,
+    clicks_per_user: int = 0,
 ) -> dict:
     """더미 시드.
 
     기본 호출(인자 0): 24명 × 8 세션 = 192건 (기세웅 원본 동작 유지).
-    확장 모드: sessions_per_user=32, use_type_offset=True, variants=True
-        → 24명 × 32 세션 = 768건. food_id 분포 분산 + 세션 태그 변종 → cf_module
-        Tab1 도배(특정 kind 점수 누적 1위 도배) 해소 + CF 임팩트 ↑.
+    확장 모드 (--extended): sessions_per_user=32, type_offset=True, variants=True
+        → 24명 × 32 세션 = 768 final. Tab1 도배 해소 + Tab2 임팩트 ↑.
+    *대확장* 모드 (--big): users_per_type=10, clicks_per_user=5
+        → 80명 × (32 final + 5 click) = 2,960 행동. 유사 사용자 풀 *대폭 확장*.
 
-    variants=True 시 세션 input_tags 절반은 (a, b), 나머지는 (a, x) / (b, y) 변종.
+    click 행동은 별도 세션 (final 과 분리). soft 풀 음식에 click — '관심만 보임' 모사.
     """
     now = now or datetime.now()
     init_db(db_path)
@@ -204,13 +222,13 @@ def seed(
 
         user_foods: dict[str, set[int]] = {}      # email -> food_id set (검증용)
         user_type: dict[str, str] = {}
-        n_users = n_logs = n_tag_sels = 0
+        n_users = n_logs = n_tag_sels = n_clicks = 0
 
         for type_idx, (tid, _name, a, b) in enumerate(TYPES):
             core, soft, noise = _pools(food_tags, a, b)
             a_id, b_id = tag_name_to_id[a], tag_name_to_id[b]
             type_offset = (type_idx * 3) if use_type_offset else 0
-            for i in range(USERS_PER_TYPE):
+            for i in range(users_per_type):
                 email = f"{tid.lower()}_u{i + 1}@demo"
                 cur = conn.execute(
                     "INSERT INTO User(email, password_hash) VALUES (?, ?)", (email, pw_hash)
@@ -244,12 +262,37 @@ def seed(
                     )
                     n_logs += 1
                     n_tag_sels += 2
+                # click 행동 — 별도 세션. soft 풀에서 회전 선택 (관심만 보인 음식)
+                if clicks_per_user > 0 and soft:
+                    for c_idx in range(clicks_per_user):
+                        click_fid = soft[(type_offset + i * 7 + c_idx) % len(soft)]
+                        # 최근 시각 (click 은 더 최신 행동으로 — 활성 사용자 모사)
+                        off = c_idx * 2 + 1
+                        ts = (now - timedelta(days=off)).strftime("%Y-%m-%d %H:%M:%S")
+                        s = conn.execute(
+                            "INSERT INTO RecommendationSession(user_id, created_at) VALUES (?, ?)",
+                            (uid, ts),
+                        )
+                        sid = s.lastrowid
+                        conn.executemany(
+                            "INSERT INTO UserTagSelection(session_id, tag_id) VALUES (?, ?)",
+                            [(sid, a_id), (sid, b_id)],
+                        )
+                        conn.execute(
+                            "INSERT INTO UserInteractionLog(session_id, food_id, action_type, created_at) "
+                            "VALUES (?, ?, 'click', ?)",
+                            (sid, click_fid, ts),
+                        )
+                        n_clicks += 1
+                        n_tag_sels += 2
+
                 user_foods[email] = set(picks)
                 user_type[email] = tid
                 n_users += 1
 
         conn.commit()
-        return {"users": n_users, "logs": n_logs, "tag_selections": n_tag_sels,
+        return {"users": n_users, "logs": n_logs, "clicks": n_clicks,
+                "tag_selections": n_tag_sels,
                 "user_foods": user_foods, "user_type": user_type}
     finally:
         conn.close()
@@ -297,24 +340,49 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--extended", action="store_true",
                         help="확장 모드 — 사용자당 32 세션 + type_offset + variants. Tab1 도배 해소용.")
+    parser.add_argument("--big", action="store_true",
+                        help="대확장 모드 — extended + users_per_type=10 + clicks_per_user=5. "
+                             "80명 × (32 final + 5 click) = 2,960 행동. Tab2 임팩트 대폭↑.")
     parser.add_argument("--sessions", type=int, default=None,
-                        help="사용자당 세션 수 (확장 모드 미사용 시 기본 8). --extended 와 함께면 기본 32.")
+                        help="사용자당 세션 수 (기본 8). --extended/--big 와 함께면 기본 32.")
+    parser.add_argument("--users-per-type", type=int, default=None,
+                        help="유형당 사용자 수 (기본 3). --big 면 10.")
+    parser.add_argument("--clicks", type=int, default=None,
+                        help="사용자당 click 행동 수 (기본 0). --big 면 5.")
     args = parser.parse_args()
 
+    use_extended = args.extended or args.big
+
     sessions = args.sessions
-    if args.extended and sessions is None:
+    if use_extended and sessions is None:
         sessions = 32
     if sessions is None:
         sessions = PICKS_PER_USER
 
+    users_per_type = args.users_per_type
+    if users_per_type is None:
+        users_per_type = 10 if args.big else USERS_PER_TYPE
+
+    clicks = args.clicks
+    if clicks is None:
+        clicks = 5 if args.big else 0
+
     try:
         res = seed(
             sessions_per_user=sessions,
-            use_type_offset=args.extended,
-            variants=args.extended,
+            use_type_offset=use_extended,
+            variants=use_extended,
+            users_per_type=users_per_type,
+            clicks_per_user=clicks,
         )
-        mode = "확장" if args.extended else "기본"
-        print(f"[OK] {mode} 모드 / User {res['users']}명 / 행동로그 {res['logs']}건 "
+        if args.big:
+            mode = "대확장"
+        elif args.extended:
+            mode = "확장"
+        else:
+            mode = "기본"
+        print(f"[OK] {mode} 모드 / User {res['users']}명 "
+              f"/ final {res['logs']}건 / click {res.get('clicks', 0)}건 "
               f"/ 태그선택 {res['tag_selections']}건 → {DB_PATH}")
         _validate(res)
     except Exception as e:  # noqa: BLE001

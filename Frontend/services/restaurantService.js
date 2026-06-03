@@ -34,7 +34,7 @@ import {
  * @returns {Promise<import('../types').Restaurant[]>}
  */
 export async function getRestaurantsByFood(food, options = {}) {
-  const { sort = 'distance', userLocation, query } = options;
+  const { sort = 'distance', userLocation, query, userId = 1 } = options;
 
   // 백엔드는 q + kind 둘 다 필수. q가 없으면 종류 이름을 자기 자신을 쿼리로.
   const kind = food?.name || '';
@@ -46,7 +46,8 @@ export async function getRestaurantsByFood(food, options = {}) {
     const url =
       `${API_BASE}/restaurants` +
       `?q=${encodeURIComponent(q)}` +
-      `&kind=${encodeURIComponent(kind)}`;
+      `&kind=${encodeURIComponent(kind)}` +
+      `&user_id=${userId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -68,7 +69,8 @@ export async function getRestaurantsByFood(food, options = {}) {
       reviewCount: rest.reviewCount ?? 0,
       delivery: rest.delivery ?? false,
       signature: rest.signature ?? false,
-      cfMatch: rest.cfMatch ?? null,
+      // cfMatch (0~1) — 백엔드가 user_id 기반 식당 cfScore 정규화해서 제공.
+      cfMatch: rest.cfMatch ?? 0,
     };
 
     if (rest.latitude == null || rest.longitude == null) {
@@ -97,8 +99,16 @@ export async function getRestaurantsByFood(food, options = {}) {
       return a.distanceKm - b.distanceKm;
     });
   } else if (sort === 'cf') {
-    // CF 백엔드 미구현 — 임시로 점수 기준 정렬
-    enriched.sort((a, b) => (b.score || 0) - (a.score || 0));
+    // 백엔드 cfScore 내림차순 — 식당 메뉴들의 *내 유사 사용자 행동 가중치 합*.
+    // 동률이면 거리순(가까운 곳)으로 fallback — 자연 순서.
+    enriched.sort((a, b) => {
+      const diff = (b.cfScore || 0) - (a.cfScore || 0);
+      if (diff !== 0) return diff;
+      // tie-breaker: 거리
+      const da = a.distanceKm ?? Infinity;
+      const db = b.distanceKm ?? Infinity;
+      return da - db;
+    });
   }
 
   return enriched;

@@ -60,7 +60,9 @@ export default function KeywordScreen({ route, navigation }) {
     navigation.navigate('Recommend', {
       keywords: selected,
       originalText: analyzeResult.originalText,
-      context: {},
+      // foodKeywords 는 /extract 가 뽑은 *카테고리·식재료* 신호 (UI 미노출).
+      // tags 모드 호출 시 같이 보내 match.py 의 substring 매칭에 사용 → 추천 품질↑.
+      context: { foodKeywords: analyzeResult.foodKeywords || [] },
     });
   };
 

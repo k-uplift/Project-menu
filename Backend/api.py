@@ -48,7 +48,47 @@ from src.data.database.sessions import (
     save_tag_selections,
 )
 from src.llm.extract import extract_tags
-from src.llm.kinds import KIND_TO_FOOD_ID
+from src.llm.kinds import KIND_TO_FOOD_ID, KIND_TO_CATEGORY
+
+
+# ── 카테고리 친근 라벨 ───────────────────────────────────────────────────────
+# kinds.py 의 raw 카테고리 ('한식국물탕') 를 카드에 보일 친근 표현 ('한식 국물요리')
+# 으로 변환. 기본 탭 카드의 추천 근거 문장에 사용.
+_CATEGORY_LABELS: dict[str, str] = {
+    "한식국물탕": "한식 국물요리",
+    "한식고기":   "한식 고기요리",
+    "한식면밥":   "한식 면·밥",
+    "한식조림찜": "한식 조림·찜",
+    "일식":       "일식",
+    "중식":       "중식",
+    "양식":       "양식",
+    "디저트":     "디저트",
+    "치킨":       "치킨",
+    "분식":       "분식",
+    "도시락":     "도시락",
+}
+
+
+def _build_kind_reason_desc(
+    kind_name: str,
+    n_stores: int,
+    matched_count: int,
+    total_keywords: int,
+) -> str:
+    """기본 탭 카드 추천 근거. '검색 키워드 모두 일치·12개 식당이 판매' 형태.
+
+    매칭의 *강도* (검색 의도와 얼마나 일치) + *데이터 신뢰* (식당 검증) 결합.
+    CF 탭의 'Charlie 등 N명이 선택' 과 문장 구조 매치.
+    """
+    parts: list[str] = []
+    if total_keywords > 0:
+        if matched_count >= total_keywords:
+            parts.append("검색 키워드 모두 일치")
+        elif matched_count > 0:
+            parts.append(f"검색 키워드 {matched_count}/{total_keywords} 일치")
+    if n_stores > 0:
+        parts.append(f"{n_stores}개 식당이 판매")
+    return " · ".join(parts) if parts else ""
 from src.llm.match import (
     _get_kind_rep_tags,
     load_menu_tags,
@@ -56,10 +96,61 @@ from src.llm.match import (
     recommend_foods_by_tags,
     recommend_stores_for_kind,
 )
+from src.auth.routes import router as auth_router
 
-from cf_module.core.recommend import recommend as cf_recommend
+from cf_module.core.recommend import (
+    recommend as cf_recommend,
+    _find_similar_users as _cf_find_similar_users,
+    _get_user_kind_max_weight as _cf_user_kind_weight,
+)
+
+# ── CF 카드 supporters 이름 매핑 ─────────────────────────────────────────────
+# 시연용 3명 (Alice·Bob·Charlie) 만 친근한 이름. 나머지 77명은 페르소나 라벨.
+# seed_demo 의 TYPES 순서로 user_id 1~10=T1, 11~20=T2, ... 81~10=T8.
+_USER_DISPLAY_NAMES: dict[int, str] = {
+    1:  "Alice",
+    2:  "Charlie",
+    41: "Bob",
+}
+_PERSONA_LABELS = [
+    "매운국물파", "튀김전러버", "뜨끈보양파", "진한메인파",
+    "단짠간식파", "해장파",     "슴슴든든파", "따뜻집밥파",
+]
+
+
+def _user_display(uid: int) -> str:
+    """user_id → 카드에 보일 이름. 시연 3명은 친근 이름, 나머지는 페르소나#N."""
+    if uid in _USER_DISPLAY_NAMES:
+        return _USER_DISPLAY_NAMES[uid]
+    if 1 <= uid <= 80:
+        type_idx = (uid - 1) // 10
+        seq = (uid - 1) % 10 + 1
+        return f"{_PERSONA_LABELS[type_idx]}#{seq}"
+    return f"사용자{uid}"
+
+
+def _build_supporters_desc(supporter_uids: list[int]) -> str:
+    """supporters user_id 리스트 → 'Charlie·매운국물파#5 등 8명이 선택' 문장.
+
+    시연 사용자(Alice·Bob·Charlie)는 *최우선*으로 보여주고, 그 다음은 supporters
+    순서대로. 상위 2명까지 이름 + 나머지는 '등 N명'.
+    """
+    n = len(supporter_uids)
+    if n == 0:
+        return ""
+    # 시연 사용자가 supporters 에 있으면 맨 앞으로 끌어옴
+    demo_ids = [uid for uid in supporter_uids if uid in _USER_DISPLAY_NAMES]
+    other_ids = [uid for uid in supporter_uids if uid not in _USER_DISPLAY_NAMES]
+    ordered = demo_ids + other_ids
+    top_named = [_user_display(uid) for uid in ordered[:2]]
+    if n <= 2:
+        return f"{'·'.join(top_named)}이 선택"
+    return f"{'·'.join(top_named)} 등 {n}명이 선택"
 
 app = FastAPI(title="me:nu recommendation API")
+
+# /auth/* 엔드포인트 흡수 (origin/DB 15582c26) — signup·login·me
+app.include_router(auth_router)
 
 # 개발용 — 모든 origin 허용. 배포 시 Expo/도메인만으로 좁히기.
 # POST 추가했으니 methods도 확장.
@@ -153,15 +244,23 @@ def _cf_results_to_kinds(results, rep_tags) -> list[dict]:
 
 
 @app.get("/foods")
-def foods(q: str = "", tags: str = "", top_k: int = 10, user_id: int = 1):
+def foods(
+    q: str = "",
+    tags: str = "",
+    food_keywords: str = "",
+    top_k: int = 10,
+    user_id: int = 1,
+):
     """자연어 쿼리 → 기본 추천 (콘텐츠 매칭, match.py).
 
     두 모드:
       - tags 가 있으면 *extract 건너뛰기* — 사용자가 KeywordScreen 에서 직접
         선택·수정한 시드 태그를 그대로 사용 (사용자 변경이 100% 반영).
+        food_keywords 도 같이 받으면 /extract 가 한 번 추출한 카테고리 신호를
+        살린다 (Claude 추가 호출 없이 substring 매칭 강화).
       - tags 없으면 q 로 extract 호출 → 시드 추출 → match (자동 모드).
 
-    tags 는 콤마 구분: `?tags=얼큰한,야식`.
+    파라미터는 콤마 구분: `?tags=얼큰한,야식&food_keywords=찌개,국밥`.
     DB 동적 wiring (Session/Tag/Log/Weight) 양쪽 동일 — 검색마다 INSERT.
     """
     if not q.strip() and not tags.strip():
@@ -169,9 +268,22 @@ def foods(q: str = "", tags: str = "", top_k: int = 10, user_id: int = 1):
 
     if tags.strip():
         tag_list = [t.strip() for t in tags.split(",") if t.strip()]
-        result = recommend_foods_by_tags(tag_list, top_k=top_k)
+        fkw_list = [t.strip() for t in food_keywords.split(",") if t.strip()]
+        result = recommend_foods_by_tags(tag_list, top_k=top_k, food_keywords=fkw_list)
     else:
         result = recommend_foods(q, top_k=top_k)
+
+    # 카드 추천 근거 — '검색 키워드 모두 일치·12개 식당이 판매' 형태.
+    # 매칭 강도(왜 추천된 신호) + 데이터 신뢰(식당 검증). CF 탭과 톤 매치.
+    total_keywords = len(result.get("keywords", []))
+    for k in result.get("kinds", []):
+        matched = len((k.get("reason", {}) or {}).get("matchedKeywords", []))
+        desc = _build_kind_reason_desc(
+            k.get("name", ""), k.get("nStores", 0), matched, total_keywords,
+        )
+        if desc:
+            k.setdefault("reason", {})["cfDescription"] = desc
+
     session_id = _open_session_and_save_tags(user_id, result.get("keywords", []))
     result["sessionId"] = session_id
     result["userId"] = user_id
@@ -179,7 +291,13 @@ def foods(q: str = "", tags: str = "", top_k: int = 10, user_id: int = 1):
 
 
 @app.get("/foods_cf")
-def foods_cf(q: str = "", tags: str = "", user_id: int = 1, top_k: int = 10):
+def foods_cf(
+    q: str = "",
+    tags: str = "",
+    food_keywords: str = "",  # 호환만 — cf_module Tab2 점수엔 미사용. 응답에 echo.
+    user_id: int = 1,
+    top_k: int = 10,
+):
     """개인화 추천 (cf_module Tab2 personalized, 사용자 기반 CF).
 
     "나와 *행동 윤곽이 닮은 사용자들*이 고른 메뉴". user_id 의 final_select 한 kind 는
@@ -202,8 +320,24 @@ def foods_cf(q: str = "", tags: str = "", user_id: int = 1, top_k: int = 10):
 
     cf_response = cf_recommend(input_tags, user_id=user_id, top_k=top_k)
 
+    # 유사 사용자 N명 + 각 kind 별 *그 중 행동한 사용자 수* 계산 — *진짜 데이터*
+    # 근거 문장 (cfDescription) 으로 사용. cf_module 의 _score_candidates 가
+    # 내부에서 같은 계산을 하지만 결과를 안 노출해서 여기서 한 번 더 한다.
+    similar_users = _cf_find_similar_users(user_id)
+    n_similar = len(similar_users)
     rep_tags = _get_kind_rep_tags()
     kinds = _cf_results_to_kinds(cf_response.tab2_results, rep_tags)
+    # 각 kind 의 supporters 수 + 이름 = 유사 사용자 중 이 kind 에 행동한 사람들
+    for kind_dict, r in zip(kinds, cf_response.tab2_results):
+        supporter_uids = [
+            uid for uid, _sim in similar_users
+            if _cf_user_kind_weight(uid, r.kind_id) > 0
+        ]
+        n_supporters = len(supporter_uids)
+        kind_dict["reason"]["cfDescription"] = _build_supporters_desc(supporter_uids)
+        kind_dict["reason"]["cfSupporters"] = n_supporters
+        kind_dict["reason"]["cfSimilarUsers"] = n_similar
+        kind_dict["reason"]["cfSupporterNames"] = [_user_display(uid) for uid in supporter_uids]
 
     session_id = _open_session_and_save_tags(user_id, input_tags)
     return {
@@ -234,18 +368,83 @@ def _load_baemin_urls() -> dict[str, str]:
     return _BAEMIN_URLS_CACHE
 
 
+# 식당 CF 점수 캐시 — store_id 별 메뉴 kind 리스트. load_menu_tags() 결과
+# 한 번 빌드해 두면 모든 /restaurants 호출에 재사용.
+_STORE_KINDS_CACHE: dict[int, list[str]] | None = None
+
+
+def _get_store_kinds() -> dict[int, list[str]]:
+    """store_id → 그 식당의 모든 메뉴 kind 리스트 (중복 포함)."""
+    global _STORE_KINDS_CACHE
+    if _STORE_KINDS_CACHE is None:
+        bag: dict[int, list[str]] = {}
+        for r in load_menu_tags():
+            if r.kind and r.store_id:
+                bag.setdefault(r.store_id, []).append(r.kind)
+        _STORE_KINDS_CACHE = bag
+    return _STORE_KINDS_CACHE
+
+
+def _kind_name_to_food_id() -> dict[str, int]:
+    """kind 이름 → recommend.db Food.food_id. cf_module 의 _KINDS 그대로."""
+    from cf_module.core.recommend import _KINDS
+    return {k.name: k.kind_id for k in _KINDS}
+
+
+def _compute_store_cf_scores(user_id: int, store_ids: list[int]) -> dict[int, float]:
+    """각 식당의 cfScore = Σ(메뉴 distinct kind 별 *유사 사용자 행동 가중치 합*).
+
+    의미: 내 유사 사용자들이 *이 식당이 다루는 음식들*을 얼마나 좋아했나.
+    식당마다 메뉴 구성 다르므로 자연스럽게 식당별 점수 차별화.
+    """
+    similar = _cf_find_similar_users(user_id)
+    if not similar:
+        return {sid: 0.0 for sid in store_ids}
+
+    store_kinds = _get_store_kinds()
+    name_to_kind_id = _kind_name_to_food_id()
+
+    scores: dict[int, float] = {}
+    for sid in store_ids:
+        score = 0.0
+        # distinct kind — 한 식당이 김치찌개 메뉴 3개 있어도 *김치찌개 1번*만 카운트
+        for kind_name in set(store_kinds.get(sid, [])):
+            kind_id = name_to_kind_id.get(kind_name)
+            if kind_id is None:
+                continue
+            for uid, sim in similar:
+                w = _cf_user_kind_weight(uid, kind_id)
+                if w > 0:
+                    score += sim * w
+        scores[sid] = score
+    return scores
+
+
 @app.get("/restaurants")
-def restaurants(q: str, kind: str, top_k: int = 10):
+def restaurants(q: str, kind: str, top_k: int = 10, user_id: int = 1):
     """선택한 음식 종류 → 그 종류의 식당 추천 (2차).
 
     q는 1차에서 쓴 쿼리 그대로 — 사용자 취향이 식당 점수에 반영되도록.
+    user_id 로 *식당별 cfScore* 계산 → 응답에 같이 노출. 프론트가 '취향 맞춤'
+    탭에서 cfScore 정렬 + cfMatch 시각화에 사용.
     응답 stores[] 각 item에 baeminUrl 주입 (시연용 매핑에 있는 식당만).
     """
     if not q.strip() or not kind.strip():
         raise HTTPException(status_code=400, detail="q and kind required")
     result = recommend_stores_for_kind(q, kind, top_k=top_k)
+
+    # CF 점수 — 모든 식당 일괄 계산 후 최댓값으로 정규화 (cfMatch 0~1)
+    stores = result.get("stores", [])
+    store_ids = [int(s["storeId"]) for s in stores if s.get("storeId")]
+    cf_scores = _compute_store_cf_scores(user_id, store_ids)
+    max_cf = max(cf_scores.values(), default=0.0) or 1.0
+
     baemin_urls = _load_baemin_urls()
-    for store in result.get("stores", []):
+    for store in stores:
+        sid = int(store.get("storeId") or 0)
+        raw = cf_scores.get(sid, 0.0)
+        store["cfScore"] = round(raw, 3)
+        store["cfMatch"] = round(raw / max_cf, 3) if max_cf > 0 else 0.0
         url = baemin_urls.get(store.get("name"))
         if url:
             store["baeminUrl"] = url

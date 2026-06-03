@@ -52,10 +52,12 @@ export async function analyzeKeywords(text) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    // 백엔드가 이미 프론트 Keyword 구조로 변환해서 보냄
+    // 백엔드가 이미 프론트 Keyword 구조로 변환해서 보냄.
+    // foodKeywords 는 *내부 매칭 보조 채널* — UI 에 노출 X, 추천 호출 시 같이 흘려보냄.
     return {
       originalText: data.originalText || text,
       keywords: Array.isArray(data.keywords) ? data.keywords : [],
+      foodKeywords: Array.isArray(data.foodKeywords) ? data.foodKeywords : [],
     };
   } catch (e) {
     console.warn('[keywordService] /extract 실패 → mock fallback:', e.message);

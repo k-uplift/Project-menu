@@ -170,6 +170,10 @@ def _get_idf(rows: list[MenuRow]) -> dict[str, float]:
 # 계산해야 안정 — '짬뽕'은 검색 무관하게 항상 '얼큰한·국물있는·진한·따뜻한'.
 _KIND_REP_TAGS_CACHE: dict[str, list[str]] | None = None
 
+# kind 별 *전체 식당 수* (모든 메뉴 통틀어). 카드의 'X개 식당이 판매' 표시용 —
+# 검색 매칭과 무관한 그 종류의 *진짜 풍부도*. 한 번 빌드 후 모듈 캐시.
+_KIND_STORE_COUNT_CACHE: dict[str, int] | None = None
+
 
 def _get_kind_rep_tags(rows: list[MenuRow] | None = None) -> dict[str, list[str]]:
     global _KIND_REP_TAGS_CACHE
@@ -188,6 +192,20 @@ def _get_kind_rep_tags(rows: list[MenuRow] | None = None) -> dict[str, list[str]
             for kind, counts in kind_tag_counts.items()
         }
     return _KIND_REP_TAGS_CACHE
+
+
+def _get_kind_store_count(rows: list[MenuRow] | None = None) -> dict[str, int]:
+    """kind 별 distinct 식당 수 — *그 종류 전체 메뉴* 기반 (검색 무관)."""
+    global _KIND_STORE_COUNT_CACHE
+    if _KIND_STORE_COUNT_CACHE is None:
+        if rows is None:
+            rows = load_menu_tags()
+        bag: dict[str, set] = {}
+        for r in rows:
+            if r.kind:
+                bag.setdefault(r.kind, set()).add(r.store_id)
+        _KIND_STORE_COUNT_CACHE = {k: len(s) for k, s in bag.items()}
+    return _KIND_STORE_COUNT_CACHE
 
 
 @dataclass
@@ -682,6 +700,8 @@ def to_kind_group(g: KindGroup) -> dict:
         "imageUrl": None,
         "tags": g.representative_tags,
         "score": _to_score100(g.score),
+        # *전체* 식당 수 — 검색 무관, 그 종류 풍부도. (g.n_stores 는 매칭된 메뉴 식당만)
+        "nStores": _get_kind_store_count().get(g.kind, g.n_stores),
         "reason": {
             "matchedKeywords": g.matched,
             "matchedFoodKeywords": g.matched_food_keywords,
@@ -809,12 +829,17 @@ def recommend_foods(query_text: str, top_k: int = 10) -> dict:
     }
 
 
-def recommend_foods_by_tags(tags: list[str], top_k: int = 10) -> dict:
+def recommend_foods_by_tags(
+    tags: list[str],
+    top_k: int = 10,
+    food_keywords: list[str] | None = None,
+) -> dict:
     """사용자가 *직접 선택한 시드 태그*로 추천. extract 단계 건너뛰기.
 
     KeywordScreen 에서 사용자가 키워드 추가/제거 한 경우 그 결과가 그대로 매칭에
-    들어가야 한다. food_keywords/exclude_* 같은 보조 채널은 *사용자 의도가 시드
-    위주*이므로 비워둔다.
+    들어가야 한다. food_keywords 는 /extract 가 *원본 자연어에서* 한 번 뽑아둔
+    카테고리·식재료 신호를 그대로 전달받아 사용 (Claude 추가 호출 없음).
+    exclude_* 채널은 사용자 의도에 명시되지 않아 비움.
 
     응답 모양은 recommend_foods() 와 동일 — 프론트 카드 컴포넌트 호환.
     """
@@ -827,13 +852,14 @@ def recommend_foods_by_tags(tags: list[str], top_k: int = 10) -> dict:
             "excludeFoodKeywords": [],
             "kinds": [],
         }
+    fkw = list(food_keywords or [])
     rows = load_menu_tags()
     wide_results = match(
         tags,
         rows,
         top_k=top_k * 8,
         exclude_tags=[],
-        food_keywords=[],
+        food_keywords=fkw,
         exclude_food_keywords=[],
     )
     kinds = aggregate_kinds(wide_results, top_k=top_k)
@@ -841,7 +867,7 @@ def recommend_foods_by_tags(tags: list[str], top_k: int = 10) -> dict:
         "query": "",
         "keywords": list(tags),
         "excludeKeywords": [],
-        "foodKeywords": [],
+        "foodKeywords": fkw,
         "excludeFoodKeywords": [],
         "kinds": [to_kind_group(g) for g in kinds],
     }

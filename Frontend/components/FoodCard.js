@@ -37,24 +37,19 @@ export default function FoodCard({ food, selected = false, onPress }) {
         </View>
       </View>
 
-      {/* 추천 이유 — 3종 명시적 분리 */}
+      {/* 추천 근거 — 1 행. 백엔드가 cfDescription 으로 만들어 보내줌:
+          기본 탭: '한식 국물요리·12개 식당이 판매'
+          CF 탭:   'Charlie·매운국물파#5 등 8명이 선택'                       */}
       <View style={styles.reasonBox}>
         <ReasonRow
-          icon="🎯"
-          title="감성 매칭"
+          icon="💡"
+          title="추천 근거"
           content={
-            reason.matchedKeywords.length > 0
-              ? reason.matchedKeywords.map((k) => `#${k}`).join(' ')
-              : '키워드 없음'
+            reason?.cfDescription ||
+            '비슷한 신호로 매칭된 음식'
           }
-        />
-        <ReasonRow
-          icon="👥"
-          title="유사 사용자"
-          content={reason.cfDescription}
           highlight
         />
-        <ReasonRow icon="🌧️" title="지금 상황" content={reason.contextNote} />
       </View>
     </Pressable>
   );

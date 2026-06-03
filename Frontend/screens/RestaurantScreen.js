@@ -34,7 +34,7 @@ export default function RestaurantScreen({ route, navigation }) {
     (async () => {
       setLoading(true);
       try {
-        const data = await getRestaurantsByFood(food, { sort, query });
+        const data = await getRestaurantsByFood(food, { sort, query, userId });
         if (mounted) setList(data);
       } catch (e) {
         console.error(e);
@@ -86,7 +86,7 @@ export default function RestaurantScreen({ route, navigation }) {
           onPress={() => setSort('distance')}
         />
         <SortTab
-          label="취향 맞춤"
+          label="취향 매칭"
           subLabel="CF"
           active={sort === 'cf'}
           onPress={() => setSort('cf')}
@@ -96,7 +96,7 @@ export default function RestaurantScreen({ route, navigation }) {
       <Text style={styles.tabDesc}>
         {sort === 'distance'
           ? '한성대 기숙사에서 가까운 순서대로 보여드려요.'
-          : '나와 취향이 비슷한 사용자들이 자주 방문한 곳이에요.'}
+          : '나와 비슷한 취향 사용자들이 좋아하는 메뉴가 많은 식당 순이에요.'}
       </Text>
 
       {loading ? (
