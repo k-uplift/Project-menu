@@ -41,15 +41,16 @@ export async function getFoodRecommendations(keywords, context = {}) {
     return { items: [], sessionId: null, userId: context.userId ?? 1 };
   }
 
-  const q =
-    (context.originalText && context.originalText.trim()) ||
-    keywords.map((k) => k.label).join(' ');
+  // 사용자가 KeywordScreen 에서 *직접 확인·수정*한 시드 태그를 그대로 백엔드에
+  // 전달. /foods 의 tags 파라미터 모드 — extract 건너뛰고 *주어진 태그*로 매칭.
+  // 사용자 변경(추가/제거)이 100% 추천에 반영. originalText 는 추적용으로만 유지.
+  const tagList = keywords.map((k) => k.label).join(',');
 
   let kinds = [];
   let sessionId = null;
   let userId = context.userId ?? 1;
   try {
-    const url = `${API_BASE}/foods?q=${encodeURIComponent(q)}&user_id=${userId}`;
+    const url = `${API_BASE}/foods?tags=${encodeURIComponent(tagList)}&user_id=${userId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -89,15 +90,14 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
     return { items: [], sessionId: null, userId: context.userId ?? 1 };
   }
 
-  const q =
-    (context.originalText && context.originalText.trim()) ||
-    keywords.map((k) => k.label).join(' ');
+  // /foods 와 동일 패턴 — 사용자 선택 시드를 tags 파라미터로 직접 전달.
+  const tagList = keywords.map((k) => k.label).join(',');
 
   let kinds = [];
   let sessionId = null;
   let userId = context.userId ?? 1;
   try {
-    const url = `${API_BASE}/foods_cf?q=${encodeURIComponent(q)}&user_id=${userId}`;
+    const url = `${API_BASE}/foods_cf?tags=${encodeURIComponent(tagList)}&user_id=${userId}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();

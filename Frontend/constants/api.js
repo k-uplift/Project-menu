@@ -19,7 +19,7 @@ import { NativeModules, Platform } from 'react-native';
 
 const BACKEND_PORT = 8000;
 // 마지막 알려진 LAN IP (수동 fallback). Wi-Fi 자주 바뀌는 환경이면 갱신.
-const FALLBACK_HOST = '192.168.219.111';
+const FALLBACK_HOST = '172.30.1.41';
 
 function detectDevHost() {
   if (Platform.OS === 'web') return 'localhost';

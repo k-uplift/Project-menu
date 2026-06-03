@@ -809,6 +809,44 @@ def recommend_foods(query_text: str, top_k: int = 10) -> dict:
     }
 
 
+def recommend_foods_by_tags(tags: list[str], top_k: int = 10) -> dict:
+    """사용자가 *직접 선택한 시드 태그*로 추천. extract 단계 건너뛰기.
+
+    KeywordScreen 에서 사용자가 키워드 추가/제거 한 경우 그 결과가 그대로 매칭에
+    들어가야 한다. food_keywords/exclude_* 같은 보조 채널은 *사용자 의도가 시드
+    위주*이므로 비워둔다.
+
+    응답 모양은 recommend_foods() 와 동일 — 프론트 카드 컴포넌트 호환.
+    """
+    if not tags:
+        return {
+            "query": "",
+            "keywords": [],
+            "excludeKeywords": [],
+            "foodKeywords": [],
+            "excludeFoodKeywords": [],
+            "kinds": [],
+        }
+    rows = load_menu_tags()
+    wide_results = match(
+        tags,
+        rows,
+        top_k=top_k * 8,
+        exclude_tags=[],
+        food_keywords=[],
+        exclude_food_keywords=[],
+    )
+    kinds = aggregate_kinds(wide_results, top_k=top_k)
+    return {
+        "query": "",
+        "keywords": list(tags),
+        "excludeKeywords": [],
+        "foodKeywords": [],
+        "excludeFoodKeywords": [],
+        "kinds": [to_kind_group(g) for g in kinds],
+    }
+
+
 def recommend_stores_for_kind(
     query_text: str, kind: str, top_k: int = 10
 ) -> dict:

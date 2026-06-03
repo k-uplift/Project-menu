@@ -53,6 +53,7 @@ from src.llm.match import (
     _get_kind_rep_tags,
     load_menu_tags,
     recommend_foods,
+    recommend_foods_by_tags,
     recommend_stores_for_kind,
 )
 
@@ -152,19 +153,25 @@ def _cf_results_to_kinds(results, rep_tags) -> list[dict]:
 
 
 @app.get("/foods")
-def foods(q: str, top_k: int = 10, user_id: int = 1):
+def foods(q: str = "", tags: str = "", top_k: int = 10, user_id: int = 1):
     """자연어 쿼리 → 기본 추천 (콘텐츠 매칭, match.py).
 
-    363 kind vocab + IDF 가중 + food_keywords 채널 + 사이드 디부스트.
-    평가셋 lenient 97.2% 검증된 알고리즘. 추천 결과는 *DB 행동 데이터와 무관* —
-    정적 menu_tags.jsonl + menu_kinds.jsonl + details.db.stores 만 본다.
+    두 모드:
+      - tags 가 있으면 *extract 건너뛰기* — 사용자가 KeywordScreen 에서 직접
+        선택·수정한 시드 태그를 그대로 사용 (사용자 변경이 100% 반영).
+      - tags 없으면 q 로 extract 호출 → 시드 추출 → match (자동 모드).
 
-    DB 동적 wiring (Session/Tag/Log/Weight) 은 그대로. 검색마다 RecommendationSession
-    + UserTagSelection INSERT — 후속 CF 신호로 흘러간다.
+    tags 는 콤마 구분: `?tags=얼큰한,야식`.
+    DB 동적 wiring (Session/Tag/Log/Weight) 양쪽 동일 — 검색마다 INSERT.
     """
-    if not q.strip():
-        raise HTTPException(status_code=400, detail="q is empty")
-    result = recommend_foods(q, top_k=top_k)
+    if not q.strip() and not tags.strip():
+        raise HTTPException(status_code=400, detail="q or tags required")
+
+    if tags.strip():
+        tag_list = [t.strip() for t in tags.split(",") if t.strip()]
+        result = recommend_foods_by_tags(tag_list, top_k=top_k)
+    else:
+        result = recommend_foods(q, top_k=top_k)
     session_id = _open_session_and_save_tags(user_id, result.get("keywords", []))
     result["sessionId"] = session_id
     result["userId"] = user_id
@@ -172,29 +179,38 @@ def foods(q: str, top_k: int = 10, user_id: int = 1):
 
 
 @app.get("/foods_cf")
-def foods_cf(q: str, user_id: int = 1, top_k: int = 10):
+def foods_cf(q: str = "", tags: str = "", user_id: int = 1, top_k: int = 10):
     """개인화 추천 (cf_module Tab2 personalized, 사용자 기반 CF).
 
     "나와 *행동 윤곽이 닮은 사용자들*이 고른 메뉴". user_id 의 final_select 한 kind 는
     재추천에서 제외 (이미 먹어본 거). click 만 한 kind 는 후보로 남김 (관심 단계).
 
+    두 모드 (/foods 와 동일):
+      - tags 가 있으면 *extract 건너뛰기* — 사용자 선택 시드 그대로 cf_module 에 전달
+      - tags 없으면 q 로 extract 호출 후 cf_module 호출
+
     응답 모양은 /foods 와 동일 (kinds[]·sessionId·userId).
     """
-    if not q.strip():
-        raise HTTPException(status_code=400, detail="q is empty")
+    if not q.strip() and not tags.strip():
+        raise HTTPException(status_code=400, detail="q or tags required")
 
-    extracted = extract_tags(q)
-    cf_response = cf_recommend(extracted.tags, user_id=user_id, top_k=top_k)
+    if tags.strip():
+        input_tags = [t.strip() for t in tags.split(",") if t.strip()]
+    else:
+        extracted = extract_tags(q)
+        input_tags = list(extracted.tags or [])
+
+    cf_response = cf_recommend(input_tags, user_id=user_id, top_k=top_k)
 
     rep_tags = _get_kind_rep_tags()
     kinds = _cf_results_to_kinds(cf_response.tab2_results, rep_tags)
 
-    session_id = _open_session_and_save_tags(user_id, extracted.tags)
+    session_id = _open_session_and_save_tags(user_id, input_tags)
     return {
         "query": q,
         "userId": user_id,
         "sessionId": session_id,
-        "keywords": extracted.tags,
+        "keywords": input_tags,
         "kinds": kinds,
         "emptyReason": cf_response.tab2_empty_reason,
     }
