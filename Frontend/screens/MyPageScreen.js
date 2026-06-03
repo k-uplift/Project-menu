@@ -38,6 +38,66 @@ import { getEarnedBadges } from '../services/badges';
 import { getCurrentUser, logout } from '../services/authService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
+/**
+ * 미식 유형 8종 — Backend seed_demo.py TYPES 와 동일한 시드 쌍.
+ * 상위 시드 2개로 사용자를 가장 가까운 유형에 매칭한다.
+ */
+const PERSONA_TYPES = [
+  { id: 'T1', name: '매운국물파', emoji: '🌶️', seeds: ['얼큰한', '국물있는'] },
+  { id: 'T2', name: '튀김전러버', emoji: '🍗', seeds: ['고소한', '바삭한'] },
+  { id: 'T3', name: '뜨끈보양파', emoji: '🍲', seeds: ['국물있는', '든든한'] },
+  { id: 'T4', name: '진한메인파', emoji: '🥩', seeds: ['든든한', '진한'] },
+  { id: 'T5', name: '단짠간식파', emoji: '🍰', seeds: ['달달한', '바삭한'] },
+  { id: 'T6', name: '해장파', emoji: '🍜', seeds: ['국물있는', '해장'] },
+  { id: 'T7', name: '슴슴든든파', emoji: '🍚', seeds: ['담백한', '든든한'] },
+  { id: 'T8', name: '따뜻집밥파', emoji: '🏠', seeds: ['든든한', '따뜻한'] },
+];
+
+/**
+ * 검색 키워드 빈도(preferredTags) + 최종선택 음식 태그(seedCounts)를 합산해
+ * 시드별 점수 맵을 만든다. 검색만 한 게스트도, 선택까지 한 사용자도 모두 반영.
+ */
+function buildSeedScore(preferredTags = [], seedCounts = {}) {
+  const score = {};
+  preferredTags.forEach(({ tag, count }) => {
+    score[tag] = (score[tag] || 0) + count;
+  });
+  Object.entries(seedCounts).forEach(([tag, count]) => {
+    score[tag] = (score[tag] || 0) + count;
+  });
+  return score;
+}
+
+/** 시드 점수 맵 → 상위 N개 [{tag, score, pct, rel}] (pct=전체 비중, rel=최댓값 대비). */
+function topSeeds(seedScore, n = 5) {
+  const entries = Object.entries(seedScore)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1]);
+  if (entries.length === 0) return [];
+  const total = entries.reduce((s, [, v]) => s + v, 0);
+  const max = entries[0][1];
+  return entries.slice(0, n).map(([tag, v]) => ({
+    tag,
+    score: v,
+    pct: Math.round((v / total) * 100),
+    rel: v / max,
+  }));
+}
+
+/** 시드 점수 맵 → 가장 가까운 미식 유형 (데이터 없으면 null). */
+function diagnosePersona(seedScore) {
+  let best = null;
+  let bestScore = 0;
+  for (const type of PERSONA_TYPES) {
+    const s = type.seeds.reduce((acc, seed) => acc + (seedScore[seed] || 0), 0);
+    if (s > bestScore) {
+      bestScore = s;
+      best = type;
+    }
+  }
+  return bestScore > 0 ? best : null;
+}
+
 export default function MyPageScreen({ navigation }) {
   const [searches, setSearches] = useState([]);
   const [recentFoods, setRecentFoods] = useState([]);
@@ -213,8 +273,14 @@ export default function MyPageScreen({ navigation }) {
           </View>
         )}
 
-        {/* 0. 취향 프로필 카드 — 달성한 칭호 + 통계 (가장 임팩트 큼) */}
-        {!isEmpty && <TasteProfileCard badges={badges} searchCount={searches.length} />}
+        {/* 0. 취향 프로필 카드 — 미식 유형 진단 + 시드 분포 + 칭호 + 통계 */}
+        {!isEmpty && (
+          <TasteProfileCard
+            badges={badges}
+            searchCount={searches.length}
+            preferredTags={preferredTags}
+          />
+        )}
 
         {/* 1. 선호 태그 */}
         {preferredTags.length > 0 && (
@@ -310,12 +376,18 @@ export default function MyPageScreen({ navigation }) {
  * 달성한 칭호 1~4개를 가장 눈에 띄게 노출.
  * 메인 칭호(카테고리 A~D)에서 우선 1~3개, 메타(E)에서 0~1개.
  */
-function TasteProfileCard({ badges, searchCount }) {
+function TasteProfileCard({ badges, searchCount, preferredTags = [] }) {
   const earnedMain = badges.earned.filter((b) => b.category !== 'E').slice(0, 3);
   const earnedMeta = badges.earned.filter((b) => b.category === 'E').slice(0, 1);
   const chips = [...earnedMain, ...earnedMeta];
 
   const stats = badges.stats || {};
+
+  // 미식 유형 진단 + 시드 분포 (검색 키워드 + 최종선택 음식 태그 합산)
+  const seedScore = buildSeedScore(preferredTags, stats.seedCounts || {});
+  const persona = diagnosePersona(seedScore);
+  const bars = topSeeds(seedScore, 5);
+
   const stat = (label, value) => (
     <View style={styles.statItem}>
       <Text style={styles.statNum}>{value ?? 0}</Text>
@@ -329,7 +401,45 @@ function TasteProfileCard({ badges, searchCount }) {
         <View style={styles.profileDot} />
         <Text style={styles.profileLabel}>YOUR TASTE</Text>
       </View>
-      {chips.length > 0 ? (
+
+      {/* 미식 유형 진단 (hero) */}
+      {persona ? (
+        <View style={styles.personaRow}>
+          <Text style={styles.personaEmoji}>{persona.emoji}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.personaName}>{persona.name}</Text>
+            <Text style={styles.personaSeeds}>
+              {persona.seeds.join(' · ')} 선호
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <Text style={styles.profileEmpty}>
+          메뉴를 검색하면 당신의 미식 유형이 나와요
+        </Text>
+      )}
+
+      {/* 시드 분포 막대 */}
+      {bars.length > 0 && (
+        <View style={styles.seedBars}>
+          {bars.map((b) => (
+            <View key={b.tag} style={styles.seedBarRow}>
+              <Text style={styles.seedBarLabel} numberOfLines={1}>
+                {b.tag}
+              </Text>
+              <View style={styles.seedBarTrack}>
+                <View
+                  style={[styles.seedBarFill, { width: `${Math.max(8, b.rel * 100)}%` }]}
+                />
+              </View>
+              <Text style={styles.seedBarPct}>{b.pct}%</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* 달성 칭호 칩 */}
+      {chips.length > 0 && (
         <View style={styles.profileChipWrap}>
           {chips.map((b) => (
             <View key={b.id} style={styles.profileChip}>
@@ -338,10 +448,6 @@ function TasteProfileCard({ badges, searchCount }) {
             </View>
           ))}
         </View>
-      ) : (
-        <Text style={styles.profileEmpty}>
-          아직 받은 칭호가 없어요{'\n'}메뉴를 검색하고 길찾기를 눌러 칭호를 모아보세요
-        </Text>
       )}
 
       <View style={styles.statRow}>
@@ -641,6 +747,65 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     letterSpacing: 1.5,
   },
+  // === 미식 유형 진단 (hero) ===
+  personaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.md,
+  },
+  personaEmoji: {
+    fontSize: 36,
+    marginRight: SPACING.md,
+  },
+  personaName: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeLg,
+    fontWeight: FONT.weightExtra,
+    marginBottom: 2,
+  },
+  personaSeeds: {
+    color: COLORS.accent,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightMedium,
+  },
+
+  // === 시드 분포 막대 ===
+  seedBars: {
+    marginBottom: SPACING.md,
+    gap: 6,
+  },
+  seedBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  seedBarLabel: {
+    width: 56,
+    color: COLORS.textSecondary,
+    fontSize: 11,
+    fontWeight: FONT.weightMedium,
+  },
+  seedBarTrack: {
+    flex: 1,
+    height: 8,
+    backgroundColor: COLORS.bg,
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginHorizontal: SPACING.sm,
+  },
+  seedBarFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 4,
+  },
+  seedBarPct: {
+    width: 34,
+    textAlign: 'right',
+    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: FONT.weightBold,
+  },
+
   profileChipWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
