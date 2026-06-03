@@ -35,6 +35,7 @@ import {
 } from '../services/userStorageService';
 import { getBehaviorEvents, clearBehaviorEvents } from '../services/behaviorTrackingService';
 import { getEarnedBadges } from '../services/badges';
+import { getCurrentUser, logout } from '../services/authService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function MyPageScreen({ navigation }) {
@@ -42,17 +43,19 @@ export default function MyPageScreen({ navigation }) {
   const [recentFoods, setRecentFoods] = useState([]);
   const [preferredTags, setPreferredTags] = useState([]);
   const [badges, setBadges] = useState({ earned: [], all: [], stats: {} });
+  const [account, setAccount] = useState(null); // 로그인 유저(없으면 비로그인)
 
   // 화면이 포커스될 때마다 데이터 새로 불러오기 (검색·식당 이동 후 즉시 반영)
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       (async () => {
-        const [s, r, t, events] = await Promise.all([
+        const [s, r, t, events, u] = await Promise.all([
           getRecentSearches(),
           getRecentFoods(),
           getPreferredTags(),
           getBehaviorEvents(),
+          getCurrentUser(),
         ]);
         if (!mounted) return;
         setSearches(s);
@@ -60,6 +63,7 @@ export default function MyPageScreen({ navigation }) {
         setPreferredTags(t);
         // 칭호 계산 (events + searches가 둘 다 필요 — D 새벽 사냥꾼 등)
         setBadges(getEarnedBadges(events, s));
+        setAccount(u);
       })();
       return () => {
         mounted = false;
@@ -107,6 +111,24 @@ export default function MyPageScreen({ navigation }) {
     );
   };
 
+  // 로그아웃 — 토큰 삭제 후 로그인 화면으로 (스택 리셋)
+  const handleLogout = () => {
+    Alert.alert('로그아웃 할까요?', '다시 이용하려면 로그인이 필요해요.', [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '로그아웃',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        },
+      },
+    ]);
+  };
+
+  // 로그인 화면으로 이동(비로그인 상태에서)
+  const goLogin = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+
   // 빈 상태 — 데이터 + 칭호 둘 다 0일 때만
   const isEmpty =
     searches.length === 0 &&
@@ -130,6 +152,47 @@ export default function MyPageScreen({ navigation }) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* 계정 카드 */}
+        <View style={styles.accountCard}>
+          {account ? (
+            <>
+              <View style={styles.accountInfo}>
+                <Text style={styles.accountAvatar}>👤</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.accountEmail} numberOfLines={1}>
+                    {account.email}
+                  </Text>
+                  <Text style={styles.accountStatus}>로그인됨</Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={handleLogout}
+                hitSlop={8}
+                style={({ pressed }) => [styles.logoutBtn, pressed && { opacity: 0.7 }]}
+              >
+                <Text style={styles.logoutText}>로그아웃</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <View style={styles.accountInfo}>
+                <Text style={styles.accountAvatar}>🙋</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.accountEmail}>로그인하지 않았어요</Text>
+                  <Text style={styles.accountStatus}>로그인하면 기기 간 기록을 이어갈 수 있어요</Text>
+                </View>
+              </View>
+              <Pressable
+                onPress={goLogin}
+                hitSlop={8}
+                style={({ pressed }) => [styles.loginBtn, pressed && { opacity: 0.85 }]}
+              >
+                <Text style={styles.loginBtnText}>로그인</Text>
+              </Pressable>
+            </>
+          )}
+        </View>
+
         {isEmpty && (
           <View style={styles.emptyBox}>
             <Text style={styles.emptyEmoji}>🍽️</Text>
@@ -436,6 +499,62 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: SPACING.lg,
     paddingBottom: SPACING.xxl,
+  },
+
+  // === 계정 카드 ===
+  accountCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.md,
+    marginTop: SPACING.sm,
+  },
+  accountInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: SPACING.md,
+  },
+  accountAvatar: {
+    fontSize: 26,
+    marginRight: SPACING.md,
+  },
+  accountEmail: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightBold,
+    marginBottom: 2,
+  },
+  accountStatus: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeXs,
+  },
+  logoutBtn: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  logoutText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightMedium,
+  },
+  loginBtn: {
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.primary,
+  },
+  loginBtnText: {
+    color: '#1A0F08',
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightBold,
   },
 
   emptyBox: {
