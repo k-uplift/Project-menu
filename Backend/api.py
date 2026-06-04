@@ -629,6 +629,51 @@ def user_diary(user_id: int = 1, limit: int = 20):
     return {"userId": user_id, "entries": entries}
 
 
+@app.delete("/user_data")
+def delete_user_data(user_id: int = 1):
+    """Delete recommendation/session history for one user."""
+    conn = _connect_recommend_db()
+    try:
+        sess_rows = conn.execute(
+            "SELECT session_id FROM RecommendationSession WHERE user_id = ?",
+            (user_id,),
+        ).fetchall()
+        session_ids = [row[0] for row in sess_rows]
+        deleted = {
+            "sessions": len(session_ids),
+            "events": 0,
+            "tagSelections": 0,
+            "foodTagWeights": 0,
+        }
+
+        if session_ids:
+            qm = ",".join("?" for _ in session_ids)
+            cur = conn.execute(
+                f"DELETE FROM UserInteractionLog WHERE session_id IN ({qm})",
+                session_ids,
+            )
+            deleted["events"] = cur.rowcount
+            cur = conn.execute(
+                f"DELETE FROM UserTagSelection WHERE session_id IN ({qm})",
+                session_ids,
+            )
+            deleted["tagSelections"] = cur.rowcount
+            conn.execute(
+                f"DELETE FROM RecommendationSession WHERE session_id IN ({qm})",
+                session_ids,
+            )
+
+        cur = conn.execute(
+            "DELETE FROM UserFoodTagWeight WHERE user_id = ?",
+            (user_id,),
+        )
+        deleted["foodTagWeights"] = cur.rowcount
+        conn.commit()
+        return {"ok": True, "userId": user_id, "deleted": deleted}
+    finally:
+        conn.close()
+
+
 # 배민 URL 매핑 — 시연용 식당 N개. 키 = stores.name. 값 = 배민 deep link.
 # 값이 빈 문자열이면 프론트가 검색 URL로 fallback.
 _BAEMIN_URLS_PATH = Path(__file__).parent / "data" / "baemin_urls.json"

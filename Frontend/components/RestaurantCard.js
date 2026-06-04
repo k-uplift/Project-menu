@@ -8,7 +8,13 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
-export default function RestaurantCard({ restaurant, index, onPress, showCfMatch = false }) {
+export default function RestaurantCard({
+  restaurant,
+  index,
+  onPress,
+  showCfMatch = false,
+  showRecommendedMenus = false,
+}) {
   const {
     name,
     rating,
@@ -19,10 +25,15 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
     recommendedPriceRange,
     delivery,
     cfMatch,
+    menuItems = [],
   } = restaurant;
 
   // 가격은 *추천 음식(kind)* 가격 우선, 없으면 식당 전체 범위로 폴백.
   const displayPrice = recommendedPriceRange || priceRange;
+  const recommendedMenuNames = menuItems
+    .map((item) => item?.name)
+    .filter(Boolean)
+    .slice(0, 2);
 
   return (
     <Pressable
@@ -63,6 +74,15 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
         </View>
 
         {displayPrice ? <Text style={styles.price}>{displayPrice}</Text> : null}
+
+        {showRecommendedMenus && recommendedMenuNames.length > 0 && (
+          <View style={styles.recommendedMenuBox}>
+            <Text style={styles.recommendedMenuLabel}>추천메뉴</Text>
+            <Text style={styles.recommendedMenuText} numberOfLines={1}>
+              {recommendedMenuNames.join(' · ')}
+            </Text>
+          </View>
+        )}
 
         {/* CF 매칭 표시 — 취향 정렬 모드 + cfMatch 데이터 있을 때만 */}
         {showCfMatch && cfMatch != null && (
@@ -163,6 +183,31 @@ const styles = StyleSheet.create({
   price: {
     color: COLORS.textMuted,
     fontSize: FONT.sizeXs,
+  },
+  recommendedMenuBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 4,
+    marginTop: SPACING.xs,
+  },
+  recommendedMenuLabel: {
+    color: COLORS.primary,
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+    marginRight: SPACING.xs,
+  },
+  recommendedMenuText: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightBold,
+    flexShrink: 1,
   },
   deliveryBadge: {
     backgroundColor: COLORS.primarySoft,

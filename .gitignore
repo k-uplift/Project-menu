@@ -18,3 +18,4 @@ venv/
 
 # Expo 로컬 개발 상태 (기기 정보 등 — 커밋 불필요)
 Frontend/.expo/
+Frontend/node_modules/

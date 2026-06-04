@@ -39,6 +39,7 @@ import {
   getSimilarUsers,
   getUserEvents,
   getUserDiary,
+  clearServerUserData,
 } from '../services/recommendationService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
@@ -185,11 +186,22 @@ export default function MyPageScreen({ navigation }) {
           text: '삭제',
           style: 'destructive',
           onPress: async () => {
+            const uid = account?.user_id ?? 1;
             await clearAllUserData();
             await clearBehaviorEvents();
+            const serverCleared = await clearServerUserData(uid);
             setSearches([]);
             setPreferredTags([]);
             setBadges({ earned: [], all: [], stats: {} });
+            setSimilarUsers([]);
+            setDiary([]);
+            setDiaryOpen(false);
+            if (!serverCleared) {
+              Alert.alert(
+                '서버 기록 삭제 실패',
+                '이 기기의 기록은 지웠지만 서버 기록은 다시 보일 수 있습니다.'
+              );
+            }
           },
         },
       ]
@@ -391,9 +403,12 @@ export default function MyPageScreen({ navigation }) {
                     </Text>
                   </View>
                   {e.selected && e.selected.length > 0 && (
-                    <Text style={styles.diaryFoods} numberOfLines={2}>
-                      🍽 선택 {e.selected.join(' · ')}
-                    </Text>
+                    <View style={styles.diarySelectedBox}>
+                      <Text style={styles.diarySelectedLabel}>선택한 메뉴</Text>
+                      <Text style={styles.diarySelectedNames} numberOfLines={2}>
+                        {e.selected.join(' · ')}
+                      </Text>
+                    </View>
                   )}
                   {e.clicked && e.clicked.length > 0 && (
                     <Text style={styles.diaryClicked} numberOfLines={2}>
@@ -510,6 +525,7 @@ function TasteProfileCard({ badges, searchCount, preferredTags = [] }) {
  * 달성=풀컬러, 미달성=회색 + 진행률 안내.
  */
 function BadgeCatalog({ badges }) {
+  const [selectedCategory, setSelectedCategory] = useState('A');
   const total = badges.all.length;
   const earned = badges.earned.length;
 
@@ -522,6 +538,7 @@ function BadgeCatalog({ badges }) {
     label: CATEGORY_LABELS[cat],
     items: badges.all.filter((b) => b.category === cat),
   }));
+  const selectedGroup = groups.find((g) => g.cat === selectedCategory) || groups[0];
 
   return (
     <View style={styles.section}>
@@ -530,20 +547,49 @@ function BadgeCatalog({ badges }) {
         <Text style={styles.sectionTitle}>칭호 도감</Text>
         <Text style={styles.sectionSub}>· {earned} / {total}</Text>
       </View>
-      {groups.map((g) => (
-        <View key={g.cat} style={styles.badgeCategoryBlock}>
-          <Text style={styles.badgeCategoryLabel}>
-            {g.cat}. {g.label}  <Text style={styles.badgeCategoryCount}>
-              {g.items.filter((b) => b.earned).length}/{g.items.length}
-            </Text>
+      <View style={styles.badgeCategoryTabs}>
+        {groups.map((g) => {
+          const isActive = selectedCategory === g.cat;
+          const earnedCount = g.items.filter((b) => b.earned).length;
+          return (
+            <Pressable
+              key={g.cat}
+              onPress={() => setSelectedCategory(g.cat)}
+              style={({ pressed }) => [
+                styles.badgeCategoryTab,
+                isActive && styles.badgeCategoryTabActive,
+                pressed && styles.badgeCategoryTabPressed,
+              ]}
+            >
+              <Text style={[styles.badgeCategoryTabCode, isActive && styles.badgeCategoryTabCodeActive]}>
+                {g.cat}
+              </Text>
+              <Text
+                style={[styles.badgeCategoryTabLabel, isActive && styles.badgeCategoryTabLabelActive]}
+                numberOfLines={2}
+              >
+                {g.label}
+              </Text>
+              <Text style={[styles.badgeCategoryTabCount, isActive && styles.badgeCategoryTabCountActive]}>
+                {earnedCount}/{g.items.length}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <View style={styles.badgeCategoryBlock}>
+        <Text style={styles.badgeCategoryLabel}>
+          {selectedGroup.cat}. {selectedGroup.label}  <Text style={styles.badgeCategoryCount}>
+            {selectedGroup.items.filter((b) => b.earned).length}/{selectedGroup.items.length}
           </Text>
-          <View style={styles.badgeGrid}>
-            {g.items.map((b) => (
-              <BadgeCell key={b.id} badge={b} />
-            ))}
-          </View>
+        </Text>
+        <View style={styles.badgeGrid}>
+          {selectedGroup.items.map((b) => (
+            <BadgeCell key={b.id} badge={b} />
+          ))}
         </View>
-      ))}
+      </View>
     </View>
   );
 }
@@ -954,6 +1000,58 @@ const styles = StyleSheet.create({
   },
 
   // === 칭호 도감 (BadgeCatalog) ===
+  badgeCategoryTabs: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginBottom: SPACING.sm,
+  },
+  badgeCategoryTab: {
+    flex: 1,
+    minHeight: 44,
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeCategoryTabActive: {
+    backgroundColor: COLORS.primarySoft,
+    borderColor: COLORS.primary,
+  },
+  badgeCategoryTabPressed: {
+    opacity: 0.75,
+  },
+  badgeCategoryTabCode: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightExtra,
+  },
+  badgeCategoryTabCodeActive: {
+    color: COLORS.primary,
+  },
+  badgeCategoryTabLabel: {
+    color: COLORS.textSecondary,
+    fontSize: 9,
+    fontWeight: FONT.weightBold,
+    textAlign: 'center',
+    marginTop: 1,
+  },
+  badgeCategoryTabLabelActive: {
+    color: COLORS.textPrimary,
+  },
+  badgeCategoryTabCount: {
+    color: COLORS.textMuted,
+    fontSize: 9,
+    marginTop: 1,
+    textAlign: 'center',
+  },
+  badgeCategoryTabCountActive: {
+    color: COLORS.primary,
+    fontWeight: FONT.weightBold,
+  },
   badgeCategoryBlock: {
     marginBottom: SPACING.md,
   },
@@ -1154,10 +1252,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  diaryFoods: {
+  diarySelectedBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    padding: SPACING.sm,
+    marginTop: SPACING.xs,
+  },
+  diarySelectedLabel: {
+    color: COLORS.primary,
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+    marginRight: SPACING.sm,
+  },
+  diarySelectedNames: {
+    flex: 1,
     color: COLORS.textPrimary,
     fontSize: FONT.sizeSm,
-    marginTop: 4,
+    fontWeight: FONT.weightBold,
   },
   diaryClicked: {
     color: COLORS.textSecondary,

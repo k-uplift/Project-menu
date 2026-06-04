@@ -5,7 +5,6 @@
  * - 예시 문장 탭하면 자동 채움
  * - 빈 입력 예외 처리
  * - "분석" 버튼 → 키워드 분석 후 KeywordScreen 으로 이동
- * - 우측 상단 마이페이지 진입 버튼 (NEW)
  */
 
 import React, { useState } from 'react';
@@ -24,7 +23,7 @@ import ScreenContainer from '../components/ScreenContainer';
 import PrimaryButton from '../components/PrimaryButton';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { analyzeKeywords } from '../services/keywordService';
-import { APP_INFO, EXAMPLE_PROMPTS } from '../constants/config';
+import { EXAMPLE_PROMPTS } from '../constants/config';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function HomeScreen({ navigation }) {
@@ -74,25 +73,6 @@ export default function HomeScreen({ navigation }) {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* 브랜딩 + 마이페이지 진입 */}
-        <View style={styles.topRow}>
-          <View style={styles.brandWrap}>
-            <Text style={styles.brand}>{APP_INFO.name}</Text>
-            <Text style={styles.team}>by {APP_INFO.team}</Text>
-          </View>
-          <Pressable
-            onPress={() => navigation.navigate('MyPage')}
-            style={({ pressed }) => [
-              styles.myPageBtn,
-              pressed && styles.myPageBtnPressed,
-            ]}
-            hitSlop={8}
-          >
-            <Text style={styles.myPageIcon}>👤</Text>
-            <Text style={styles.myPageText}>마이</Text>
-          </Pressable>
-        </View>
-
         {/* 헤드라인 */}
         <Text style={styles.headline}>
           오늘의 한 끼,{'\n'}
@@ -142,53 +122,6 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: SPACING.md,
-    marginBottom: SPACING.xl,
-  },
-  brandWrap: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-  },
-  brand: {
-    fontSize: FONT.sizeXxl,
-    fontWeight: FONT.weightExtra,
-    color: COLORS.primary,
-    letterSpacing: -1,
-  },
-  team: {
-    fontSize: FONT.sizeXs,
-    color: COLORS.textMuted,
-    marginLeft: SPACING.sm,
-  },
-
-  myPageBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.pill,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  myPageBtnPressed: {
-    backgroundColor: COLORS.surfaceAlt,
-    borderColor: COLORS.primary,
-  },
-  myPageIcon: {
-    fontSize: 14,
-    marginRight: 4,
-  },
-  myPageText: {
-    color: COLORS.textSecondary,
-    fontSize: FONT.sizeXs,
-    fontWeight: FONT.weightMedium,
-  },
-
   headline: {
     fontSize: FONT.sizeXl,
     fontWeight: FONT.weightExtra,
