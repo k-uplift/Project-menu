@@ -580,6 +580,17 @@ def user_diary(user_id: int = 1, limit: int = 20):
     finally:
         conn.close()
 
+    # 한 번의 검색이 base(/foods)·CF(/foods_cf)·cold-start fallback 으로 세션을 2~3개
+    # 만들 수 있다(쓰기 로직은 그대로). 일기에선 *같은 태그 + 근접 시각(≤120초)* 세션을
+    # 한 칸으로 합쳐 음식 선택/클릭을 병합 — 사용자가 본 '검색 한 번'에 대응.
+    from datetime import datetime as _datetime
+
+    def _parse(ts):
+        try:
+            return _datetime.fromisoformat(ts)
+        except Exception:
+            return None
+
     entries = []
     for sid, created_at in sess_rows:
         tags = tag_map.get(sid, [])
@@ -587,6 +598,18 @@ def user_diary(user_id: int = 1, limit: int = 20):
         clicked = list(dict.fromkeys(clk_map.get(sid, [])))
         if not tags and not selected and not clicked:
             continue
+        dt = _parse(created_at)
+        if entries:
+            last = entries[-1]
+            close = (
+                dt is not None
+                and last["_dt"] is not None
+                and abs((dt - last["_dt"]).total_seconds()) <= 120
+            )
+            if last["tags"] == tags and close:
+                last["selected"] = list(dict.fromkeys(last["selected"] + selected))
+                last["clicked"] = list(dict.fromkeys(last["clicked"] + clicked))
+                continue
         entries.append(
             {
                 "sessionId": sid,
@@ -594,10 +617,13 @@ def user_diary(user_id: int = 1, limit: int = 20):
                 "tags": tags,
                 "selected": selected,
                 "clicked": clicked,
+                "_dt": dt,
             }
         )
         if len(entries) >= limit:
             break
+    for e in entries:
+        e.pop("_dt", None)
     return {"userId": user_id, "entries": entries}
 
 
