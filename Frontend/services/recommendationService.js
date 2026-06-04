@@ -153,3 +153,21 @@ export async function getPersonalizedRecommendations(keywords, context = {}) {
   }));
   return { items, sessionId, userId, fallback: false };
 }
+
+/**
+ * 나와 취향이 닮은 사용자 — user-based CF 유사도 상위 K명.
+ *
+ * 백엔드 /similar_users 호출. 각 item: {userId, name, match(0~100), sharedFoods[]}.
+ * cold start(행동 이력 없는 신규 사용자)면 빈 배열 — 호출처가 섹션 숨김 처리.
+ */
+export async function getSimilarUsers(userId = 1, topK = 5) {
+  try {
+    const res = await fetch(`${API_BASE}/similar_users?user_id=${userId}&top_k=${topK}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data.users) ? data.users : [];
+  } catch (e) {
+    console.warn('[recommendationService] /similar_users 실패:', e.message);
+    return [];
+  }
+}

@@ -36,6 +36,7 @@ import {
 import { getBehaviorEvents, clearBehaviorEvents } from '../services/behaviorTrackingService';
 import { getEarnedBadges } from '../services/badges';
 import { getCurrentUser, logout } from '../services/authService';
+import { getSimilarUsers } from '../services/recommendationService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 /**
@@ -104,6 +105,7 @@ export default function MyPageScreen({ navigation }) {
   const [preferredTags, setPreferredTags] = useState([]);
   const [badges, setBadges] = useState({ earned: [], all: [], stats: {} });
   const [account, setAccount] = useState(null); // 로그인 유저(없으면 비로그인)
+  const [similarUsers, setSimilarUsers] = useState([]); // CF 닮은 사용자 (서버)
 
   // 화면이 포커스될 때마다 데이터 새로 불러오기 (검색·식당 이동 후 즉시 반영)
   useFocusEffect(
@@ -124,6 +126,10 @@ export default function MyPageScreen({ navigation }) {
         // 칭호 계산 (events + searches가 둘 다 필요 — D 새벽 사냥꾼 등)
         setBadges(getEarnedBadges(events, s));
         setAccount(u);
+        // 나와 닮은 사용자 (서버 CF) — 로그인 유저 또는 비로그인=1(Alice)
+        const uid = u?.user_id ?? 1;
+        const sims = await getSimilarUsers(uid);
+        if (mounted) setSimilarUsers(sims);
       })();
       return () => {
         mounted = false;
@@ -189,11 +195,13 @@ export default function MyPageScreen({ navigation }) {
   // 로그인 화면으로 이동(비로그인 상태에서)
   const goLogin = () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
 
-  // 빈 상태 — 데이터 + 칭호 둘 다 0일 때만
+  // 빈 상태 — 로컬 데이터·칭호·닮은 사용자 모두 0일 때만
+  // (닮은 사용자는 서버 CF라 로컬 기록 0인 게스트도 채워질 수 있음)
   const isEmpty =
     searches.length === 0 &&
     recentFoods.length === 0 &&
-    badges.earned.length === 0;
+    badges.earned.length === 0 &&
+    similarUsers.length === 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -280,6 +288,37 @@ export default function MyPageScreen({ navigation }) {
             searchCount={searches.length}
             preferredTags={preferredTags}
           />
+        )}
+
+        {/* 0.5 나와 닮은 사용자 (CF) — 서버 데이터라 로컬 기록과 독립 */}
+        {!isEmpty && similarUsers.length > 0 && (
+          <Section
+            title="나와 닮은 사용자"
+            subtitle={`취향이 비슷한 ${similarUsers.length}명`}
+            icon="🤝"
+          >
+            {similarUsers.map((u) => (
+              <View key={u.userId} style={styles.simUserRow}>
+                <Text style={styles.simAvatar}>👤</Text>
+                <View style={styles.simInfo}>
+                  <View style={styles.simNameRow}>
+                    <Text style={styles.simName} numberOfLines={1}>
+                      {u.name}
+                    </Text>
+                    <Text style={styles.simMatch}>{u.match}% 일치</Text>
+                  </View>
+                  {u.sharedFoods && u.sharedFoods.length > 0 && (
+                    <Text style={styles.simShared} numberOfLines={1}>
+                      둘 다 고른: {u.sharedFoods.join(' · ')}
+                    </Text>
+                  )}
+                </View>
+              </View>
+            ))}
+            <Text style={styles.simNote}>
+              💡 이들이 고른 메뉴가 "나를 위한 추천(CF)"에 반영돼요
+            </Text>
+          </Section>
         )}
 
         {/* 1. 선호 태그 */}
@@ -804,6 +843,53 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: 11,
     fontWeight: FONT.weightBold,
+  },
+
+  // === 나와 닮은 사용자 (CF) ===
+  simUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.sm,
+  },
+  simAvatar: {
+    fontSize: 22,
+    marginRight: SPACING.md,
+  },
+  simInfo: {
+    flex: 1,
+  },
+  simNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  simName: {
+    flex: 1,
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightBold,
+    marginRight: SPACING.sm,
+  },
+  simMatch: {
+    color: COLORS.primary,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightExtra,
+  },
+  simShared: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeXs,
+    marginTop: 2,
+  },
+  simNote: {
+    color: COLORS.accent,
+    fontSize: FONT.sizeXs,
+    marginTop: SPACING.xs,
+    lineHeight: 17,
   },
 
   profileChipWrap: {

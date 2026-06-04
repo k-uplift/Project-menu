@@ -47,6 +47,7 @@ from src.data.database.sessions import (
     log_event,
     save_tag_selections,
 )
+from src.data.database.schema import connect as _connect_recommend_db
 from src.llm.extract import extract_tags
 from src.llm.kinds import KIND_TO_FOOD_ID, KIND_TO_CATEGORY
 
@@ -348,6 +349,70 @@ def foods_cf(
         "kinds": kinds,
         "emptyReason": cf_response.tab2_empty_reason,
     }
+
+
+def _user_final_foods(conn, user_id: int) -> list[str]:
+    """그 사용자가 최종선택(final_select)한 음식 종류 목록 (중복 제거, food_id 순)."""
+    rows = conn.execute(
+        """
+        SELECT DISTINCT f.food_name, f.food_id
+          FROM UserInteractionLog l
+          JOIN RecommendationSession rs ON rs.session_id = l.session_id
+          JOIN Food f ON f.food_id = l.food_id
+         WHERE rs.user_id = ? AND l.action_type = 'final_select'
+         ORDER BY f.food_id
+        """,
+        (user_id,),
+    ).fetchall()
+    return [r[0] for r in rows]
+
+
+def _shared_foods(user_id: int, other_id: int, limit: int = 3) -> list[str]:
+    """두 사용자가 *둘 다* 최종선택한 음식 (왜 닮았는지 보여주는 교집합).
+
+    교집합이 비면(예: 본인 이력이 적음) 상대방 음식 일부로 폴백.
+    """
+    try:
+        conn = _connect_recommend_db()
+        try:
+            mine = _user_final_foods(conn, user_id)
+            theirs = _user_final_foods(conn, other_id)
+        finally:
+            conn.close()
+        mine_set = set(mine)
+        shared = [f for f in theirs if f in mine_set]
+        result = shared if shared else theirs
+        return result[:limit]
+    except Exception:
+        return []
+
+
+@app.get("/similar_users")
+def similar_users(user_id: int = 1, top_k: int = 5):
+    """나와 취향이 닮은 사용자 — user-based CF 유사도 상위 K명.
+
+    마이페이지에서 'Charlie와 56% 닮았어요 · 짬뽕·육개장을 골랐어요' 식으로
+    노출. CF 가 추상 알고리즘이 아니라 *눈에 보이는 기능*임을 보여주는 자리.
+    cold start(행동 이력 0)면 users=[] — 프론트가 '아직 닮은 사용자 없음' 폴백.
+
+    match = jaccard 유사도 × 100 (정직한 raw 값). topFoods = 그 사람이 최종선택한
+    음식 종류 상위 3개.
+    """
+    try:
+        sims = _cf_find_similar_users(user_id)  # [(uid, sim), ...] 내림차순
+    except Exception:
+        sims = []
+    users = []
+    for uid, sim in sims[:top_k]:
+        if sim <= 0:
+            continue
+        users.append({
+            "userId": uid,
+            "name": _user_display(uid),
+            "match": round(sim * 100),
+            "sharedFoods": _shared_foods(user_id, uid, limit=3),
+        })
+    return {"userId": user_id, "users": users}
 
 
 # 배민 URL 매핑 — 시연용 식당 N개. 키 = stores.name. 값 = 배민 deep link.
