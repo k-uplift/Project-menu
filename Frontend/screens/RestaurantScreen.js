@@ -13,6 +13,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Pressable,
+  ScrollView,
 } from 'react-native';
 
 import ScreenContainer from '../components/ScreenContainer';
@@ -23,7 +24,7 @@ import { BASE_LOCATION } from '../services/contextService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 export default function RestaurantScreen({ route, navigation }) {
-  const { food } = route.params;
+  const { food, query, sessionId = null, userId = 1 } = route.params;
 
   const [sort, setSort] = useState('distance');
   const [list, setList] = useState([]);
@@ -34,7 +35,7 @@ export default function RestaurantScreen({ route, navigation }) {
     (async () => {
       setLoading(true);
       try {
-        const data = await getRestaurantsByFood(food.id, { sort });
+        const data = await getRestaurantsByFood(food, { sort, query, userId });
         if (mounted) setList(data);
       } catch (e) {
         console.error(e);
@@ -45,21 +46,31 @@ export default function RestaurantScreen({ route, navigation }) {
     return () => {
       mounted = false;
     };
-  }, [food.id, sort]);
+  }, [food.id, sort, query]);
 
   const handleRestaurantPress = (restaurant) => {
-    navigation.navigate('RestaurantDetail', { restaurant, food });
+    navigation.navigate('RestaurantDetail', { restaurant, food, sessionId, userId });
   };
 
   return (
     <ScreenContainer
       step="restaurant"
       bottomBar={
-        <PrimaryButton
-          label="처음부터 다시 찾기"
-          variant="ghost"
-          onPress={() => navigation.popToTop()}
-        />
+        <View style={styles.bottomActions}>
+          <View style={styles.bottomLeft}>
+            <PrimaryButton
+              label="메뉴 다시 고르기"
+              variant="ghost"
+              onPress={() => navigation.goBack()}
+            />
+          </View>
+          <View style={styles.bottomRight}>
+            <PrimaryButton
+              label="처음부터 다시 찾기"
+              onPress={() => navigation.popToTop()}
+            />
+          </View>
+        </View>
       }
     >
       <Text style={styles.title}>{food.name} 음식점</Text>
@@ -86,8 +97,7 @@ export default function RestaurantScreen({ route, navigation }) {
           onPress={() => setSort('distance')}
         />
         <SortTab
-          label="취향 맞춤"
-          subLabel="CF"
+          label="인기순"
           active={sort === 'cf'}
           onPress={() => setSort('cf')}
         />
@@ -96,8 +106,10 @@ export default function RestaurantScreen({ route, navigation }) {
       <Text style={styles.tabDesc}>
         {sort === 'distance'
           ? '한성대 기숙사에서 가까운 순서대로 보여드려요.'
-          : '나와 취향이 비슷한 사용자들이 자주 방문한 곳이에요.'}
+          : '추천 메뉴가 많이 선택된 식당 순으로 보여드려요.'}
       </Text>
+
+      {sort === 'distance' && <MapPreview restaurants={list} />}
 
       {loading ? (
         <View style={styles.loadingBox}>
@@ -111,7 +123,7 @@ export default function RestaurantScreen({ route, navigation }) {
               key={r.id}
               restaurant={r}
               index={idx}
-              showCfMatch={sort === 'cf'}
+              showRecommendedMenus={sort === 'cf'}
               onPress={() => handleRestaurantPress(r)}
             />
           ))}
@@ -123,6 +135,62 @@ export default function RestaurantScreen({ route, navigation }) {
         </>
       )}
     </ScreenContainer>
+  );
+}
+
+function MapPreview({ restaurants }) {
+  const visibleRestaurants = restaurants
+    .filter((r) => r.latitude != null && r.longitude != null)
+    .slice(0, 8);
+
+  return (
+    <View style={styles.mapBox}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.routeMapContent}
+      >
+        <View style={styles.routeCanvas}>
+          <View style={styles.routeSideBlockLeft} />
+          <View style={styles.routeSideBlockRight} />
+          <View style={styles.routeLineShadow} />
+          <View style={styles.routeLine} />
+          <View style={styles.routeDashRow}>
+            {Array.from({ length: 18 }).map((_, idx) => (
+              <View key={idx} style={styles.routeDash} />
+            ))}
+          </View>
+
+          <View style={styles.baseStop}>
+            <View style={styles.baseMarker}>
+              <Text style={styles.baseMarkerText}>현위치</Text>
+            </View>
+            <Text style={styles.stopCaption}>{BASE_LOCATION.name}</Text>
+          </View>
+
+          {visibleRestaurants.map((restaurant, idx) => (
+            <View
+              key={restaurant.id}
+              style={[styles.routeStop, { left: 190 + idx * 118 }]}
+            >
+              <View style={styles.restaurantMarker}>
+                <Text style={styles.restaurantMarkerText}>{idx + 1}</Text>
+              </View>
+              <Text style={styles.stopCaption} numberOfLines={1}>
+                {restaurant.name}
+              </Text>
+              {restaurant.walkMin != null && (
+                <Text style={styles.stopMeta}>도보 {restaurant.walkMin}분</Text>
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+      <View style={styles.mapFooter}>
+        <Text style={styles.mapTitle}>거리순 경로 프리뷰</Text>
+        <Text style={styles.mapSub}>가로로 드래그하면 후보 {visibleRestaurants.length}곳을 순서대로 볼 수 있어요.</Text>
+      </View>
+    </View>
   );
 }
 
@@ -142,6 +210,18 @@ function SortTab({ label, subLabel, active, onPress }) {
 }
 
 const styles = StyleSheet.create({
+  bottomActions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    alignItems: 'stretch',
+  },
+  bottomLeft: {
+    flex: 0.9,
+  },
+  bottomRight: {
+    flex: 1.1,
+  },
+
   title: {
     fontSize: FONT.sizeXl,
     fontWeight: FONT.weightExtra,
@@ -230,7 +310,145 @@ const styles = StyleSheet.create({
   tabDesc: {
     fontSize: FONT.sizeXs,
     color: COLORS.textMuted,
+    marginBottom: SPACING.md,
+  },
+
+  mapBox: {
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    overflow: 'hidden',
     marginBottom: SPACING.lg,
+  },
+  routeMapContent: {
+    paddingRight: SPACING.lg,
+  },
+  routeCanvas: {
+    width: 1120,
+    height: 126,
+    backgroundColor: '#1F2A24',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  routeSideBlockLeft: {
+    position: 'absolute',
+    left: 36,
+    top: 12,
+    width: 210,
+    height: 34,
+    borderRadius: RADIUS.md,
+    backgroundColor: '#24322B',
+  },
+  routeSideBlockRight: {
+    position: 'absolute',
+    right: 58,
+    bottom: 10,
+    width: 260,
+    height: 38,
+    borderRadius: RADIUS.md,
+    backgroundColor: '#24322B',
+  },
+  routeLineShadow: {
+    position: 'absolute',
+    left: 44,
+    right: 44,
+    top: 54,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#121916',
+  },
+  routeLine: {
+    position: 'absolute',
+    left: 44,
+    right: 44,
+    top: 59,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#3E5148',
+  },
+  routeDashRow: {
+    position: 'absolute',
+    left: 74,
+    top: 62,
+    flexDirection: 'row',
+    gap: 30,
+  },
+  routeDash: {
+    width: 28,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: '#AFA69C',
+    opacity: 0.55,
+  },
+  baseStop: {
+    position: 'absolute',
+    left: 34,
+    top: 28,
+    width: 118,
+    alignItems: 'center',
+  },
+  routeStop: {
+    position: 'absolute',
+    top: 26,
+    width: 104,
+    alignItems: 'center',
+  },
+  baseMarker: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 5,
+    borderRadius: RADIUS.pill,
+    borderWidth: 2,
+    borderColor: COLORS.bg,
+  },
+  baseMarkerText: {
+    color: '#1A0F08',
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+  },
+  restaurantMarker: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surface,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+  },
+  restaurantMarkerText: {
+    color: COLORS.primary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightExtra,
+  },
+  stopCaption: {
+    color: COLORS.textPrimary,
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+    marginTop: 7,
+    maxWidth: 96,
+    textAlign: 'center',
+  },
+  stopMeta: {
+    color: COLORS.textMuted,
+    fontSize: 10,
+    marginTop: 2,
+  },
+  mapFooter: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.md,
+  },
+  mapTitle: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeSm,
+    fontWeight: FONT.weightBold,
+    marginBottom: 2,
+  },
+  mapSub: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeXs,
   },
 
   loadingBox: {

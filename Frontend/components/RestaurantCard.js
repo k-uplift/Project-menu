@@ -1,14 +1,19 @@
 /**
  * RestaurantCard — 음식점 카드
  *
- * 거리, 평점, 배달 여부, CF 매칭도 표시
+ * 거리, 평점, 배달 여부 표시
  */
 
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
-export default function RestaurantCard({ restaurant, index, onPress, showCfMatch = false }) {
+export default function RestaurantCard({
+  restaurant,
+  index,
+  onPress,
+  showRecommendedMenus = false,
+}) {
   const {
     name,
     rating,
@@ -17,8 +22,13 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
     walkMin,
     priceRange,
     delivery,
-    cfMatch,
+    menuItems = [],
   } = restaurant;
+  const recommendedMenuNames = menuItems
+    .map((item) => item.name)
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(', ');
 
   return (
     <Pressable
@@ -39,28 +49,36 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
           {delivery && <DeliveryBadge />}
         </View>
 
+        {/* 평점 + 거리 — 평점 데이터 없으면(현재 백엔드) 거리만 표시 */}
         <View style={styles.metaRow}>
-          <Text style={styles.star}>★</Text>
-          <Text style={styles.rating}>{rating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({reviewCount})</Text>
-          <Text style={styles.dot}>·</Text>
-          <Text style={styles.meta}>
-            {distanceKm}km · 도보 {walkMin}분
-          </Text>
+          {rating > 0 && (
+            <>
+              <Text style={styles.star}>★</Text>
+              <Text style={styles.rating}>{rating.toFixed(1)}</Text>
+              {reviewCount > 0 && (
+                <Text style={styles.reviewCount}>({reviewCount})</Text>
+              )}
+              {distanceKm != null && <Text style={styles.dot}>·</Text>}
+            </>
+          )}
+          {distanceKm != null && (
+            <Text style={styles.meta}>
+              {distanceKm}km{walkMin != null ? ` · 도보 ${walkMin}분` : ''}
+            </Text>
+          )}
         </View>
 
-        <Text style={styles.price}>{priceRange}</Text>
+        {priceRange ? <Text style={styles.price}>{priceRange}</Text> : null}
 
-        {/* CF 매칭 표시 — 취향 정렬 모드일 때만 */}
-        {showCfMatch && (
-          <View style={styles.cfBox}>
-            <Text style={styles.cfLabel}>👥 취향 일치도</Text>
-            <View style={styles.cfBarWrap}>
-              <View style={[styles.cfBar, { width: `${Math.round(cfMatch * 100)}%` }]} />
-            </View>
-            <Text style={styles.cfPercent}>{Math.round(cfMatch * 100)}%</Text>
+        {showRecommendedMenus && recommendedMenuNames ? (
+          <View style={styles.recommendedBox}>
+            <Text style={styles.recommendedLabel}>추천 메뉴</Text>
+            <Text style={styles.recommendedText} numberOfLines={2}>
+              {recommendedMenuNames}
+            </Text>
           </View>
-        )}
+        ) : null}
+
       </View>
     </Pressable>
   );
@@ -151,6 +169,27 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: FONT.sizeXs,
   },
+  recommendedBox: {
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.primarySoft,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.primaryDim,
+  },
+  recommendedLabel: {
+    color: COLORS.primary,
+    fontSize: 10,
+    fontWeight: FONT.weightBold,
+    marginBottom: 2,
+  },
+  recommendedText: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeXs,
+    lineHeight: 17,
+    fontWeight: FONT.weightMedium,
+  },
   deliveryBadge: {
     backgroundColor: COLORS.primarySoft,
     paddingHorizontal: SPACING.sm,
@@ -161,36 +200,5 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 11,
     fontWeight: FONT.weightBold,
-  },
-
-  cfBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-  },
-  cfLabel: {
-    fontSize: 11,
-    color: COLORS.textMuted,
-    marginRight: SPACING.sm,
-  },
-  cfBarWrap: {
-    flex: 1,
-    height: 4,
-    backgroundColor: COLORS.border,
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginRight: SPACING.sm,
-  },
-  cfBar: {
-    height: '100%',
-    backgroundColor: COLORS.primary,
-    borderRadius: 2,
-  },
-  cfPercent: {
-    fontSize: 11,
-    color: COLORS.primary,
-    fontWeight: FONT.weightBold,
-    minWidth: 32,
-    textAlign: 'right',
   },
 });

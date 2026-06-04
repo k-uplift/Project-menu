@@ -2,12 +2,13 @@
  * RestaurantDetailScreen — 음식점 상세 (STEP 5)
  *
  * 변경:
- *  - "플랫폼에서 보기" → "최종 선택"
- *  - 4개 버튼 → 2개 버튼 (길찾기, 배달의민족)
- *  - 행동 추적 이벤트 전송 (CF 학습용)
+ *  - 메뉴 섹션을 *추천 메뉴 강조* + *전체 메뉴 목록* 두 섹션으로 분리
+ *  - 진입 시 `getAllMenusByStore`로 그 식당의 *전체* 메뉴 추가 로드
+ *  - 평점·배달·시그니처 같은 stub 값이면 안 보이게 가드
+ *  - 길찾기/배달의민족 행동 추적 이벤트 유지
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +17,7 @@ import {
   Alert,
   Linking,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,15 +26,35 @@ import {
   trackNavigateClick,
   trackDeliveryClick,
 } from '../services/behaviorTrackingService';
+import { getAllMenusByStore } from '../services/restaurantService';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
 export default function RestaurantDetailScreen({ route, navigation }) {
-  const { restaurant, food } = route.params;
+  const { restaurant, food, sessionId = null, userId = 1 } = route.params;
+
+  // 그 식당 전체 메뉴 (추천 흐름과 무관하게 그 식당이 파는 모든 메뉴)
+  // restaurant.menuItems는 *선택한 kind에 매칭된* 메뉴만 들어 있어 "메뉴 적다"
+  // 인상을 줘서 별도 fetch.
+  const [allMenus, setAllMenus] = useState([]);
+  const [menusLoading, setMenusLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setMenusLoading(true);
+      const menus = await getAllMenusByStore(restaurant.storeId || restaurant.id);
+      if (mounted) {
+        setAllMenus(menus);
+        setMenusLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [restaurant.storeId, restaurant.id]);
 
   // 길찾기 (카카오맵으로 연결 — 가장 보편적인 지도 앱)
   const handleNavigate = async () => {
     // 행동 점수 +2점 — fire-and-forget (await 없이 호출)
-    trackNavigateClick(restaurant, food);
+    trackNavigateClick(restaurant, food, { sessionId, userId });
 
     const query = encodeURIComponent(restaurant.name);
     const url = `https://map.kakao.com/?q=${query}`;
@@ -52,36 +74,60 @@ export default function RestaurantDetailScreen({ route, navigation }) {
     }
   };
 
-  // 배달의민족 연결
+  // 배달 연결 — 3단 우선순위:
+  //   ① restaurant.baeminUrl (시연용 수동 매핑) — 배민 식당 페이지 직행
+  //   ② restaurant.naverPlaceId — 네이버 플레이스 *배달 탭* 직행
+  //                              (배민·요기요·쿠팡이츠 통합 노출. 식당 324/330=98%)
+  //   ③ 카카오맵 검색 fallback — 결손 6개 식당용. 카카오맵은 *반드시* 검색 결과
+  //                              페이지 열림, 매칭 식당의 *카카오 주문 통합* 노출
+  //                              (baemin.me/search는 404 위험 있어 카카오로 교체)
   const handleDelivery = async () => {
     // 행동 점수 +2점
-    trackDeliveryClick(restaurant, food);
+    trackDeliveryClick(restaurant, food, { sessionId, userId });
 
-    const query = encodeURIComponent(restaurant.name);
-    const url = `https://baemin.me/search?query=${query}`;
+    let url, label;
+    if (restaurant.baeminUrl) {
+      url = restaurant.baeminUrl;
+      label = '배달의민족';
+    } else if (restaurant.naverPlaceId) {
+      url = `https://m.place.naver.com/restaurant/${restaurant.naverPlaceId}/order/delivery`;
+      label = '네이버 주문';
+    } else {
+      url = `https://map.kakao.com/?q=${encodeURIComponent(restaurant.name)}`;
+      label = '카카오맵';
+    }
 
     try {
       const canOpen = await Linking.canOpenURL(url);
       if (canOpen) {
         Linking.openURL(url);
       } else {
-        Alert.alert('연결 실패', '배달의민족 앱을 열 수 없어요.');
+        Alert.alert('연결 실패', `${label} 페이지를 열 수 없어요.`);
       }
     } catch (e) {
       Alert.alert(
-        '배달의민족',
-        `"${restaurant.name}" 검색 결과로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
+        label,
+        `"${restaurant.name}" 페이지로 이동합니다.\n\n(시연 환경에서는 실제 이동되지 않을 수 있어요)`
       );
     }
   };
 
-  // 별점 렌더링
+  // 별점 렌더링 (rating > 0일 때만 표시)
   const renderStars = () => {
-    const full = Math.floor(restaurant.rating);
-    const half = restaurant.rating - full >= 0.5;
-    const stars = '★'.repeat(full) + (half ? '★' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
-    return stars;
+    const r = restaurant.rating || 0;
+    const full = Math.floor(r);
+    const half = r - full >= 0.5;
+    return '★'.repeat(full) + (half ? '★' : '') + '☆'.repeat(5 - full - (half ? 1 : 0));
   };
+
+  // 추천 메뉴(매칭) 이름 집합 — 전체 메뉴에서 추천 메뉴 제외 시 사용
+  const recommendedMenus = restaurant.menuItems || [];
+  const recommendedNames = new Set(recommendedMenus.map((m) => m.name));
+  const otherMenus = allMenus.filter((m) => !recommendedNames.has(m.name));
+  const recommendedMenuText = recommendedMenus
+    .map((m) => m.name)
+    .slice(0, 3)
+    .join(', ');
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
@@ -90,14 +136,21 @@ export default function RestaurantDetailScreen({ route, navigation }) {
         <Pressable onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={12}>
           <Text style={styles.backText}>‹ 뒤로</Text>
         </Pressable>
-        <View style={styles.brandWrap}>
+        <Pressable
+          onPress={() => navigation.navigate('Home')}
+          style={({ pressed }) => [styles.brandWrap, pressed && styles.headerPressed]}
+          hitSlop={8}
+        >
           <Text style={styles.brand}>me:nu</Text>
-        </View>
-        <View style={styles.dashes}>
-          {[...Array(5)].map((_, i) => (
-            <View key={i} style={styles.dash} />
-          ))}
-        </View>
+        </Pressable>
+        <Pressable
+          onPress={() => navigation.navigate('MyPage')}
+          style={({ pressed }) => [styles.myPageBtn, pressed && styles.myPageBtnPressed]}
+          hitSlop={8}
+        >
+          <Text style={styles.myPageIcon}>👤</Text>
+          <Text style={styles.myPageText}>마이</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -116,12 +169,16 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           <Text style={styles.headerName}>{restaurant.name}</Text>
         </View>
 
-        {/* 평점 */}
-        <View style={styles.ratingRow}>
-          <Text style={styles.starText}>{renderStars()}</Text>
-          <Text style={styles.ratingNum}>{restaurant.rating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({restaurant.reviewCount}개 리뷰)</Text>
-        </View>
+        {/* 평점 — 데이터가 있을 때만 (현재 백엔드에 없으면 안 보임) */}
+        {restaurant.rating > 0 && (
+          <View style={styles.ratingRow}>
+            <Text style={styles.starText}>{renderStars()}</Text>
+            <Text style={styles.ratingNum}>{restaurant.rating.toFixed(1)}</Text>
+            {restaurant.reviewCount > 0 && (
+              <Text style={styles.reviewCount}>({restaurant.reviewCount}개 리뷰)</Text>
+            )}
+          </View>
+        )}
 
         {/* 정보 카드 */}
         <View style={styles.infoCard}>
@@ -138,55 +195,58 @@ export default function RestaurantDetailScreen({ route, navigation }) {
               accent
             />
           )}
+          {recommendedMenuText ? (
+            <InfoRow
+              icon="🍽️"
+              text={`추천 메뉴: ${recommendedMenuText}`}
+              accent
+            />
+          ) : null}
         </View>
 
-        {/* 메뉴 목록 */}
-        <Text style={styles.sectionLabel}>메뉴</Text>
+        {/* 추천 메뉴 — 사용자가 검색한 종류의 매칭 메뉴 강조 */}
+        {recommendedMenus.length > 0 && (
+          <>
+            <Text style={styles.sectionLabel}>
+              🎯 추천 메뉴 {food?.name ? `· ${food.name}` : ''}
+            </Text>
+            <View style={[styles.menuCard, styles.menuCardRecommended]}>
+              {recommendedMenus.map((item, idx) => (
+                <MenuRowItem
+                  key={`rec-${item.name}-${idx}`}
+                  item={item}
+                  isLast={idx === recommendedMenus.length - 1}
+                />
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* 전체 메뉴 — 그 식당의 다른 모든 메뉴 */}
+        <Text style={styles.sectionLabel}>
+          전체 메뉴 {allMenus.length > 0 ? `(${allMenus.length})` : ''}
+        </Text>
         <View style={styles.menuCard}>
-          {restaurant.menuItems && restaurant.menuItems.length > 0 ? (
-            restaurant.menuItems.map((item, idx) => (
-              <View
-                key={`${item.name}-${idx}`}
-                style={[
-                  styles.menuRow,
-                  idx === restaurant.menuItems.length - 1 && styles.menuRowLast,
-                ]}
-              >
-                <View style={styles.menuLeft}>
-                  <Text style={styles.menuName}>{item.name}</Text>
-                  {item.isSignature && (
-                    <View style={styles.signatureBadge}>
-                      <Text style={styles.signatureText}>대표</Text>
-                    </View>
-                  )}
-                </View>
-                <Text style={styles.menuPrice}>
-                  {item.price.toLocaleString()}원
-                </Text>
-              </View>
+          {menusLoading ? (
+            <View style={{ paddingVertical: SPACING.lg, alignItems: 'center' }}>
+              <ActivityIndicator color={COLORS.primary} />
+            </View>
+          ) : otherMenus.length > 0 ? (
+            otherMenus.map((item, idx) => (
+              <MenuRowItem
+                key={`all-${item.name}-${idx}`}
+                item={item}
+                isLast={idx === otherMenus.length - 1}
+              />
             ))
-          ) : (
+          ) : allMenus.length === 0 ? (
             <Text style={styles.menuEmpty}>메뉴 정보가 없어요</Text>
+          ) : (
+            <Text style={styles.menuEmpty}>
+              추천 메뉴 외 다른 메뉴 정보가 없어요
+            </Text>
           )}
         </View>
-
-        {/* CF 매칭도 */}
-        {restaurant.cfMatch && (
-          <View style={styles.cfBox}>
-            <Text style={styles.cfLabel}>👥 취향 일치도</Text>
-            <View style={styles.cfBarWrap}>
-              <View
-                style={[
-                  styles.cfBar,
-                  { width: `${Math.round(restaurant.cfMatch * 100)}%` },
-                ]}
-              />
-            </View>
-            <Text style={styles.cfPercent}>
-              {Math.round(restaurant.cfMatch * 100)}%
-            </Text>
-          </View>
-        )}
 
         {/* === 최종 선택 영역 === */}
         <Text style={styles.sectionLabel}>최종 선택</Text>
@@ -219,10 +279,6 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           />
         </View>
 
-        <Text style={styles.dataNote}>
-          💡 현재는 더미 데이터입니다.{'\n'}
-          추후 음식점 DB + 공공데이터 메뉴 API와 연결됩니다.
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -234,6 +290,27 @@ function InfoRow({ icon, text, accent = false }) {
     <View style={styles.infoRow}>
       <Text style={styles.infoIcon}>{icon}</Text>
       <Text style={[styles.infoText, accent && styles.infoTextAccent]}>{text}</Text>
+    </View>
+  );
+}
+
+/** 메뉴 한 줄 — 추천/일반 공용. 가격은 백엔드가 원본 문자열로 줌 */
+function MenuRowItem({ item, isLast }) {
+  return (
+    <View style={[styles.menuRow, isLast && styles.menuRowLast]}>
+      <View style={styles.menuLeft}>
+        <Text style={styles.menuName}>{item.name}</Text>
+        {item.isSignature && (
+          <View style={styles.signatureBadge}>
+            <Text style={styles.signatureText}>대표</Text>
+          </View>
+        )}
+      </View>
+      {item.price ? (
+        <Text style={styles.menuPrice}>
+          {String(item.price).includes('원') ? item.price : `${item.price}원`}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -280,21 +357,37 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
   },
+  headerPressed: {
+    opacity: 0.75,
+  },
   brand: {
     fontSize: FONT.sizeLg,
     fontWeight: FONT.weightExtra,
     color: COLORS.primary,
     letterSpacing: -0.5,
   },
-  dashes: {
+  myPageBtn: {
     flexDirection: 'row',
-    gap: 3,
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.pill,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
-  dash: {
-    width: 8,
-    height: 2,
-    backgroundColor: COLORS.primary,
-    borderRadius: 1,
+  myPageBtnPressed: {
+    backgroundColor: COLORS.surfaceAlt,
+    borderColor: COLORS.primary,
+  },
+  myPageIcon: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+  myPageText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT.sizeXs,
+    fontWeight: FONT.weightMedium,
   },
 
   scrollContent: {
@@ -421,6 +514,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+  menuCardRecommended: {
+    backgroundColor: COLORS.primarySoft,
+    borderColor: COLORS.primary,
+  },
   menuRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -465,43 +562,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: SPACING.lg,
   },
-
-  cfBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: RADIUS.md,
-    padding: SPACING.md,
-    marginBottom: SPACING.lg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  cfLabel: {
-    fontSize: FONT.sizeXs,
-    color: COLORS.textSecondary,
-    marginRight: SPACING.sm,
-  },
-  cfBarWrap: {
-    flex: 1,
-    height: 6,
-    backgroundColor: COLORS.bg,
-    borderRadius: 3,
-    overflow: 'hidden',
-    marginRight: SPACING.sm,
-  },
-  cfBar: {
-    height: '100%',
-    backgroundColor: COLORS.primary,
-    borderRadius: 3,
-  },
-  cfPercent: {
-    fontSize: FONT.sizeXs,
-    color: COLORS.primary,
-    fontWeight: FONT.weightBold,
-    minWidth: 36,
-    textAlign: 'right',
-  },
-
   // === 최종 선택 영역 (2개 버튼) ===
   finalRow: {
     flexDirection: 'row',
