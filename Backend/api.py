@@ -596,7 +596,9 @@ def user_diary(user_id: int = 1, limit: int = 20):
         tags = tag_map.get(sid, [])
         selected = list(dict.fromkeys(sel_map.get(sid, [])))
         clicked = list(dict.fromkeys(clk_map.get(sid, [])))
-        if not tags and not selected and not clicked:
+        # 일기는 *음식을 고른(선택/클릭)* 칸만 — 태그만 있고 음식 없는 검색은 제외.
+        # (검색만 하고 안 고른 세션이 태그만 잔뜩 쌓여 일기가 지저분해지던 문제)
+        if not selected and not clicked:
             continue
         dt = _parse(created_at)
         if entries:
