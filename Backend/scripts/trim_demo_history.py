@@ -50,7 +50,6 @@ def trim(conn: sqlite3.Connection) -> None:
         if not sessions:
             print(f"  ⚠️  user {uid} ({label}) 세션 없음 — 건너뜀")
             continue
-        first_session = sessions[0]
 
         qmarks = ",".join("?" for _ in sessions)
         before = conn.execute(
@@ -62,21 +61,26 @@ def trim(conn: sqlite3.Connection) -> None:
         conn.execute(
             f"DELETE FROM UserInteractionLog WHERE session_id IN ({qmarks})", sessions
         )
-        # 2) 시그니처 kind 를 final_select 로 첫 세션에 INSERT
+        # 2) 시그니처를 *최근 세션들에 하나씩 분산* INSERT.
+        #    sessions 는 session_id 오름차순 → 뒤쪽이 최근. 한 시그니처당 한 세션.
+        #    이렇게 하면 '나의 먹거리 일기'(최근순)에 [태그 + 선택 음식]이 여러 칸으로 보인다.
+        #    (CF 는 사용자 단위 집계라 세션 분산과 무관 — 유사도·제외·점수 모두 동일.)
+        recent = sessions[-len(sig_names):] if len(sessions) >= len(sig_names) else sessions
         inserted = []
-        for name in sig_names:
+        for i, name in enumerate(sig_names):
             fid = _food_id(conn, name)
             if fid is None:
                 print(f"  ⚠️  '{name}' Food 테이블에 없음 — 건너뜀")
                 continue
+            sess = recent[i % len(recent)]
             conn.execute(
                 "INSERT INTO UserInteractionLog(session_id, food_id, action_type, created_at) "
                 "VALUES (?, ?, 'final_select', datetime('now'))",
-                (first_session, fid),
+                (sess, fid),
             )
             inserted.append(name)
 
-        print(f"  ✅ {label} (user {uid}): 로그 {before}→{len(inserted)}개 final  시그니처={inserted}")
+        print(f"  ✅ {label} (user {uid}): 로그 {before}→{len(inserted)}개 final (최근 세션 분산)  시그니처={inserted}")
 
 
 def main() -> None:

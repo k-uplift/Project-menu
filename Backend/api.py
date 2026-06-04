@@ -536,6 +536,71 @@ def user_events(user_id: int = 1):
     }
 
 
+@app.get("/user_diary")
+def user_diary(user_id: int = 1, limit: int = 20):
+    """나의 먹거리 일기 — 그 user_id 의 검색 세션별 {태그, 선택 음식, 클릭 음식}.
+
+    recommend.db 에 *실제 저장된* 데이터를 세션 단위로 묶어 돌려준다 (DB·user_id 직결):
+      - tags     = UserTagSelection (그 검색에서 고른/추출된 시드 태그)
+      - selected = UserInteractionLog action_type='final_select' (길찾기·배달 = 최종 선택)
+      - clicked  = UserInteractionLog action_type='click' (카드 클릭 = 관심)
+    최근 세션부터 limit 개. 태그·선택·클릭이 모두 없는 빈 세션은 건너뛴다.
+    """
+    info = _food_info()  # food_id → (name, tags)
+    conn = _connect_recommend_db()
+    try:
+        sess_rows = conn.execute(
+            "SELECT session_id, created_at FROM RecommendationSession "
+            "WHERE user_id = ? ORDER BY session_id DESC LIMIT ?",
+            (user_id, max(limit * 4, 80)),
+        ).fetchall()
+        sess_ids = [r[0] for r in sess_rows]
+        if not sess_ids:
+            return {"userId": user_id, "entries": []}
+        qm = ",".join("?" for _ in sess_ids)
+        tag_map: dict[int, list[str]] = {}
+        for sid, tname in conn.execute(
+            f"SELECT uts.session_id, t.tag_name FROM UserTagSelection uts "
+            f"JOIN Tag t ON t.tag_id = uts.tag_id WHERE uts.session_id IN ({qm})",
+            sess_ids,
+        ):
+            tag_map.setdefault(sid, []).append(tname)
+        sel_map: dict[int, list[str]] = {}
+        clk_map: dict[int, list[str]] = {}
+        for sid, fid, action in conn.execute(
+            f"SELECT session_id, food_id, action_type FROM UserInteractionLog "
+            f"WHERE session_id IN ({qm})",
+            sess_ids,
+        ):
+            name = info.get(fid, (None, []))[0]
+            if not name:
+                continue
+            bucket = sel_map if action == "final_select" else clk_map
+            bucket.setdefault(sid, []).append(name)
+    finally:
+        conn.close()
+
+    entries = []
+    for sid, created_at in sess_rows:
+        tags = tag_map.get(sid, [])
+        selected = list(dict.fromkeys(sel_map.get(sid, [])))
+        clicked = list(dict.fromkeys(clk_map.get(sid, [])))
+        if not tags and not selected and not clicked:
+            continue
+        entries.append(
+            {
+                "sessionId": sid,
+                "timestamp": _iso_ts(created_at),
+                "tags": tags,
+                "selected": selected,
+                "clicked": clicked,
+            }
+        )
+        if len(entries) >= limit:
+            break
+    return {"userId": user_id, "entries": entries}
+
+
 # 배민 URL 매핑 — 시연용 식당 N개. 키 = stores.name. 값 = 배민 deep link.
 # 값이 빈 문자열이면 프론트가 검색 URL로 fallback.
 _BAEMIN_URLS_PATH = Path(__file__).parent / "data" / "baemin_urls.json"
