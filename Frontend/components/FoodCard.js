@@ -37,20 +37,19 @@ export default function FoodCard({ food, selected = false, onPress }) {
         </View>
       </View>
 
-      {/* 추천 근거 — 1 행. 백엔드가 cfDescription 으로 만들어 보내줌:
-          기본 탭: '한식 국물요리·12개 식당이 판매'
-          CF 탭:   'Charlie·매운국물파#5 등 8명이 선택'                       */}
-      <View style={styles.reasonBox}>
-        <ReasonRow
-          icon="💡"
-          title="추천 근거"
-          content={
-            reason?.cfDescription ||
-            '비슷한 신호로 매칭된 음식'
-          }
-          highlight
-        />
-      </View>
+      {/* 추천 근거 — CF 탭에서만 노출. 기본 탭은 근거가 카드마다 거의 같아
+          (모두 '검색 키워드 일치') 생략하고, CF 탭만 '나와 닮은 사용자' 근거를 보여준다.
+          base 응답은 cfScore=null, CF 응답은 cfScore 숫자라 이걸로 구분. */}
+      {reason?.cfScore != null && reason?.cfDescription ? (
+        <View style={styles.reasonBox}>
+          <ReasonRow
+            icon="🤝"
+            title="취향 매칭"
+            content={reason.cfDescription}
+            highlight
+          />
+        </View>
+      ) : null}
     </Pressable>
   );
 }

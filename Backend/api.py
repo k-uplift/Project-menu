@@ -131,10 +131,11 @@ def _user_display(uid: int) -> str:
 
 
 def _build_supporters_desc(supporter_uids: list[int]) -> str:
-    """supporters user_id 리스트 → 'Charlie·매운국물파#5 등 8명이 선택' 문장.
+    """supporters user_id 리스트 → '나와 닮은 Charlie 등 8명이 고른 메뉴' 문장.
 
     시연 사용자(Alice·Bob·Charlie)는 *최우선*으로 보여주고, 그 다음은 supporters
     순서대로. 상위 2명까지 이름 + 나머지는 '등 N명'.
+    조사는 '이/가' 대신 '명이'(받침 ㅇ) · '님이'(받침 ㅁ)로 통일해 이름 어미와 무관하게 자연스럽게.
     """
     n = len(supporter_uids)
     if n == 0:
@@ -143,10 +144,11 @@ def _build_supporters_desc(supporter_uids: list[int]) -> str:
     demo_ids = [uid for uid in supporter_uids if uid in _USER_DISPLAY_NAMES]
     other_ids = [uid for uid in supporter_uids if uid not in _USER_DISPLAY_NAMES]
     ordered = demo_ids + other_ids
+    if n == 1:
+        return f"나와 닮은 {_user_display(ordered[0])}님이 고른 메뉴"
     top_named = [_user_display(uid) for uid in ordered[:2]]
-    if n <= 2:
-        return f"{'·'.join(top_named)}이 선택"
-    return f"{'·'.join(top_named)} 등 {n}명이 선택"
+    suffix = " 등" if n > 2 else ""
+    return f"나와 닮은 {'·'.join(top_named)}{suffix} {n}명이 고른 메뉴"
 
 app = FastAPI(title="me:nu recommendation API")
 
