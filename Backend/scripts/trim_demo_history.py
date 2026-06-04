@@ -38,6 +38,16 @@ def _food_id(conn: sqlite3.Connection, name: str) -> int | None:
     return row[0] if row else None
 
 
+def _food_tag_ids(conn: sqlite3.Connection, food_id: int, limit: int = 3) -> list[int]:
+    """그 음식(kind)의 대표 태그 tag_id 상위 N개 (FoodTag)."""
+    return [
+        r[0]
+        for r in conn.execute(
+            "SELECT tag_id FROM FoodTag WHERE food_id = ? LIMIT ?", (food_id, limit)
+        )
+    ]
+
+
 def trim(conn: sqlite3.Connection) -> None:
     for uid, (label, sig_names) in SIGNATURES.items():
         sessions = [
@@ -73,11 +83,29 @@ def trim(conn: sqlite3.Connection) -> None:
                 print(f"  ⚠️  '{name}' Food 테이블에 없음 — 건너뜀")
                 continue
             sess = recent[i % len(recent)]
+            # 세션 시각을 하루씩 벌린다 — 같은 태그 음식들이 일기 dedup(같은 태그+근접
+            # 시각 ≤120초)으로 *한 칸에 뭉치는 것* 방지. 음식마다 하나씩 칸이 나오게.
+            # 최신 id(recent[-1])일수록 더 최근 시각이 되도록 오프셋 계산.
+            day_off = len(recent) - 1 - i
+            conn.execute(
+                "UPDATE RecommendationSession SET created_at = datetime('now', ?) "
+                "WHERE session_id = ?",
+                (f"-{day_off} days", sess),
+            )
             conn.execute(
                 "INSERT INTO UserInteractionLog(session_id, food_id, action_type, created_at) "
-                "VALUES (?, ?, 'final_select', datetime('now'))",
-                (sess, fid),
+                "VALUES (?, ?, 'final_select', datetime('now', ?))",
+                (sess, fid, f"-{day_off} days"),
             )
+            # 그 세션의 검색 태그를 *이 음식의 태그*로 교체 → 먹거리 일기에서
+            # [태그]🍽[음식] 짝이 페르소나와 일치 (예: [얼큰한,국물있는]🍽짬뽕).
+            # seed_demo 가 박은 무관한 태그([달달한]🍽짬뽕 같은) 부정합 제거.
+            conn.execute("DELETE FROM UserTagSelection WHERE session_id = ?", (sess,))
+            for tid in _food_tag_ids(conn, fid, 3):
+                conn.execute(
+                    "INSERT INTO UserTagSelection(session_id, tag_id) VALUES (?, ?)",
+                    (sess, tid),
+                )
             inserted.append(name)
 
         print(f"  ✅ {label} (user {uid}): 로그 {before}→{len(inserted)}개 final (최근 세션 분산)  시그니처={inserted}")
