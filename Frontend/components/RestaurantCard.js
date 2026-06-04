@@ -16,9 +16,13 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
     distanceKm,
     walkMin,
     priceRange,
+    recommendedPriceRange,
     delivery,
     cfMatch,
   } = restaurant;
+
+  // 가격은 *추천 음식(kind)* 가격 우선, 없으면 식당 전체 범위로 폴백.
+  const displayPrice = recommendedPriceRange || priceRange;
 
   return (
     <Pressable
@@ -58,7 +62,7 @@ export default function RestaurantCard({ restaurant, index, onPress, showCfMatch
           )}
         </View>
 
-        {priceRange ? <Text style={styles.price}>{priceRange}</Text> : null}
+        {displayPrice ? <Text style={styles.price}>{displayPrice}</Text> : null}
 
         {/* CF 매칭 표시 — 취향 정렬 모드 + cfMatch 데이터 있을 때만 */}
         {showCfMatch && cfMatch != null && (

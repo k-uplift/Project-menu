@@ -174,9 +174,19 @@ export default function RestaurantDetailScreen({ route, navigation }) {
           <InfoRow icon="📍" text={restaurant.address} />
           <InfoRow
             icon="🕐"
-            text={`${restaurant.hours} · ${restaurant.closedDay} 휴무`}
+            text={[
+              restaurant.hours,
+              restaurant.closedDay ? `${restaurant.closedDay} 휴무` : '휴무 없음',
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           />
-          <InfoRow icon="💰" text={restaurant.priceRange} />
+          {(restaurant.recommendedPriceRange || restaurant.priceRange) ? (
+            <InfoRow
+              icon="💰"
+              text={restaurant.recommendedPriceRange || restaurant.priceRange}
+            />
+          ) : null}
           {food && (
             <InfoRow
               icon="🎯"

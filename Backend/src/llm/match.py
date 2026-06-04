@@ -761,6 +761,30 @@ def aggregate_stores(
     return groups[:top_k]
 
 
+def _format_kind_price(menus) -> str | None:
+    """추천 음식(kind) 매칭 메뉴들의 가격 → '8,000원'(단일) 또는 '8,000~12,000원'(범위).
+
+    menus[].price 는 크롤링 원본이라 '25000'·콤마 포함·None 등이 섞여 있어 숫자만 뽑아 집계.
+    카드/상세의 가격을 *식당 전체 범위*(priceRange) 대신 *추천 음식의 가격*으로 보여주기 위함.
+    유효 가격이 없으면 None — 프론트가 식당 전체 범위로 폴백.
+    """
+    import re
+
+    prices = []
+    for m in menus:
+        raw = getattr(m, "price", None)
+        if raw is None:
+            continue
+        digits = re.sub(r"[^0-9]", "", str(raw))
+        if digits:
+            prices.append(int(digits))
+    prices = [p for p in prices if p > 0]
+    if not prices:
+        return None
+    lo, hi = min(prices), max(prices)
+    return f"{lo:,}원" if lo == hi else f"{lo:,}~{hi:,}원"
+
+
 def to_store_group(g: StoreGroup) -> dict:
     """StoreGroup → 프론트 Restaurant 계약 (restaurants.mock.js 형태).
 
@@ -785,6 +809,8 @@ def to_store_group(g: StoreGroup) -> dict:
         "breakTime": info.break_time if info else None,
         "lastOrder": info.last_order if info else None,
         "priceRange": info.price_range if info else None,
+        # 추천 음식(kind) 매칭 메뉴들의 가격 범위 — 카드/상세가 식당 전체 범위 대신 이걸 우선 표시.
+        "recommendedPriceRange": _format_kind_price(g.menus),
         "naverPlaceId": info.naver_place_id if info else None,
         "score": _to_score100(g.score),
         "reason": {
