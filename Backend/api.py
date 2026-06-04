@@ -415,6 +415,125 @@ def similar_users(user_id: int = 1, top_k: int = 5):
     return {"userId": user_id, "users": users}
 
 
+# ── 마이페이지 칭호·미식유형용 서버 데이터 (user_id 기반) ──────────────────────
+# 그동안 칭호·미식유형은 폰 로컬(AsyncStorage)만 봐서 *계정을 바꿔도 똑같았다*.
+# 아래는 recommend.db의 그 user_id 행동 이력을 프론트 이벤트 모양으로 복원해,
+# 칭호·미식유형이 로그인한 사용자 기준으로 계산되게 한다.
+_KIND_TO_CATEGORY_CACHE: dict[str, str] | None = None
+_FOOD_INFO_CACHE: dict[int, tuple[str, list[str]]] | None = None  # food_id → (name, tags)
+
+
+def _kind_to_category() -> dict[str, str]:
+    """음식 종류(kind) → 카테고리. kinds.py KINDS_BY_CATEGORY 역매핑 (한 번 빌드)."""
+    global _KIND_TO_CATEGORY_CACHE
+    if _KIND_TO_CATEGORY_CACHE is None:
+        from src.llm.kinds import KINDS_BY_CATEGORY
+
+        rev: dict[str, str] = {}
+        for cat, kinds in KINDS_BY_CATEGORY.items():
+            for k in kinds:
+                rev[k] = cat
+        _KIND_TO_CATEGORY_CACHE = rev
+    return _KIND_TO_CATEGORY_CACHE
+
+
+def _food_info() -> dict[int, tuple[str, list[str]]]:
+    """food_id → (food_name, [tag_name...]). recommend.db Food+FoodTag+Tag 한 번 읽어 캐시."""
+    global _FOOD_INFO_CACHE
+    if _FOOD_INFO_CACHE is None:
+        conn = _connect_recommend_db()
+        try:
+            names = {
+                fid: name
+                for fid, name in conn.execute("SELECT food_id, food_name FROM Food")
+            }
+            tags: dict[int, list[str]] = {}
+            for fid, tname in conn.execute(
+                "SELECT ft.food_id, t.tag_name FROM FoodTag ft JOIN Tag t ON t.tag_id = ft.tag_id"
+            ):
+                tags.setdefault(fid, []).append(tname)
+        finally:
+            conn.close()
+        _FOOD_INFO_CACHE = {fid: (name, tags.get(fid, [])) for fid, name in names.items()}
+    return _FOOD_INFO_CACHE
+
+
+def _iso_ts(created_at: str) -> str:
+    """DB 'YYYY-MM-DD HH:MM:SS' → JS Date가 로컬로 파싱하는 'YYYY-MM-DDTHH:MM:SS'."""
+    return created_at.replace(" ", "T") if created_at else created_at
+
+
+@app.get("/user_events")
+def user_events(user_id: int = 1):
+    """마이페이지 칭호·미식유형을 *서버 user_id 기준*으로 계산하기 위한 행동 데이터.
+
+    recommend.db의 UserInteractionLog(그 user_id의 click·final_select)를 프론트
+    behaviorTrackingService 이벤트 모양으로 복원한다.
+    - foodTags          : FoodTag→Tag
+    - restaurantCategory: kind→카테고리(kinds.py). 로그에 store가 없어 kind로 유도
+    - searches          : RecommendationSession 시각 (새벽 검색 칭호용)
+    - preferredTags     : UserTagSelection 빈도 상위 (미식유형 buildSeedScore용)
+    ⚠️ 로그에 store_id가 없어 '단골'(maxStoreCount) 칭호는 서버 기준으론 안 잡힌다.
+    """
+    info = _food_info()
+    kcat = _kind_to_category()
+    conn = _connect_recommend_db()
+    try:
+        rows = conn.execute(
+            """
+            SELECT l.action_type, l.created_at, l.food_id
+              FROM UserInteractionLog l
+              JOIN RecommendationSession rs ON rs.session_id = l.session_id
+             WHERE rs.user_id = ?
+             ORDER BY l.log_id
+            """,
+            (user_id,),
+        ).fetchall()
+        sess = conn.execute(
+            "SELECT created_at FROM RecommendationSession WHERE user_id = ? ORDER BY session_id",
+            (user_id,),
+        ).fetchall()
+        tag_rows = conn.execute(
+            """
+            SELECT t.tag_name, COUNT(*) c
+              FROM UserTagSelection uts
+              JOIN RecommendationSession rs ON rs.session_id = uts.session_id
+              JOIN Tag t ON t.tag_id = uts.tag_id
+             WHERE rs.user_id = ?
+             GROUP BY t.tag_name ORDER BY c DESC
+            """,
+            (user_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+
+    events = []
+    for action_type, created_at, food_id in rows:
+        name, tags = info.get(food_id, (None, []))
+        if not name:
+            continue
+        ev_type = "navigate_click" if action_type == "final_select" else "food_card_click"
+        events.append(
+            {
+                "type": ev_type,
+                "timestamp": _iso_ts(created_at),
+                "payload": {
+                    "foodName": name,
+                    "foodTags": tags,
+                    "restaurantCategory": kcat.get(name),
+                },
+            }
+        )
+    searches = [{"timestamp": _iso_ts(c)} for (c,) in sess]
+    preferred_tags = [{"tag": name, "count": c} for name, c in tag_rows]
+    return {
+        "userId": user_id,
+        "events": events,
+        "searches": searches,
+        "preferredTags": preferred_tags,
+    }
+
+
 # 배민 URL 매핑 — 시연용 식당 N개. 키 = stores.name. 값 = 배민 deep link.
 # 값이 빈 문자열이면 프론트가 검색 URL로 fallback.
 _BAEMIN_URLS_PATH = Path(__file__).parent / "data" / "baemin_urls.json"

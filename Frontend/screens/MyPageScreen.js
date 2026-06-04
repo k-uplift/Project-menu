@@ -36,7 +36,7 @@ import {
 import { getBehaviorEvents, clearBehaviorEvents } from '../services/behaviorTrackingService';
 import { getEarnedBadges } from '../services/badges';
 import { getCurrentUser, logout } from '../services/authService';
-import { getSimilarUsers } from '../services/recommendationService';
+import { getSimilarUsers, getUserEvents } from '../services/recommendationService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 /**
@@ -112,22 +112,37 @@ export default function MyPageScreen({ navigation }) {
     useCallback(() => {
       let mounted = true;
       (async () => {
-        const [s, r, t, events, u] = await Promise.all([
+        const [s, r, u] = await Promise.all([
           getRecentSearches(),
           getRecentFoods(),
-          getPreferredTags(),
-          getBehaviorEvents(),
           getCurrentUser(),
         ]);
         if (!mounted) return;
-        setSearches(s);
+        setSearches(s); // 최근 검색 표시 — 이 기기 UX 기록 (로컬 유지)
         setRecentFoods(r);
-        setPreferredTags(t);
-        // 칭호 계산 (events + searches가 둘 다 필요 — D 새벽 사냥꾼 등)
-        setBadges(getEarnedBadges(events, s));
         setAccount(u);
-        // 나와 닮은 사용자 (서버 CF) — 로그인 유저 또는 비로그인=1(Alice)
+
+        // 칭호·미식유형·닮은사용자 = *서버 user_id 기준* (계정 바꾸면 달라짐).
+        // 로그인 유저 또는 비로그인=1(Alice).
         const uid = u?.user_id ?? 1;
+        // 서버 행동 데이터로 칭호·미식유형 계산. 실패 시 로컬 AsyncStorage 폴백.
+        const ue = await getUserEvents(uid);
+        let evList, searchList, prefTags;
+        if (ue) {
+          evList = ue.events;
+          searchList = ue.searches;
+          prefTags = ue.preferredTags;
+        } else {
+          [evList, searchList, prefTags] = await Promise.all([
+            getBehaviorEvents(),
+            Promise.resolve(s),
+            getPreferredTags(),
+          ]);
+        }
+        if (!mounted) return;
+        setPreferredTags(prefTags); // 미식유형 seedScore에 사용
+        setBadges(getEarnedBadges(evList, searchList));
+
         const sims = await getSimilarUsers(uid);
         if (mounted) setSimilarUsers(sims);
       })();

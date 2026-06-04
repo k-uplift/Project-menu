@@ -171,3 +171,28 @@ export async function getSimilarUsers(userId = 1, topK = 5) {
     return [];
   }
 }
+
+/**
+ * 마이페이지 칭호·미식유형을 *서버 user_id 기준*으로 계산하기 위한 행동 데이터.
+ *
+ * 백엔드 /user_events 호출 — recommend.db의 그 user_id 행동 이력을
+ * behaviorTrackingService 이벤트 모양으로 복원해 돌려준다.
+ * 반환: { events:[{type,timestamp,payload:{foodName,foodTags,restaurantCategory}}],
+ *        searches:[{timestamp}], preferredTags:[{tag,count}] }.
+ * 실패 시 null — 호출처가 로컬 AsyncStorage로 폴백.
+ */
+export async function getUserEvents(userId = 1) {
+  try {
+    const res = await fetch(`${API_BASE}/user_events?user_id=${userId}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return {
+      events: Array.isArray(data.events) ? data.events : [],
+      searches: Array.isArray(data.searches) ? data.searches : [],
+      preferredTags: Array.isArray(data.preferredTags) ? data.preferredTags : [],
+    };
+  } catch (e) {
+    console.warn('[recommendationService] /user_events 실패:', e.message);
+    return null;
+  }
+}
