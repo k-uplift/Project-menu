@@ -41,30 +41,13 @@ export default function FoodCard({ food, selected = false, onPress }) {
           <ReasonRow
             icon="🤝"
             title="취향 매칭"
-            content={maskMentionedNames(reason.cfDescription, reason.cfSupporterNames)}
+            content={reason.cfDescription}
             highlight
           />
         </View>
       ) : null}
     </Pressable>
   );
-}
-
-function maskMentionedNames(content, names = []) {
-  if (!content || !Array.isArray(names) || names.length === 0) {
-    return content;
-  }
-
-  return names
-    .filter(Boolean)
-    .sort((a, b) => b.length - a.length)
-    .reduce((text, name) => {
-      const chars = Array.from(String(name));
-      if (chars.length <= 1) return text;
-      const masked = `${chars[0]}${'*'.repeat(chars.length - 1)}`;
-      const escaped = String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      return text.replace(new RegExp(escaped, 'g'), masked);
-    }, content);
 }
 
 function ReasonRow({ icon, title, content, highlight = false }) {

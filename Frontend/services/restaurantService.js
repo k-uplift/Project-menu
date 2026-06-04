@@ -110,12 +110,13 @@ export async function getRestaurantsByFood(food, options = {}) {
       return a.distanceKm - b.distanceKm;
     });
   } else if (sort === 'cf') {
-    // 백엔드 cfScore 내림차순 — 식당 메뉴들의 *내 유사 사용자 행동 가중치 합*.
-    // 동률이면 거리순(가까운 곳)으로 fallback — 자연 순서.
+    // cfMatch(닮은 사용자 중 이 식당 음식 고른 *비율*) 내림차순 — 막대 길이와 카드
+    // 순서를 일치시킨다. 동률이면 cfScore(가중합), 그 다음 거리순으로 fallback.
     enriched.sort((a, b) => {
-      const diff = (b.cfScore || 0) - (a.cfScore || 0);
-      if (diff !== 0) return diff;
-      // tie-breaker: 거리
+      const m = (b.cfMatch || 0) - (a.cfMatch || 0);
+      if (m !== 0) return m;
+      const s = (b.cfScore || 0) - (a.cfScore || 0);
+      if (s !== 0) return s;
       const da = a.distanceKm ?? Infinity;
       const db = b.distanceKm ?? Infinity;
       return da - db;

@@ -744,6 +744,31 @@ def _compute_store_cf_scores(user_id: int, store_ids: list[int]) -> dict[int, fl
     return scores
 
 
+def _compute_store_cf_match(user_id: int, store_ids: list[int]) -> dict[int, float]:
+    """각 식당의 cfMatch = (이 식당 음식 중 하나라도 고른 *닮은 사용자* 수) / (전체 닮은 사용자 수).
+
+    '나와 닮은 사용자 N명 중 M명이 이 식당 음식을 좋아해요' 의 절대 비율 (0~1).
+    cfScore(가중합)와 달리 *목록 최댓값에 정규화하지 않아* 1등이 무조건 100%가 되지 않는다.
+    메뉴가 많아 닮은 사용자 전원 입맛을 커버하는 식당만 100% — 진짜 의미 있는 값.
+    """
+    similar = _cf_find_similar_users(user_id)
+    n = len(similar)
+    if n == 0:
+        return {sid: 0.0 for sid in store_ids}
+    store_kinds = _get_store_kinds()
+    name_to_kind_id = _kind_name_to_food_id()
+    matches: dict[int, float] = {}
+    for sid in store_ids:
+        kind_ids = {name_to_kind_id.get(k) for k in set(store_kinds.get(sid, []))}
+        kind_ids.discard(None)
+        supporters: set[int] = set()
+        for uid, _sim in similar:
+            if any(_cf_user_kind_weight(uid, kid) > 0 for kid in kind_ids):
+                supporters.add(uid)
+        matches[sid] = round(len(supporters) / n, 3)
+    return matches
+
+
 @app.get("/restaurants")
 def restaurants(q: str, kind: str, top_k: int = 10, user_id: int = 1):
     """선택한 음식 종류 → 그 종류의 식당 추천 (2차).
@@ -757,18 +782,18 @@ def restaurants(q: str, kind: str, top_k: int = 10, user_id: int = 1):
         raise HTTPException(status_code=400, detail="q and kind required")
     result = recommend_stores_for_kind(q, kind, top_k=top_k)
 
-    # CF 점수 — 모든 식당 일괄 계산 후 최댓값으로 정규화 (cfMatch 0~1)
+    # cfScore = 가중합(정렬·tiebreak용). cfMatch = *절대 비율*(닮은 사용자 중 이 식당
+    # 음식 고른 비율) — 목록 최댓값 정규화 안 해서 1등이 무조건 100%가 되지 않음.
     stores = result.get("stores", [])
     store_ids = [int(s["storeId"]) for s in stores if s.get("storeId")]
     cf_scores = _compute_store_cf_scores(user_id, store_ids)
-    max_cf = max(cf_scores.values(), default=0.0) or 1.0
+    cf_match = _compute_store_cf_match(user_id, store_ids)
 
     baemin_urls = _load_baemin_urls()
     for store in stores:
         sid = int(store.get("storeId") or 0)
-        raw = cf_scores.get(sid, 0.0)
-        store["cfScore"] = round(raw, 3)
-        store["cfMatch"] = round(raw / max_cf, 3) if max_cf > 0 else 0.0
+        store["cfScore"] = round(cf_scores.get(sid, 0.0), 3)
+        store["cfMatch"] = cf_match.get(sid, 0.0)
         url = baemin_urls.get(store.get("name"))
         if url:
             store["baeminUrl"] = url

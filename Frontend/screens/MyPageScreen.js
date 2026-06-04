@@ -352,23 +352,6 @@ export default function MyPageScreen({ navigation }) {
           </Section>
         )}
 
-        {/* 1. 선호 태그 */}
-        {preferredTags.length > 0 && (
-          <Section
-            title="내 선호 태그"
-            subtitle="검색 키워드에서 자주 등장한 표현이에요"
-            icon="🏷️"
-          >
-            <View style={styles.tagWrap}>
-              {preferredTags.map(({ tag, count }) => (
-                <View key={tag} style={styles.preferTag}>
-                  <Text style={styles.preferTagText}>#{tag}</Text>
-                  <Text style={styles.preferTagCount}>{count}</Text>
-                </View>
-              ))}
-            </View>
-          </Section>
-        )}
 
         {/* 2. 칭호 도감 — 5 카테고리 29종 (CLAUDE.md §5.13 (8)) */}
         {!isEmpty && badges.all.length > 0 && <BadgeCatalog badges={badges} />}
@@ -419,11 +402,6 @@ export default function MyPageScreen({ navigation }) {
               ))}
           </View>
         )}
-
-        <Text style={styles.footerNote}>
-          모든 데이터는 기기에만 저장돼요{'\n'}
-          (추후 백엔드 연결 예정)
-        </Text>
       </ScrollView>
     </SafeAreaView>
   );

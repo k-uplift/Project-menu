@@ -56,7 +56,14 @@ export default function RestaurantDetailScreen({ route, navigation }) {
     // 행동 점수 +2점 — fire-and-forget (await 없이 호출)
     trackNavigateClick(restaurant, food, { sessionId, userId });
 
-    const query = encodeURIComponent(restaurant.name);
+    // 이름만으로 검색하면 *전국 동명 식당*이 잡혀 엉뚱한 곳으로 가는 경우가 많다.
+    // 주소에서 구(예: 성북구) + 법정동(괄호 안, 예: 동소문동2가)을 뽑아 함께 검색해
+    // 같은 이름 다른 지역과 구분한다. 주소 없으면 이름만으로 폴백.
+    const addr = restaurant.address || '';
+    const gu = (addr.match(/(\S+구)(?:\s|$)/) || [])[1] || '';
+    const dong = (addr.match(/\(([^,)]+)/) || [])[1] || '';
+    const area = [gu, dong].filter(Boolean).join(' ');
+    const query = encodeURIComponent(area ? `${restaurant.name} ${area}` : restaurant.name);
     const url = `https://map.kakao.com/?q=${query}`;
 
     try {
@@ -270,9 +277,9 @@ export default function RestaurantDetailScreen({ route, navigation }) {
             textColor="#FFFFFF"
             onPress={handleNavigate}
           />
-          {/* 배달의민족 — 배민 청록 */}
+          {/* 배달 — 배민/네이버 주문 등으로 연결 */}
           <FinalButton
-            label="배달의민족"
+            label="배달"
             icon="🛵"
             color="#2AC1BC"
             textColor="#FFFFFF"
