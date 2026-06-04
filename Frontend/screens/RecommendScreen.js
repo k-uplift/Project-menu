@@ -41,13 +41,11 @@ export default function RecommendScreen({ route, navigation }) {
   const [cfFallback, setCfFallback] = useState(false);
   const [userId, setUserId] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshSeed, setRefreshSeed] = useState(0);
   const [selectedFoodId, setSelectedFoodId] = useState(null);
 
   const loadRecommendations = useCallback(
-    async (seed) => {
-      const ctx = { ...ctxParam, originalText, refreshSeed: seed, userId };
+    async () => {
+      const ctx = { ...ctxParam, originalText, userId };
       const [base, cf] = await Promise.all([
         getFoodRecommendations(keywords, ctx),
         getPersonalizedRecommendations(keywords, ctx),
@@ -85,26 +83,6 @@ export default function RecommendScreen({ route, navigation }) {
     };
   }, [keywords, originalText, loadRecommendations]);
 
-  const handleRefresh = async () => {
-    if (refreshing) return;
-    setRefreshing(true);
-    try {
-      const newSeed = refreshSeed + 1;
-      const { base, cf } = await loadRecommendations(newSeed);
-      setBaseList(base.items);
-      setCfList(cf.items);
-      setBaseSessionId(base.sessionId);
-      setCfSessionId(cf.sessionId);
-      setCfFallback(!!cf.fallback);
-      setRefreshSeed(newSeed);
-      if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setRefreshing(false);
-    }
-  };
-
   // 현재 보고 있는 탭의 sessionId — 클릭 이벤트가 어느 검색 맥락에서 일어났는지 묶음
   const currentSessionId = tab === 'base' ? baseSessionId : cfSessionId;
 
@@ -131,6 +109,13 @@ export default function RecommendScreen({ route, navigation }) {
     });
   };
 
+  const handleRestartInput = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Home' }],
+    });
+  };
+
   const ctxLine = ctxParam
     ? `${ctxParam.timeCtx?.label || ''} · ${ctxParam.weatherCtx?.label || ''}`
     : '';
@@ -139,11 +124,22 @@ export default function RecommendScreen({ route, navigation }) {
     <ScreenContainer
       step="food"
       bottomBar={
-        <PrimaryButton
-          label={selectedFood ? `${selectedFood.name} 음식점 찾기 →` : '음식을 선택해주세요'}
-          onPress={handleNext}
-          disabled={!selectedFood}
-        />
+        <View style={styles.bottomActions}>
+          <View style={styles.bottomLeft}>
+            <PrimaryButton
+              label="다시 입력하기"
+              variant="ghost"
+              onPress={handleRestartInput}
+            />
+          </View>
+          <View style={styles.bottomRight}>
+            <PrimaryButton
+              label={selectedFood ? `${selectedFood.name} 음식점 찾기 →` : '음식을 선택해주세요'}
+              onPress={handleNext}
+              disabled={!selectedFood}
+            />
+          </View>
+        </View>
       }
     >
       <View style={styles.titleRow}>
@@ -187,24 +183,9 @@ export default function RecommendScreen({ route, navigation }) {
       <View style={styles.descRow}>
         <Text style={styles.tabDesc}>
           {tab === 'base'
-            ? '키워드와 일치도가 높은 메뉴 순서대로 보여드려요.'
-            : '나와 비슷한 취향의 사용자들이 자주 선택한 메뉴예요.'}
+            ? '키워드와 일치도가 높은 메뉴를 소개합니다.'
+            : '나와 비슷한 취향의 사용자들이 선택한 메뉴예요.'}
         </Text>
-        <Pressable
-          onPress={handleRefresh}
-          disabled={refreshing || loading}
-          style={({ pressed }) => [
-            styles.refreshBtn,
-            (refreshing || loading) && styles.refreshBtnDisabled,
-            pressed && styles.refreshBtnPressed,
-          ]}
-          hitSlop={6}
-        >
-          <Text style={styles.refreshIcon}>{refreshing ? '⟳' : '↻'}</Text>
-          <Text style={styles.refreshText}>
-            {refreshing ? '추천 중...' : '다른 추천 보기'}
-          </Text>
-        </Pressable>
       </View>
 
       {loading ? (
@@ -229,18 +210,12 @@ export default function RecommendScreen({ route, navigation }) {
           )}
           {currentList.map((food) => (
             <FoodCard
-              key={`${food.id}-${refreshSeed}`}
+              key={food.id}
               food={food}
               selected={selectedFoodId === food.id}
               onPress={() => handleFoodCardPress(food)}
             />
           ))}
-
-          {refreshSeed > 0 && (
-            <Text style={styles.refreshNote}>
-              💡 같은 키워드로 {refreshSeed}번째 추천을 받았어요
-            </Text>
-          )}
 
           <Text style={styles.dataNote}>
             현재는 더미 데이터로 동작합니다.{'\n'}
@@ -271,6 +246,18 @@ function TabButton({ label, subLabel, active, onPress }) {
 }
 
 const styles = StyleSheet.create({
+  bottomActions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    alignItems: 'stretch',
+  },
+  bottomLeft: {
+    flex: 0.9,
+  },
+  bottomRight: {
+    flex: 1.1,
+  },
+
   titleRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -390,34 +377,6 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     flex: 1,
     lineHeight: 18,
-    paddingRight: SPACING.sm,
-  },
-  refreshBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    backgroundColor: COLORS.primarySoft,
-    borderRadius: RADIUS.pill,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
-  },
-  refreshBtnDisabled: {
-    opacity: 0.5,
-  },
-  refreshBtnPressed: {
-    opacity: 0.7,
-  },
-  refreshIcon: {
-    color: COLORS.primary,
-    fontSize: FONT.sizeMd,
-    marginRight: 4,
-    fontWeight: FONT.weightBold,
-  },
-  refreshText: {
-    color: COLORS.primary,
-    fontSize: FONT.sizeXs,
-    fontWeight: FONT.weightBold,
   },
 
   loadingBox: {
@@ -430,13 +389,6 @@ const styles = StyleSheet.create({
     fontSize: FONT.sizeSm,
   },
 
-  refreshNote: {
-    fontSize: FONT.sizeXs,
-    color: COLORS.accent,
-    textAlign: 'center',
-    marginTop: SPACING.sm,
-    marginBottom: SPACING.sm,
-  },
   cfFallbackBanner: {
     backgroundColor: COLORS.primarySoft,
     borderRadius: RADIUS.md,

@@ -214,3 +214,19 @@ export async function getUserDiary(userId = 1, limit = 20) {
     return [];
   }
 }
+
+/**
+ * 서버 DB에 저장된 사용자 추천/행동 기록 삭제.
+ */
+export async function clearServerUserData(userId = 1) {
+  try {
+    const res = await fetch(`${API_BASE}/user_data?user_id=${userId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return true;
+  } catch (e) {
+    console.warn('[recommendationService] /user_data 삭제 실패:', e.message);
+    return false;
+  }
+}

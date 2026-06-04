@@ -8,7 +8,7 @@ import FoodThumbnail from './FoodThumbnail';
 import { COLORS, SPACING, RADIUS, FONT, SHADOW } from '../constants/theme';
 
 export default function FoodCard({ food, selected = false, onPress }) {
-  const { name, score, reason } = food;
+  const { name, reason } = food;
 
   return (
     <Pressable
@@ -20,7 +20,7 @@ export default function FoodCard({ food, selected = false, onPress }) {
         pressed && styles.pressed,
       ]}
     >
-      {/* 상단: 썸네일 + 이름 + 점수 */}
+      {/* 상단: 썸네일 + 이름 + 태그 */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <FoodThumbnail food={food} size="md" imageUrl={food.imageUrl} />
@@ -30,10 +30,6 @@ export default function FoodCard({ food, selected = false, onPress }) {
               {(food.tags || []).slice(0, 3).map((t) => `#${t}`).join(' ')}
             </Text>
           </View>
-        </View>
-
-        <View style={styles.headerRight}>
-          <ScoreBadge score={score} />
         </View>
       </View>
 
@@ -45,13 +41,30 @@ export default function FoodCard({ food, selected = false, onPress }) {
           <ReasonRow
             icon="🤝"
             title="취향 매칭"
-            content={reason.cfDescription}
+            content={maskMentionedNames(reason.cfDescription, reason.cfSupporterNames)}
             highlight
           />
         </View>
       ) : null}
     </Pressable>
   );
+}
+
+function maskMentionedNames(content, names = []) {
+  if (!content || !Array.isArray(names) || names.length === 0) {
+    return content;
+  }
+
+  return names
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length)
+    .reduce((text, name) => {
+      const chars = Array.from(String(name));
+      if (chars.length <= 1) return text;
+      const masked = `${chars[0]}${'*'.repeat(chars.length - 1)}`;
+      const escaped = String(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return text.replace(new RegExp(escaped, 'g'), masked);
+    }, content);
 }
 
 function ReasonRow({ icon, title, content, highlight = false }) {
@@ -68,20 +81,11 @@ function ReasonRow({ icon, title, content, highlight = false }) {
   );
 }
 
-function ScoreBadge({ score }) {
-  return (
-    <View style={styles.scoreBadge}>
-      <Text style={styles.scoreNum}>{score}</Text>
-      <Text style={styles.scoreUnit}>점</Text>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.surface,
     borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
+    padding: SPACING.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -98,7 +102,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.md,
   },
   titleRow: {
     flexDirection: 'row',
@@ -108,40 +111,21 @@ const styles = StyleSheet.create({
   titleTextWrap: {
     marginLeft: SPACING.md,
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontSize: FONT.sizeLg,
     fontWeight: FONT.weightBold,
     color: COLORS.textPrimary,
-    marginBottom: 2,
+    flexShrink: 1,
+    marginRight: SPACING.sm,
   },
   tags: {
     fontSize: FONT.sizeXs,
     color: COLORS.textMuted,
-  },
-
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  scoreBadge: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    backgroundColor: COLORS.primarySoft,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: RADIUS.pill,
-  },
-  scoreNum: {
-    fontSize: FONT.sizeMd,
-    fontWeight: FONT.weightExtra,
-    color: COLORS.primary,
-  },
-  scoreUnit: {
-    fontSize: FONT.sizeXs,
-    color: COLORS.primary,
-    marginLeft: 2,
+    textAlign: 'right',
+    flex: 1,
   },
 
   reasonBox: {
@@ -149,6 +133,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.sm,
+    marginTop: SPACING.md,
   },
   reasonRow: {
     flexDirection: 'row',
