@@ -196,3 +196,21 @@ export async function getUserEvents(userId = 1) {
     return null;
   }
 }
+
+/**
+ * 나의 먹거리 일기 — 그 user_id 의 DB 검색 세션별 {태그, 선택 음식, 클릭 음식}.
+ *
+ * 백엔드 /user_diary 호출 — recommend.db 에 실제 저장된 내 태그 검색·선택 이력.
+ * 각 entry: {sessionId, timestamp, tags:[], selected:[], clicked:[]}.
+ */
+export async function getUserDiary(userId = 1, limit = 20) {
+  try {
+    const res = await fetch(`${API_BASE}/user_diary?user_id=${userId}&limit=${limit}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data.entries) ? data.entries : [];
+  } catch (e) {
+    console.warn('[recommendationService] /user_diary 실패:', e.message);
+    return [];
+  }
+}

@@ -53,16 +53,22 @@ async function writeJSON(key, value) {
 // =====================================================
 
 /**
- * 최근 검색 항목 추가
- * @param {string} originalText
- * @param {{label:string}[]} keywords - extract 결과의 키워드 (라벨만 저장)
+ * 최근 검색 항목 추가 — '나의 먹거리 일기' 한 칸.
+ * 쿼리 + 추출 태그 + 그때 추천받은 메뉴를 함께 묶어 자기완결적 일기 entry로 저장.
+ * @param {string} originalText  사용자가 입력한 쿼리 원문
+ * @param {{label:string}[]} keywords  extract 결과 키워드 (라벨만 저장)
+ * @param {{name:string, tags?:string[]}[]} [foods]  그 검색으로 추천받은 메뉴 상위 몇 개
  */
-export async function addRecentSearch(originalText, keywords) {
+export async function addRecentSearch(originalText, keywords, foods = []) {
   const list = await readJSON(KEYS.recentSearches, []);
   const entry = {
     id: `search-${Date.now()}`,
     originalText,
     keywords: keywords.map((k) => k.label),
+    foods: (foods || []).slice(0, 3).map((f) => ({
+      name: f.name,
+      tags: (f.tags || []).slice(0, 3),
+    })),
     timestamp: Date.now(),
   };
 

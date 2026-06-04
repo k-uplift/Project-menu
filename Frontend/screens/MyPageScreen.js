@@ -29,14 +29,17 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import {
   getRecentSearches,
-  getRecentFoods,
   getPreferredTags,
   clearAllUserData,
 } from '../services/userStorageService';
 import { getBehaviorEvents, clearBehaviorEvents } from '../services/behaviorTrackingService';
 import { getEarnedBadges } from '../services/badges';
 import { getCurrentUser, logout } from '../services/authService';
-import { getSimilarUsers, getUserEvents } from '../services/recommendationService';
+import {
+  getSimilarUsers,
+  getUserEvents,
+  getUserDiary,
+} from '../services/recommendationService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
 /**
@@ -101,25 +104,24 @@ function diagnosePersona(seedScore) {
 
 export default function MyPageScreen({ navigation }) {
   const [searches, setSearches] = useState([]);
-  const [recentFoods, setRecentFoods] = useState([]);
   const [preferredTags, setPreferredTags] = useState([]);
   const [badges, setBadges] = useState({ earned: [], all: [], stats: {} });
   const [account, setAccount] = useState(null); // 로그인 유저(없으면 비로그인)
   const [similarUsers, setSimilarUsers] = useState([]); // CF 닮은 사용자 (서버)
+  const [diary, setDiary] = useState([]); // 나의 먹거리 일기 (서버 DB, user_id별)
+  const [diaryOpen, setDiaryOpen] = useState(false); // 접이식 — 버튼 누르면 펼침
 
   // 화면이 포커스될 때마다 데이터 새로 불러오기 (검색·식당 이동 후 즉시 반영)
   useFocusEffect(
     useCallback(() => {
       let mounted = true;
       (async () => {
-        const [s, r, u] = await Promise.all([
+        const [s, u] = await Promise.all([
           getRecentSearches(),
-          getRecentFoods(),
           getCurrentUser(),
         ]);
         if (!mounted) return;
-        setSearches(s); // 최근 검색 표시 — 이 기기 UX 기록 (로컬 유지)
-        setRecentFoods(r);
+        setSearches(s); // '나의 먹거리 일기' — 이 기기 검색 이력(쿼리+태그+추천메뉴)
         setAccount(u);
 
         // 칭호·미식유형·닮은사용자 = *서버 user_id 기준* (계정 바꾸면 달라짐).
@@ -145,6 +147,9 @@ export default function MyPageScreen({ navigation }) {
 
         const sims = await getSimilarUsers(uid);
         if (mounted) setSimilarUsers(sims);
+        // 나의 먹거리 일기 — 서버 DB의 그 user_id 태그검색·선택 이력
+        const dia = await getUserDiary(uid);
+        if (mounted) setDiary(dia);
       })();
       return () => {
         mounted = false;
@@ -183,7 +188,6 @@ export default function MyPageScreen({ navigation }) {
             await clearAllUserData();
             await clearBehaviorEvents();
             setSearches([]);
-            setRecentFoods([]);
             setPreferredTags([]);
             setBadges({ earned: [], all: [], stats: {} });
           },
@@ -214,7 +218,7 @@ export default function MyPageScreen({ navigation }) {
   // (닮은 사용자는 서버 CF라 로컬 기록 0인 게스트도 채워질 수 있음)
   const isEmpty =
     searches.length === 0 &&
-    recentFoods.length === 0 &&
+    diary.length === 0 &&
     badges.earned.length === 0 &&
     similarUsers.length === 0;
 
@@ -357,61 +361,48 @@ export default function MyPageScreen({ navigation }) {
         {/* 2. 칭호 도감 — 5 카테고리 29종 (CLAUDE.md §5.13 (8)) */}
         {!isEmpty && badges.all.length > 0 && <BadgeCatalog badges={badges} />}
 
-        {/* 3. 최근 추천받은 메뉴 */}
-        {recentFoods.length > 0 && (
-          <Section
-            title="최근 추천 메뉴"
-            subtitle={`최근 ${recentFoods.length}개`}
-            icon="🕘"
-          >
-            {recentFoods.map((food) => (
-              <View key={food.id} style={styles.foodRow}>
-                <Text style={styles.foodEmoji}>{food.emoji}</Text>
-                <View style={styles.foodInfo}>
-                  <Text style={styles.foodName}>{food.name}</Text>
-                  <Text style={styles.foodTime}>
-                    {formatRelativeTime(food.timestamp)}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </Section>
-        )}
+        {/* 3. 나의 먹거리 일기 — 서버 DB(user_id별) 태그검색·선택 이력. 버튼 누르면 펼침 */}
+        {!isEmpty && diary.length > 0 && (
+          <View style={styles.section}>
+            <Pressable
+              onPress={() => setDiaryOpen((o) => !o)}
+              style={({ pressed }) => [styles.diaryToggle, pressed && { opacity: 0.7 }]}
+            >
+              <Text style={styles.sectionIcon}>📖</Text>
+              <Text style={styles.sectionTitle}>나의 먹거리 일기</Text>
+              <View style={{ flex: 1 }} />
+              <Text style={styles.diaryCount}>{diary.length}개</Text>
+              <Text style={styles.diaryChevron}>{diaryOpen ? '▾' : '▸'}</Text>
+            </Pressable>
 
-        {/* 4. 최근 검색 */}
-        {searches.length > 0 && (
-          <Section
-            title="최근 검색"
-            subtitle="탭하면 같은 키워드로 다시 추천받아요"
-            icon="🔎"
-          >
-            {searches.map((s) => (
-              <Pressable
-                key={s.id}
-                onPress={() => handleReuseSearch(s)}
-                style={({ pressed }) => [
-                  styles.searchRow,
-                  pressed && styles.searchRowPressed,
-                ]}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.searchText} numberOfLines={1}>
-                    "{s.originalText}"
-                  </Text>
-                  <View style={styles.searchKeywordRow}>
-                    {s.keywords.slice(0, 4).map((kw, idx) => (
-                      <Text key={idx} style={styles.searchKeyword}>
-                        #{kw}
-                      </Text>
-                    ))}
+            {diaryOpen &&
+              diary.map((e) => (
+                <View key={e.sessionId} style={styles.diaryEntry}>
+                  <View style={styles.diaryHeader}>
+                    <View style={styles.diaryTags}>
+                      {(e.tags || []).map((t, i) => (
+                        <Text key={i} style={styles.searchKeyword}>
+                          #{t}
+                        </Text>
+                      ))}
+                    </View>
+                    <Text style={styles.searchTime}>
+                      {formatRelativeTime(new Date(e.timestamp).getTime())}
+                    </Text>
                   </View>
+                  {e.selected && e.selected.length > 0 && (
+                    <Text style={styles.diaryFoods} numberOfLines={2}>
+                      🍽 선택 {e.selected.join(' · ')}
+                    </Text>
+                  )}
+                  {e.clicked && e.clicked.length > 0 && (
+                    <Text style={styles.diaryClicked} numberOfLines={2}>
+                      👆 클릭 {e.clicked.join(' · ')}
+                    </Text>
+                  )}
                 </View>
-                <Text style={styles.searchTime}>
-                  {formatRelativeTime(s.timestamp)}
-                </Text>
-              </Pressable>
-            ))}
-          </Section>
+              ))}
+          </View>
         )}
 
         <Text style={styles.footerNote}>
@@ -1110,10 +1101,10 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   searchText: {
+    flex: 1,
     color: COLORS.textPrimary,
     fontSize: FONT.sizeSm,
     fontStyle: 'italic',
-    marginBottom: 4,
   },
   searchKeywordRow: {
     flexDirection: 'row',
@@ -1128,6 +1119,50 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     fontSize: 11,
     marginLeft: SPACING.sm,
+  },
+  // 나의 먹거리 일기 — 접이식 버튼 + 한 칸: 태그 + 선택/클릭 음식
+  diaryToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  diaryCount: {
+    color: COLORS.textMuted,
+    fontSize: FONT.sizeXs,
+    marginRight: SPACING.xs,
+  },
+  diaryChevron: {
+    color: COLORS.primary,
+    fontSize: FONT.sizeMd,
+  },
+  diaryEntry: {
+    backgroundColor: COLORS.surface,
+    padding: SPACING.md,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.sm,
+  },
+  diaryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  diaryTags: {
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  diaryFoods: {
+    color: COLORS.textPrimary,
+    fontSize: FONT.sizeSm,
+    marginTop: 4,
+  },
+  diaryClicked: {
+    color: COLORS.textSecondary,
+    fontSize: FONT.sizeSm,
+    marginTop: 4,
   },
 
   footerNote: {

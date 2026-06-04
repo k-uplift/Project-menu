@@ -23,10 +23,7 @@ import {
   getFoodRecommendations,
   getPersonalizedRecommendations,
 } from '../services/recommendationService';
-import {
-  addRecentSearch,
-  addRecentFood,
-} from '../services/userStorageService';
+import { addRecentSearch } from '../services/userStorageService';
 import { trackFoodCardClick } from '../services/behaviorTrackingService';
 import { COLORS, SPACING, RADIUS, FONT } from '../constants/theme';
 
@@ -75,10 +72,8 @@ export default function RecommendScreen({ route, navigation }) {
         if (base.userId) setUserId(base.userId);
         if (base.items.length > 0) setSelectedFoodId(base.items[0].id);
 
-        await addRecentSearch(originalText, keywords);
-        for (const food of base.items.slice(0, 3)) {
-          await addRecentFood(food);
-        }
+        // '나의 먹거리 일기' 한 칸 — 쿼리 + 태그 + 그때 추천받은 메뉴 상위 3개를 함께 저장.
+        await addRecentSearch(originalText, keywords, base.items.slice(0, 3));
       } catch (e) {
         console.error(e);
       } finally {
