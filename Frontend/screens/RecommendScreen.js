@@ -47,14 +47,18 @@ export default function RecommendScreen({ route, navigation }) {
 
   const loadRecommendations = useCallback(
     async (seed) => {
-      const ctx = { ...ctxParam, originalText, refreshSeed: seed, userId };
+      // ⚠️ userId를 ctx에 *넣지 않는다*. 넣으면 서비스의 getDefaultUserId(로그인 사용자)를
+      // 덮어써(context.userId ?? defaultUid) 항상 초기값 1(Alice)로 추천돼 버린다.
+      // 서비스가 getCurrentUser로 로그인 user_id를 직접 해석하게 두고, 응답의 userId로
+      // 아래 setUserId 해서 추적·다음 화면 전달에 쓴다.
+      const ctx = { ...ctxParam, originalText, refreshSeed: seed };
       const [base, cf] = await Promise.all([
         getFoodRecommendations(keywords, ctx),
         getPersonalizedRecommendations(keywords, ctx),
       ]);
       return { base, cf };
     },
-    [keywords, ctxParam, originalText, userId]
+    [keywords, ctxParam, originalText]
   );
 
   useEffect(() => {
